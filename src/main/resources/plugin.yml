@@ -1,0 +1,9 @@
+name: FC
+main: gg.revival.factions.core.FC
+version: 1.0.0
+author: johnsama
+description: Powers HCFR's Spawntag, Cooldowns, Deathbans, Lives, Progression and Scoreboards
+commands:
+  logout:
+    description: Safely logout from the server without leaving a Combat Logger
+    aliases: [safelog]
