@@ -31,13 +31,12 @@ public class Configuration
     public static int MECH_MOBSTACKING_INTERVAL = 5;
 
     public static boolean MINING_ENABLED = true;
-    public static int MINING_POOL = 10000;
-    public static boolean MINING_GOLD_ANNOUNCE = false;
-    public static int MINING_GOLD_POOL = 300;
-    public static boolean MINING_DIAMOND_ANNOUNCE = true;
-    public static int MINING_DIAMOND_POOL = 200;
-    public static boolean MINING_EMERALD_ANNOUNCE = true;
-    public static int MINING_EMERALD_POOL = 100;
+    public static float MINING_GOLD_CHANCE = 0.01f;
+    public static float MINING_DIAMOND_CHANCE = 0.006f;
+    public static float MINING_EMERALD_CHANCE = 0.002f;
+    public static boolean MINING_ANNOUNCE_GOLD = false;
+    public static boolean MINING_ANNOUNCE_DIAMOND = true;
+    public static boolean MINING_ANNOUNCE_EMERALD = true;
 
     public static boolean PROGRESS_ENABLED = true;
     public static int PROGRESS_DURATION = 3600;

@@ -40,8 +40,6 @@ public class FC extends JavaPlugin
         Deathbans.onDisable();
         Classes.onDisable();
         Lives.onDisable();
-        Mechanics.onDisable();
-        Mining.onDisable();
         Progression.onDisable();
         ServerMode.onDisable();
         UI.onDisable();

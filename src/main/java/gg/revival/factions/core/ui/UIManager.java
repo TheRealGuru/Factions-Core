@@ -176,6 +176,12 @@ public class UIManager
             builder.append(" " + ChatColor.AQUA + "" + ChatColor.BOLD + "Logout" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
+        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL))
+        {
+            long dur = facPlayer.getTimer(TimerType.ENDERPEARL).getExpire() - System.currentTimeMillis();
+            builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enderpearl" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+        }
+
         if(builder.toString().length() == 0) return;
 
         IChatBaseComponent icbc = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" +

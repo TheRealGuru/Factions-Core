@@ -2,6 +2,9 @@ package gg.revival.factions.core.mechanics;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.mechanics.emeraldxp.EmeraldEXPListener;
+import gg.revival.factions.core.mechanics.enderpearlcd.EnderpearlCDListener;
+import gg.revival.factions.core.mechanics.mobstacking.Mobstacker;
+import gg.revival.factions.core.mechanics.mobstacking.MobstackingListener;
 import gg.revival.factions.core.tools.Configuration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,25 +16,23 @@ public class Mechanics
 
     public static void onEnable()
     {
-        loadCommands();
         loadListeners();
         loadRecipes();
-    }
-
-    public static void onDisable()
-    {
-
-    }
-
-    public static void loadCommands()
-    {
-
     }
 
     public static void loadListeners()
     {
         if(Configuration.MECH_EMERALDXP_ENABLED)
             Bukkit.getPluginManager().registerEvents(new EmeraldEXPListener(), FC.getFactionsCore());
+
+        if(Configuration.MECH_ENDERPEARLCD_ENABLED)
+            Bukkit.getPluginManager().registerEvents(new EnderpearlCDListener(), FC.getFactionsCore());
+
+        if(Configuration.MECH_MOBSTACKING_ENABLED)
+        {
+            Bukkit.getPluginManager().registerEvents(new MobstackingListener(), FC.getFactionsCore());
+            Mobstacker.run();
+        }
     }
 
     public static void loadRecipes()

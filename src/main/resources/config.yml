@@ -74,6 +74,7 @@ mechanics:
 # Announce - Should finding this ore cause an announcement?
 mining:
   enabled: true
+  min-delay: 10
   values:
     pool: 10000
     gold:
