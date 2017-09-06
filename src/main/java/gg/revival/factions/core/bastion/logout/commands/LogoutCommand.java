@@ -1,7 +1,7 @@
-package gg.revival.factions.core.bastion.commands;
+package gg.revival.factions.core.bastion.logout.commands;
 
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.bastion.tasks.LogoutTask;
+import gg.revival.factions.core.bastion.logout.tasks.LogoutTask;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerManager;
@@ -36,10 +36,10 @@ public class LogoutCommand implements CommandExecutor
             return false;
         }
 
-        facPlayer.addTimer(TimerManager.createTimer(TimerType.LOGOUT, Configuration.BASTION_LOGOUT_TIMER));
+        facPlayer.addTimer(TimerManager.createTimer(TimerType.LOGOUT, Configuration.logoutTimer));
         LogoutTask.getStartingLocations().put(player.getUniqueId(), player.getLocation());
         LogoutTask.getSafeloggers().add(player.getUniqueId());
-        player.sendMessage(ChatColor.YELLOW + "You will be safely logged out from the server in " + ChatColor.GOLD + Configuration.BASTION_LOGOUT_TIMER + ChatColor.YELLOW + " seconds");
+        player.sendMessage(ChatColor.YELLOW + "You will be safely logged out from the server in " + ChatColor.GOLD + Configuration.logoutTimer + ChatColor.YELLOW + " seconds");
 
         return false;
     }

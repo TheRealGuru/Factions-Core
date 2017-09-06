@@ -1,7 +1,7 @@
-package gg.revival.factions.core.bastion.listeners;
+package gg.revival.factions.core.bastion.logout.listeners;
 
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.bastion.tasks.LogoutTask;
+import gg.revival.factions.core.bastion.logout.tasks.LogoutTask;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerType;
 import org.bukkit.ChatColor;

@@ -1,4 +1,4 @@
-package gg.revival.factions.core.bastion.tasks;
+package gg.revival.factions.core.bastion.logout.tasks;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;

@@ -23,7 +23,7 @@ public class EnderpearlCDListener implements Listener
 
         if(player.getInventory().getItemInHand() == null || !player.getInventory().getItemInHand().getType().equals(Material.ENDER_PEARL)) return;
 
-        if(!EnderpearlCDTask.attemptEnderpearl(player.getUniqueId(), Configuration.MECH_ENDERPEARLCD_DUR))
+        if(!EnderpearlCDTask.attemptEnderpearl(player.getUniqueId(), Configuration.enderpearlCooldownsDuration))
             event.setCancelled(true);
     }
 

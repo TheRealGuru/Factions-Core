@@ -38,19 +38,19 @@ public class Mining
         if(size < 2)
             size = 2;
 
-        if(chance <= Configuration.MINING_GOLD_CHANCE && chance > Configuration.MINING_DIAMOND_CHANCE)
+        if(chance <= Configuration.miningGoldChance && chance > Configuration.miningDiamondChance)
         {
             generateVein(player, location, random, size, Material.GOLD_ORE);
             return;
         }
 
-        if(chance <= Configuration.MINING_DIAMOND_CHANCE && chance > Configuration.MINING_EMERALD_CHANCE)
+        if(chance <= Configuration.miningDiamondChance && chance > Configuration.miningEmeraldChance)
         {
             generateVein(player, location, random, size, Material.DIAMOND_ORE);
             return;
         }
 
-        if(chance <= Configuration.MINING_EMERALD_CHANCE)
+        if(chance <= Configuration.miningEmeraldChance)
         {
             generateVein(player, location, random, size, Material.EMERALD_ORE);
             return;
@@ -154,7 +154,7 @@ public class Mining
         {
             if(material.equals(Material.GOLD_ORE))
             {
-                if(Configuration.MINING_ANNOUNCE_GOLD)
+                if(Configuration.announceFoundGold)
                 {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
                 }
@@ -167,7 +167,7 @@ public class Mining
 
             if(material.equals(Material.DIAMOND_ORE))
             {
-                if(Configuration.MINING_ANNOUNCE_DIAMOND)
+                if(Configuration.announceFoundDiamond)
                 {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
                 }
@@ -180,7 +180,7 @@ public class Mining
 
             if(material.equals(Material.EMERALD_ORE))
             {
-                if(Configuration.MINING_ANNOUNCE_EMERALD)
+                if(Configuration.announceFoundEmerald)
                 {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
                 }
@@ -200,7 +200,7 @@ public class Mining
 
     public static void loadListeners()
     {
-        if(Configuration.MINING_ENABLED)
+        if(Configuration.miningEnabled)
             Bukkit.getPluginManager().registerEvents(new MiningEventsListener(), FC.getFactionsCore());
     }
 

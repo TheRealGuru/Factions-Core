@@ -1,15 +1,27 @@
 package gg.revival.factions.core.mechanics;
 
 import gg.revival.factions.core.FC;
+import gg.revival.factions.core.mechanics.crowbars.CrowbarCommand;
+import gg.revival.factions.core.mechanics.crowbars.CrowbarListener;
 import gg.revival.factions.core.mechanics.emeraldxp.EmeraldEXPListener;
+import gg.revival.factions.core.mechanics.endermite.EndermiteListener;
 import gg.revival.factions.core.mechanics.enderpearlcd.EnderpearlCDListener;
+import gg.revival.factions.core.mechanics.highspawners.HighSpawnerListener;
+import gg.revival.factions.core.mechanics.invalidpearl.InvalidPearlListener;
 import gg.revival.factions.core.mechanics.mobstacking.Mobstacker;
 import gg.revival.factions.core.mechanics.mobstacking.MobstackingListener;
+import gg.revival.factions.core.mechanics.portalprotection.NetherPortalListener;
+import gg.revival.factions.core.mechanics.spawnerbreaking.SpawnerBreakingListener;
+import gg.revival.factions.core.mechanics.unenchantablebooks.BookUnchantmentListener;
 import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.tools.ItemTools;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
+
+import java.util.Iterator;
 
 public class Mechanics
 {
@@ -17,27 +29,54 @@ public class Mechanics
     public static void onEnable()
     {
         loadListeners();
+        loadCommands();
         loadRecipes();
     }
 
     public static void loadListeners()
     {
-        if(Configuration.MECH_EMERALDXP_ENABLED)
+        if(Configuration.emeraldXpEnabled)
             Bukkit.getPluginManager().registerEvents(new EmeraldEXPListener(), FC.getFactionsCore());
 
-        if(Configuration.MECH_ENDERPEARLCD_ENABLED)
+        if(Configuration.enderpearlCooldownsEnabled)
             Bukkit.getPluginManager().registerEvents(new EnderpearlCDListener(), FC.getFactionsCore());
 
-        if(Configuration.MECH_MOBSTACKING_ENABLED)
+        if(Configuration.mobstackingEnabled)
         {
             Bukkit.getPluginManager().registerEvents(new MobstackingListener(), FC.getFactionsCore());
             Mobstacker.run();
         }
+
+        if(Configuration.crowbarsEnabled)
+            Bukkit.getPluginManager().registerEvents(new CrowbarListener(), FC.getFactionsCore());
+
+        if(Configuration.protectNetherPortals)
+            Bukkit.getPluginManager().registerEvents(new NetherPortalListener(), FC.getFactionsCore());
+
+        if(Configuration.bookUnenchantingEnabled)
+            Bukkit.getPluginManager().registerEvents(new BookUnchantmentListener(), FC.getFactionsCore());
+
+        if(Configuration.highSpawnersDisabled)
+            Bukkit.getPluginManager().registerEvents(new HighSpawnerListener(), FC.getFactionsCore());
+
+        if(Configuration.invalidPearlBlocksEnabled)
+            Bukkit.getPluginManager().registerEvents(new InvalidPearlListener(), FC.getFactionsCore());
+
+        if(Configuration.settingsDisableBreakingSpawners)
+            Bukkit.getPluginManager().registerEvents(new SpawnerBreakingListener(), FC.getFactionsCore());
+
+        if(Configuration.settingsDisableEndermites)
+            Bukkit.getPluginManager().registerEvents(new EndermiteListener(), FC.getFactionsCore());
+    }
+
+    public static void loadCommands()
+    {
+        FC.getFactionsCore().getCommand("crowbar").setExecutor(new CrowbarCommand());
     }
 
     public static void loadRecipes()
     {
-        if(Configuration.MECH_EMERALDXP_ENABLED)
+        if(Configuration.emeraldXpEnabled)
         {
             ItemStack expBottle = new ItemStack(Material.EXP_BOTTLE);
             ShapedRecipe expRecipe = new ShapedRecipe(expBottle);
@@ -45,6 +84,12 @@ public class Mechanics
             expRecipe.setIngredient('*', Material.EMERALD);
 
             FC.getFactionsCore().getServer().addRecipe(expRecipe);
+        }
+
+        if(Configuration.settingsRemoveGApples)
+        {
+            ItemStack gApple = new ItemStack(Material.GOLDEN_APPLE, 1, (short)1);
+            ItemTools.deleteRecipe(gApple);
         }
     }
 

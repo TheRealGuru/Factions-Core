@@ -7,3 +7,7 @@ commands:
   logout:
     description: Safely logout from the server without leaving a Combat Logger
     aliases: [safelog]
+  crowbar:
+    description: Spawn a crowbar
+  pvp:
+    description: PvP protection command

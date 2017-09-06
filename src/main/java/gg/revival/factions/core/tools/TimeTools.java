@@ -20,4 +20,17 @@ public class TimeTools
         }
     }
 
+    /**
+     * Formats a string in to Hours, minutes and seconds
+     * @param duration Time in seconds
+     * @return The fancy looking time
+     */
+    public static String formatIntoHHMMSS(int duration) {
+        int remainder = duration % 3600;
+        int minutes = remainder / 60;
+        int seconds = remainder % 60;
+
+        return new StringBuilder().append(minutes).append(":").append(seconds < 10 ? "0" : "").append(seconds).toString();
+    }
+
 }

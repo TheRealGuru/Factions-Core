@@ -154,8 +154,6 @@ public class UIManager
 
         if(facPlayer == null) return;
 
-        Block standingOn = player.getLocation().subtract(0, 2, 0).getBlock();
-
         StringBuilder builder = new StringBuilder();
 
         if(facPlayer.isBeingTimed(TimerType.HOME))
@@ -180,6 +178,24 @@ public class UIManager
         {
             long dur = facPlayer.getTimer(TimerType.ENDERPEARL).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enderpearl" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+        }
+
+        if(facPlayer.isBeingTimed(TimerType.TAG))
+        {
+            long dur = facPlayer.getTimer(TimerType.TAG).getExpire() - System.currentTimeMillis();
+            builder.append(" " + ChatColor.RED + "" + ChatColor.BOLD + "Combat-tag" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+        }
+
+        if(facPlayer.isBeingTimed(TimerType.SAFETY))
+        {
+            long dur = facPlayer.getTimer(TimerType.SAFETY).getExpire() - System.currentTimeMillis();
+            builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Safety" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+        }
+
+        if(facPlayer.isBeingTimed(TimerType.PVPPROT))
+        {
+            long dur = facPlayer.getTimer(TimerType.PVPPROT).getExpire() - System.currentTimeMillis();
+            builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
         }
 
         if(builder.toString().length() == 0) return;

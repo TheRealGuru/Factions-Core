@@ -242,7 +242,7 @@ public class Mobstacker
                     for(LivingEntity entity : worlds.getLivingEntities())
                     {
                         if(protectedEntities.contains(entity.getUniqueId())) continue;
-                        if(getStackSize(entity) >= Configuration.MECH_MOBSTACKING_MAXSTACK) continue;
+                        if(getStackSize(entity) >= Configuration.mobstackingMaxStack) continue;
 
                         EntityType type = entity.getType();
 
@@ -267,7 +267,7 @@ public class Mobstacker
                                 if(!nearbyEntities.getType().equals(type)) continue;
                                 if(!(nearbyEntities instanceof LivingEntity)) continue;
                                 if(protectedEntities.contains(nearbyEntities.getUniqueId())) continue;
-                                if(getStackSize(nearbyEntities) >= Configuration.MECH_MOBSTACKING_MAXSTACK) continue;
+                                if(getStackSize(nearbyEntities) >= Configuration.mobstackingMaxStack) continue;
 
                                 attemptStack(entity, nearbyEntities);
                             }
@@ -275,6 +275,6 @@ public class Mobstacker
                     }
                 }
             }
-        }.runTaskTimer(FC.getFactionsCore(), 0L, Configuration.MECH_MOBSTACKING_INTERVAL * 20L);
+        }.runTaskTimer(FC.getFactionsCore(), 0L, Configuration.mobstackingInterval * 20L);
     }
 }
