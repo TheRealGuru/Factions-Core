@@ -8,6 +8,7 @@ import gg.revival.factions.core.mechanics.Mechanics;
 import gg.revival.factions.core.mining.Mining;
 import gg.revival.factions.core.progression.Progression;
 import gg.revival.factions.core.servermode.ServerMode;
+import gg.revival.factions.core.signs.Signs;
 import gg.revival.factions.core.ui.UI;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,7 @@ public class FC extends JavaPlugin
         Mining.onEnable();
         Progression.onEnable();
         ServerMode.onEnable();
+        Signs.onEnable();
         UI.onEnable();
     }
 

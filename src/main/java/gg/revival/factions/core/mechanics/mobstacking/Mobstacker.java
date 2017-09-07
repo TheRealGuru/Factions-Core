@@ -221,7 +221,11 @@ public class Mobstacker
         else
         {
             splitEntity.setCustomName(ChatColor.YELLOW + "x" + (newStackSize + 1));
-            entity.setCustomName(ChatColor.YELLOW + "x" + newStackSize);
+
+            if(newStackSize > 1)
+            {
+                entity.setCustomName(ChatColor.YELLOW + "x" + newStackSize);
+            }
         }
 
         setProtected(entity, 30);

@@ -9,6 +9,8 @@ import java.util.Map;
 public class Configuration
 {
 
+    public static String databaseName = "factions";
+
     public static int logoutTimer = 30;
     public static int tagAttacker = 60;
     public static int tagAttacked = 30;
@@ -45,9 +47,9 @@ public class Configuration
     public static int highSpawnersHeight = 125;
 
     public static boolean miningEnabled = true;
-    public static float miningGoldChance = 0.01f;
-    public static float miningDiamondChance = 0.006f;
-    public static float miningEmeraldChance = 0.002f;
+    public static float miningGoldChance = 0.02f;
+    public static float miningDiamondChance = 0.007f;
+    public static float miningEmeraldChance = 0.003f;
     public static boolean announceFoundGold = false;
     public static boolean announceFoundDiamond = true;
     public static boolean announceFoundEmerald = true;

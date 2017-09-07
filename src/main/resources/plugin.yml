@@ -1,8 +1,9 @@
-name: FC
+name: FactionsCore
 main: gg.revival.factions.core.FC
 version: 1.0.0
 author: johnsama
 description: Powers HCFR's Spawntag, Cooldowns, Deathbans, Lives, Progression and Scoreboards
+depends: [Revival]
 commands:
   logout:
     description: Safely logout from the server without leaving a Combat Logger
@@ -11,3 +12,7 @@ commands:
     description: Spawn a crowbar
   pvp:
     description: PvP protection command
+  deathban:
+    description: Deathban command
+  deaths:
+    description: View a players previous deathbans
