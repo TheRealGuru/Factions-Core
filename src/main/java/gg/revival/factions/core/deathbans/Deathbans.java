@@ -62,7 +62,7 @@ public class Deathbans
                 public void run() {
                     loadDeathbans();
                 }
-            }.runTask(FC.getFactionsCore());
+            }.runTaskLaterAsynchronously(FC.getFactionsCore(), 2 * 20L);
 
             return;
         }

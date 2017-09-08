@@ -1,0 +1,85 @@
+database:
+  database-name: 'factions'
+
+bastion:
+  logout-timer: 30
+  combat-tag:
+    attacker-duration: 60
+    attacked-duration: 30
+  pvp-prot:
+    enabled: true
+    duration: 1800
+  pvp-safety:
+    enabled: true
+    duration: 5
+  loggers:
+    duration: 20
+    enemy-distance: 30
+
+classes:
+  archer:
+    enabled: true
+    max-damage: 4.0
+  scout:
+    enabled: true
+  bard:
+    enabled: true
+
+deathbans:
+  enabled: true
+  durations:
+    normal: 86400
+    event: 10800
+    new: 3600
+
+lives:
+  enabled: true
+
+mechanics:
+  emerald-xp: true
+  enderpearl-cooldowns:
+    enabled: true
+    duration: 16
+  mobstacking:
+    enabled: true
+    max-stack: 30
+    update-interval: 5
+  crowbars:
+    enabled: true
+    spawner-uses: 1
+    frame-uses: 6
+  unenchant-books: true
+  invalid-pearling: true
+  high-spawners-disabled:
+    enabled: true
+    height: 125
+  disable-endermites: true
+  disable-breaking-spawners: true
+  remove-gapple-recipe: true
+  protect-nether-portals: true
+
+mining:
+  enabled: true
+  odds:
+    gold: 0.02
+    diamond: 0.007
+    emerald: 0.003
+  announce:
+    gold: false
+    diamond: true
+    emerald: true
+
+progression:
+  enabled: true
+  duration: 3600
+
+enchant-limits:
+  enabled: true
+  enchants:
+    DAMAGE_ALL: 2
+    PROTECTION_ENVIRONMENTAL: 3
+
+potion-limits:
+  enabled: true
+  potions:
+    REGENERATION: 1

@@ -1,5 +1,6 @@
 package gg.revival.factions.core.tools;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
 
@@ -22,6 +23,7 @@ public class Configuration
     public static int loggerEnemyDistance = 30;
 
     public static boolean archerEnabled = true;
+    public static double maxArcherDamage = 4.0;
     public static boolean scoutEnabled = true;
     public static boolean bardEnabled = true;
 
@@ -67,5 +69,90 @@ public class Configuration
 
     public static boolean limitPotions = true;
     public static Map<PotionEffectType, Integer> potionLimits = new HashMap<>();
+
+    public static void load()
+    {
+        FileManager.createFiles();
+
+        FileConfiguration config = FileManager.getConfig();
+
+        databaseName = config.getString("database.database-name");
+
+        logoutTimer = config.getInt("bastion.logout-timer");
+        tagAttacker = config.getInt("bastion.combat-tag.attacker-duration");
+        tagAttacked = config.getInt("bastion.combat-tag.attacked-duration");
+        pvpProtEnabled = config.getBoolean("bastion.pvp-prot.enabled");
+        pvpProtDuration = config.getInt("bastion.pvp-prot.duration");
+        pvpSafetyEnabled = config.getBoolean("bastion.pvp-safety.enabled");
+        pvpSafetyDuration = config.getInt("bastion.pvp-safety.duration");
+        loggerDuration = config.getInt("bastion.loggers.duration");
+        loggerEnemyDistance = config.getInt("bastion.loggers.enemy-distance");
+
+        archerEnabled = config.getBoolean("classes.archer.enabled");
+        maxArcherDamage = config.getDouble("classes.archer.max-damage");
+        scoutEnabled = config.getBoolean("classes.scout.enabled");
+        bardEnabled = config.getBoolean("classes.bard.enabled");
+
+        deathbansEnabled = config.getBoolean("deathbans.enabled");
+        normalDeathban = config.getInt("deathbans.durations.normal");
+        eventDeathban = config.getInt("deathbans.durations.event");
+        newDeathban = config.getInt("deathbans.durations.new");
+
+        livesEnabled = config.getBoolean("lives.enabled");
+
+        emeraldXpEnabled = config.getBoolean("mechanics.emerald-xp");
+        enderpearlCooldownsEnabled = config.getBoolean("mechanics.enderpearl-cooldowns.enabled");
+        enderpearlCooldownsDuration = config.getInt("mechanics.enderpearl-cooldowns.duration");
+        mobstackingEnabled = config.getBoolean("mechanics.mobstacking.enabled");
+        mobstackingMaxStack = config.getInt("mechanics.mobstacking.max-stack");
+        mobstackingInterval = config.getInt("mechanics.mobstacking.update-interval");
+        crowbarsEnabled = config.getBoolean("mechanics.crowbars.enabled");
+        crowbarSpawnerUse = config.getInt("mechanics.crowbars.spawner-uses");
+        crowbarPortalUse = config.getInt("mechanics.crowbars.frame-uses");
+        bookUnenchantingEnabled = config.getBoolean("mechanics.unenchant-books");
+        invalidPearlBlocksEnabled = config.getBoolean("mechanics.invalid-pearling");
+        highSpawnersDisabled = config.getBoolean("mechanics.high-spawners-disabled.enabled");
+        highSpawnersHeight = config.getInt("mechanics.high-spawners-disabled.height");
+
+        miningEnabled = config.getBoolean("mining.enabled");
+        miningGoldChance = (float)config.getDouble("mining.odds.gold");
+        miningDiamondChance = (float)config.getDouble("mining.odds.diamond");
+        miningEmeraldChance = (float)config.getDouble("mining.odds.emerald");
+        announceFoundGold = config.getBoolean("mining.announce.gold");
+        announceFoundDiamond = config.getBoolean("mining.announce.diamond");
+        announceFoundEmerald = config.getBoolean("mining.announce.emerald");
+
+        progressEnabled = config.getBoolean("progression.enabled");
+        progressDuration = config.getInt("progression.duration");
+
+        limitEnchants = config.getBoolean("enchant-limits.enabled");
+        limitPotions = config.getBoolean("potion-limits.enabled");
+
+        for(String enchantKeys : config.getConfigurationSection("enchant-limits.enchants").getKeys(false))
+        {
+            Enchantment enchantment = Enchantment.getByName(enchantKeys);
+            int lvl = config.getInt("enchant-limits.enchants." + enchantKeys);
+
+            enchantmentLimits.put(enchantment, lvl);
+        }
+
+        for(String potionKeys : config.getConfigurationSection("potion-limits.potions").getKeys(false))
+        {
+            PotionEffectType potionEffectType = PotionEffectType.getByName(potionKeys);
+            int lvl = config.getInt("potion-limits.potions." + potionKeys);
+
+            potionLimits.put(potionEffectType, lvl);
+        }
+
+        Logger.log("Loaded " + enchantmentLimits.size() + " Enchantment limits");
+        Logger.log("Loaded " + potionLimits.size() + " Potion limits");
+    }
+
+    public static void reload()
+    {
+        FileManager.reloadFiles();
+
+        load();
+    }
 
 }

@@ -13,6 +13,7 @@ import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import gg.revival.factions.obj.ServerFaction;
 import gg.revival.factions.timers.TimerType;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -78,7 +79,7 @@ public class CombatListener implements Listener
 
                 facPlayer.removeTimer(TimerType.ENDERPEARL);
 
-                // TODO: Send cant enderpearl in safezone while tagged
+                player.sendMessage(ChatColor.RED + "You can not use enderpearls in this claim while combat-tagged");
 
                 event.setCancelled(true);
             }
@@ -133,6 +134,9 @@ public class CombatListener implements Listener
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event)
     {
+        if(event.isCancelled())
+            return;
+
         Entity damaged = event.getEntity();
         Entity damager = event.getDamager();
 

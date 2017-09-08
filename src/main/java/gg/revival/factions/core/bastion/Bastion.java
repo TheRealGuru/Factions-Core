@@ -5,6 +5,7 @@ import gg.revival.factions.core.bastion.combatprotection.CombatProtectionListene
 import gg.revival.factions.core.bastion.combatprotection.PvPCommand;
 import gg.revival.factions.core.bastion.logout.commands.LogoutCommand;
 import gg.revival.factions.core.bastion.logout.listeners.LogoutListener;
+import gg.revival.factions.core.bastion.shield.Shield;
 import gg.revival.factions.core.bastion.tag.CombatListener;
 import gg.revival.factions.core.bastion.tag.CombatLogger;
 import gg.revival.factions.core.bastion.tag.CombatManager;
@@ -16,6 +17,8 @@ public class Bastion
 
     public static void onEnable()
     {
+        Shield.onEnable();
+
         loadCommands();
         loadListeners();
     }

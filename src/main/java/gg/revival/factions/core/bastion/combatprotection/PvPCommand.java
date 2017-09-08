@@ -122,7 +122,6 @@ public class PvPCommand implements CommandExecutor
                 if(facPlayer.isBeingTimed(TimerType.PVPPROT))
                 {
                     facPlayer.getTimer(TimerType.PVPPROT).setExpire(duration * 1000L);
-
                     pvpPlayer.sendMessage(ChatColor.BLUE + player.getName() + ChatColor.YELLOW + " updated your PvP protection time to " + ChatColor.GOLD + TimeTools.formatIntoHHMMSS(duration));
                 }
 
