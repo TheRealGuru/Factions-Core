@@ -3,6 +3,11 @@ package gg.revival.factions.core.ui;
 import gg.revival.core.scoreboards.RScoreboard;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
+import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.events.obj.BeaconEvent;
+import gg.revival.factions.core.events.obj.DTCEvent;
+import gg.revival.factions.core.events.obj.Event;
+import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.Faction;
@@ -21,6 +26,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class UIManager
 {
@@ -196,6 +202,62 @@ public class UIManager
         {
             long dur = facPlayer.getTimer(TimerType.PVPPROT).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
+        }
+
+        if(!EventManager.getActiveEvents().isEmpty())
+        {
+            List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
+
+            for(Event activeEvents : cache) {
+                if(activeEvents instanceof KOTHEvent) {
+                    KOTHEvent koth = (KOTHEvent)activeEvents;
+
+                    if(koth.isContested()) {
+                        builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + koth.getEventName() + ChatColor.WHITE + ": " + ChatColor.RED + "Contested" + ChatColor.RESET + " ");
+                        continue;
+                    }
+
+                    if(koth.getNextTicketTime() == -1L) {
+                        long dur = System.currentTimeMillis() + (koth.getDuration() * 1000L);
+                        builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + koth.getEventName() + ChatColor.WHITE + ": " + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                        continue;
+                    }
+
+                    long dur = koth.getNextTicketTime() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + koth.getEventName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+
+                    continue;
+                }
+
+                if(activeEvents instanceof DTCEvent) {
+                    DTCEvent dtc = (DTCEvent)activeEvents;
+
+                    if(dtc.getCappingFaction() != null) {
+                        builder.append(" " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + dtc.getEventName() + ChatColor.WHITE + ": " +
+                                ChatColor.YELLOW + dtc.getCappingFaction().getDisplayName() + ChatColor.GOLD + "(" + ChatColor.BLUE + (dtc.getWinCond() - dtc.getTickets().get(dtc.getCappingFaction())) + ChatColor.GOLD + ")" + ChatColor.RESET + " ");
+                        continue;
+                    }
+
+                    builder.append(" " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + dtc.getEventName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + dtc.getWinCond() + ChatColor.RESET + " ");
+
+                    continue;
+                }
+
+                if(activeEvents instanceof BeaconEvent) {
+                    BeaconEvent beacon = (BeaconEvent)activeEvents;
+
+                    if(beacon.getTicketsInOrder().isEmpty()) {
+                        builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + beacon.getEventName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + beacon.getWinCond() + ChatColor.RESET + " ");
+                        continue;
+                    }
+
+                    PlayerFaction leader = beacon.getTicketsInOrder().keySet().iterator().next();
+                    builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + beacon.getEventName() + ChatColor.WHITE + ": " +
+                            ChatColor.YELLOW + leader.getDisplayName() + ChatColor.GOLD + "(" + ChatColor.BLUE + (beacon.getWinCond() - beacon.getTickets().get(leader)) + ChatColor.GOLD + ")" + ChatColor.RESET + " ");
+
+                    continue;
+                }
+            }
         }
 
         if(builder.toString().length() == 0) return;

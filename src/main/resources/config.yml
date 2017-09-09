@@ -64,10 +64,12 @@ mining:
     gold: 0.02
     diamond: 0.007
     emerald: 0.003
+    glowstone: 0.009
   announce:
     gold: false
     diamond: true
     emerald: true
+    glowstone: false
 
 progression:
   enabled: true

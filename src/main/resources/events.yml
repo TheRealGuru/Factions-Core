@@ -1,0 +1,10 @@
+configuration:
+  koth:
+    default-duration: 60
+    default-wincond: 15
+  dtc:
+    default-regen: 15
+    default-wincond: 300
+  beacon:
+    default-range: 30
+    default-wincond: 600

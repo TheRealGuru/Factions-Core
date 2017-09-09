@@ -24,10 +24,10 @@ public class MiningEventsListener implements Listener
 
         for(Block blocks : event.getBlocks())
         {
-            if(Mining.getPlacedStone().contains(blocks.getLocation()))
+            if(Mining.getPlacedBlocks().contains(blocks.getLocation()))
             {
-                Mining.getPlacedStone().remove(blocks.getLocation());
-                Mining.getPlacedStone().add(blocks.getRelative(event.getDirection()).getLocation());
+                Mining.getPlacedBlocks().remove(blocks.getLocation());
+                Mining.getPlacedBlocks().add(blocks.getRelative(event.getDirection()).getLocation());
                 return;
             }
         }
@@ -42,10 +42,10 @@ public class MiningEventsListener implements Listener
 
         for(Block blocks : event.getBlocks())
         {
-            if(Mining.getPlacedStone().contains(blocks.getLocation()))
+            if(Mining.getPlacedBlocks().contains(blocks.getLocation()))
             {
-                Mining.getPlacedStone().remove(blocks.getLocation());
-                Mining.getPlacedStone().add(blocks.getRelative(event.getDirection()).getLocation());
+                Mining.getPlacedBlocks().remove(blocks.getLocation());
+                Mining.getPlacedBlocks().add(blocks.getRelative(event.getDirection()).getLocation());
                 return;
             }
         }
@@ -58,10 +58,10 @@ public class MiningEventsListener implements Listener
 
         Block block = event.getBlock();
 
-        if(!block.getType().equals(Material.STONE)) return;
+        if(!block.getType().equals(Material.STONE) && !block.getType().equals(Material.NETHERRACK)) return;
 
-        if(!Mining.getPlacedStone().contains(block.getLocation()))
-            Mining.getPlacedStone().add(block.getLocation());
+        if(!Mining.getPlacedBlocks().contains(block.getLocation()))
+            Mining.getPlacedBlocks().add(block.getLocation());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -72,12 +72,11 @@ public class MiningEventsListener implements Listener
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
-        if(block.getType().equals(Material.STONE))
-        {
+        if(block.getType().equals(Material.STONE) || block.getType().equals(Material.NETHERRACK)) {
             Mining.runLottery(player, block.getLocation());
 
-            if(Mining.getPlacedStone().contains(block.getLocation()))
-                Mining.getPlacedStone().remove(block.getLocation());
+            if(Mining.getPlacedBlocks().contains(block.getLocation()))
+                Mining.getPlacedBlocks().remove(block.getLocation());
         }
     }
 

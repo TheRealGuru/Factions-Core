@@ -30,8 +30,7 @@ public class DeathbanCommand implements CommandExecutor
             }
         }
 
-        if(args.length != 2)
-        {
+        if(args.length != 2) {
             sender.sendMessage(ChatColor.RED + "/deathban <player> <time>");
             return false;
         }

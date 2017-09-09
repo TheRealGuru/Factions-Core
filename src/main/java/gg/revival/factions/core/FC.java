@@ -3,6 +3,7 @@ package gg.revival.factions.core;
 import gg.revival.factions.core.bastion.Bastion;
 import gg.revival.factions.core.classes.Classes;
 import gg.revival.factions.core.deathbans.Deathbans;
+import gg.revival.factions.core.events.Events;
 import gg.revival.factions.core.limits.Limiter;
 import gg.revival.factions.core.lives.Lives;
 import gg.revival.factions.core.mechanics.Mechanics;
@@ -37,6 +38,7 @@ public class FC extends JavaPlugin
         Progression.onEnable();
         ServerMode.onEnable();
         Signs.onEnable();
+        Events.onEnable();
         UI.onEnable();
     }
 

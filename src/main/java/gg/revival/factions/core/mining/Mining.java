@@ -20,7 +20,7 @@ public class Mining
     /**
      * Contains all stone that has been placed below Y=32 since the server started up
      */
-    @Getter static List<Location> placedStone = new ArrayList<>();
+    @Getter static List<Location> placedBlocks = new ArrayList<>();
 
     /**
      * Runs a lottery to determine if a player should receive a drop and how big that drop should be
@@ -29,7 +29,7 @@ public class Mining
      */
     public static void runLottery(Player player, Location location)
     {
-        if(placedStone.contains(location)) return;
+        if(placedBlocks.contains(location)) return;
 
         Random random = new Random();
         int size = random.nextInt(8);
@@ -38,19 +38,25 @@ public class Mining
         if(size < 2)
             size = 2;
 
-        if(chance <= Configuration.miningGoldChance && chance > Configuration.miningDiamondChance)
+        if(location.getWorld().getEnvironment().equals(World.Environment.NETHER) && chance <= Configuration.miningGlowstoneChance)
+        {
+            generateVein(player, location, random, size, Material.GLOWSTONE);
+            return;
+        }
+
+        if(chance <= Configuration.miningGoldChance && chance > Configuration.miningDiamondChance && location.getBlockY() <= 32)
         {
             generateVein(player, location, random, size, Material.GOLD_ORE);
             return;
         }
 
-        if(chance <= Configuration.miningDiamondChance && chance > Configuration.miningEmeraldChance)
+        if(chance <= Configuration.miningDiamondChance && chance > Configuration.miningEmeraldChance && location.getBlockY() <= 16)
         {
             generateVein(player, location, random, size, Material.DIAMOND_ORE);
             return;
         }
 
-        if(chance <= Configuration.miningEmeraldChance)
+        if(chance <= Configuration.miningEmeraldChance && location.getBlockY() <= 16)
         {
             generateVein(player, location, random, size, Material.EMERALD_ORE);
             return;
@@ -89,8 +95,7 @@ public class Mining
 
         int found = 0;
 
-        for (int i = 0; i <= size; i++)
-        {
+        for (int i = 0; i <= size; i++) {
             double xPos = x1 + (x2 - x1) * i / size;
             double yPos = y1 + (y2 - y1) * i / size;
             double zPos = z1 + (z2 - z1) * i / size;
@@ -107,41 +112,44 @@ public class Mining
             int yFinish = (int) Math.floor(yPos + workY / 2.0D);
             int zFinish = (int) Math.floor(zPos + workXZ / 2.0D);
 
-            for (int ix = xBegin; ix <= xFinish; ix++)
-            {
+            for (int ix = xBegin; ix <= xFinish; ix++) {
                 double xMore = (ix + 0.5D - xPos) / (workXZ / 2.0D);
 
-                if (xMore * xMore < 1.0D)
-                {
+                if (xMore * xMore < 1.0D) {
                     for (int iy = yBegin; iy <= yFinish; iy++) {
 
                         double yMore = (iy + 0.5D - yPos) / (workY / 2.0D);
 
-                        if (xMore * xMore + yMore * yMore < 1.0D)
-                        {
-                            for (int iz = zBegin; iz <= zFinish; iz++)
-                            {
+                        if (xMore * xMore + yMore * yMore < 1.0D) {
+                            for (int iz = zBegin; iz <= zFinish; iz++) {
                                 double zMore = (iz + 0.5D - zPos) / (workXZ / 2.0D);
 
-                                if (xMore * xMore + yMore * yMore + zMore * zMore < 1.0D)
-                                {
+                                if (xMore * xMore + yMore * yMore + zMore * zMore < 1.0D) {
                                     Block block = world.getBlockAt(new Location(world, ix, iy, iz));
+                                    Claim claim = ClaimManager.getClaimAt(block.getLocation(), false);
 
-                                    if ((block != null) && (block.getType() == Material.STONE)) {
-                                        Claim claim = ClaimManager.getClaimAt(block.getLocation(), false);
+                                    if(claim != null) {
+                                        Faction claimOwner = claim.getClaimOwner();
 
-                                        if(claim != null)
-                                        {
-                                            Faction claimOwner = claim.getClaimOwner();
+                                        if(playerFaction == null || !playerFaction.getFactionID().equals(claimOwner.getFactionID())) continue;
+                                    }
 
-                                            if(playerFaction == null || !playerFaction.getFactionID().equals(claimOwner.getFactionID())) continue;
-                                        }
+                                    if(block == null || block.getType().equals(Material.AIR)) continue;
+
+                                    if(material.equals(Material.GLOWSTONE)) {
+                                        if(!block.getType().equals(Material.NETHERRACK)) continue;
+
+                                        player.playSound(block.getLocation(), Sound.GLASS, 1.0f, 1.0f);
+                                    }
+
+                                    if(material.equals(Material.GOLD_ORE) || material.equals(Material.DIAMOND_ORE) || material.equals(Material.EMERALD_ORE)) {
+                                        if(!block.getType().equals(Material.STONE)) continue;
 
                                         player.playSound(block.getLocation(), Sound.DIG_STONE, 1.0f, 1.0f);
-
-                                        block.setType(material);
-                                        found++;
                                     }
+
+                                    block.setType(material);
+                                    found++;
                                 }
                             }
                         }
@@ -150,44 +158,36 @@ public class Mining
             }
         }
 
-        if(found > 0)
-        {
-            if(material.equals(Material.GOLD_ORE))
-            {
-                if(Configuration.announceFoundGold)
-                {
+        if(found > 0) {
+            if(material.equals(Material.GOLD_ORE)) {
+                if(Configuration.announceFoundGold) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
-                }
-
-                else
-                {
+                } else {
                     player.sendMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
                 }
             }
 
-            if(material.equals(Material.DIAMOND_ORE))
-            {
-                if(Configuration.announceFoundDiamond)
-                {
+            if(material.equals(Material.DIAMOND_ORE)) {
+                if(Configuration.announceFoundDiamond) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
-                }
-
-                else
-                {
+                } else {
                     player.sendMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
                 }
             }
 
-            if(material.equals(Material.EMERALD_ORE))
-            {
-                if(Configuration.announceFoundEmerald)
-                {
+            if(material.equals(Material.EMERALD_ORE)) {
+                if(Configuration.announceFoundEmerald) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
-                }
-
-                else
-                {
+                } else {
                     player.sendMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
+                }
+            }
+
+            if(material.equals(Material.GLOWSTONE)) {
+                if(Configuration.announceFoundGlowstone) {
+                    Bukkit.broadcastMessage("[RM] " + ChatColor.YELLOW + player.getName() + " uncovered " + found + " Glowstone Blocks");
+                } else {
+                    player.sendMessage("[RM] " + ChatColor.YELLOW + player.getName() + " uncovered " + found + " Glowstone Blocks");
                 }
             }
         }

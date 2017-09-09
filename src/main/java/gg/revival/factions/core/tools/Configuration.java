@@ -52,9 +52,11 @@ public class Configuration
     public static float miningGoldChance = 0.02f;
     public static float miningDiamondChance = 0.007f;
     public static float miningEmeraldChance = 0.003f;
+    public static float miningGlowstoneChance = 0.009f;
     public static boolean announceFoundGold = false;
     public static boolean announceFoundDiamond = true;
     public static boolean announceFoundEmerald = true;
+    public static boolean announceFoundGlowstone = false;
 
     public static boolean progressEnabled = true;
     public static int progressDuration = 3600;
@@ -118,9 +120,11 @@ public class Configuration
         miningGoldChance = (float)config.getDouble("mining.odds.gold");
         miningDiamondChance = (float)config.getDouble("mining.odds.diamond");
         miningEmeraldChance = (float)config.getDouble("mining.odds.emerald");
+        miningGlowstoneChance = (float)config.getDouble("mining.odds.glowstone");
         announceFoundGold = config.getBoolean("mining.announce.gold");
         announceFoundDiamond = config.getBoolean("mining.announce.diamond");
         announceFoundEmerald = config.getBoolean("mining.announce.emerald");
+        announceFoundGlowstone = config.getBoolean("mining.announce.glowstone");
 
         progressEnabled = config.getBoolean("progression.enabled");
         progressDuration = config.getInt("progression.duration");
