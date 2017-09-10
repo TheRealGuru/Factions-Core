@@ -7,6 +7,7 @@ import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.ServerFaction;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import java.util.Calendar;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class KOTHBuilder {
 
     @Getter @Setter String eventName;
+    @Getter @Setter String displayName;
     @Getter @Setter String hookedFactionName;
     @Getter @Setter Location lootChest;
     @Getter @Setter CapZone capzone;
@@ -23,13 +25,13 @@ public class KOTHBuilder {
     @Getter @Setter int duration, winCond;
     @Getter @Setter boolean palace;
 
-    public KOTHBuilder(String eventName, String hookedFactionName, int duration, int winCond, boolean palace) {
-        this.eventName = eventName;
-        this.hookedFactionName = hookedFactionName;
+    @Getter @Setter int buildPhase;
+
+    public KOTHBuilder(int duration, int winCond) {
         this.duration = duration;
         this.winCond = winCond;
-        this.palace = palace;
-        this.lootChest = null;
+
+        this.buildPhase = 1;
 
         Map<Integer, Map<Integer, Integer>> schedule = new HashMap<>();
         Map<Integer, Integer> time = new HashMap<>();
@@ -50,6 +52,9 @@ public class KOTHBuilder {
         if(eventName == null)
             return false;
 
+        if(displayName == null)
+            return false;
+
         if(lootChest == null)
             return false;
 
@@ -63,6 +68,9 @@ public class KOTHBuilder {
     }
 
     public KOTHEvent convertToKOTH() {
+        if(!isReady()) return null;
+
+        String displayName = ChatColor.translateAlternateColorCodes('&', getDisplayName());
         Faction faction = FactionManager.getFactionByName(hookedFactionName);
         ServerFaction hookedFaction = null;
 
@@ -70,9 +78,45 @@ public class KOTHBuilder {
             hookedFaction = (ServerFaction)faction;
         }
 
-        KOTHEvent koth = new KOTHEvent(eventName, hookedFaction, lootChest, schedule, capzone, winCond, duration, palace);
+        KOTHEvent koth = new KOTHEvent(eventName, displayName, hookedFaction, lootChest, schedule, capzone, duration, winCond, palace);
 
         return koth;
+    }
+
+    public String getPhaseResponse() {
+        if(buildPhase == 1) {
+            return ChatColor.GREEN + "Type the name of this event";
+        }
+
+        if(buildPhase == 2) {
+            return ChatColor.GREEN + "Now enter the display name (w/ color codes!) for this event";
+        }
+
+        if(buildPhase == 3) {
+            return ChatColor.GREEN + "Type the name of the faction claims this event is connected to (if any)";
+        }
+
+        if(buildPhase == 4) {
+            return ChatColor.GREEN + "Right-click the Event Loot Chest'";
+        }
+
+        if(buildPhase == 5) {
+            return ChatColor.GREEN + "Assuming the default event schedule (Mon-Fri), re-configure it in the events.yml file" + "\n" + ChatColor.GREEN + "Right-click the first corner of the CapZone";
+        }
+
+        if(buildPhase == 6) {
+            return ChatColor.GREEN + "Right-click the second corner of the CapZone";
+        }
+
+        if(buildPhase == 7) {
+            return ChatColor.GREEN + "Is this a Palace event? (y/N)";
+        }
+
+        if(buildPhase == 8) {
+            return ChatColor.GREEN + "Event configured successfully";
+        }
+
+        return null;
     }
 
 }

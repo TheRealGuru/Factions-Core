@@ -29,7 +29,6 @@ public class FC extends JavaPlugin
         Configuration.load();
 
         Bastion.onEnable();
-        Deathbans.onEnable();
         Classes.onEnable();
         Lives.onEnable();
         Limiter.onEnable();
@@ -39,6 +38,7 @@ public class FC extends JavaPlugin
         ServerMode.onEnable();
         Signs.onEnable();
         Events.onEnable();
+        Deathbans.onEnable();
         UI.onEnable();
     }
 
@@ -46,12 +46,11 @@ public class FC extends JavaPlugin
     public void onDisable()
     {
         Bastion.onDisable();
-        Deathbans.onDisable();
         Classes.onDisable();
         Lives.onDisable();
         Progression.onDisable();
         ServerMode.onDisable();
-        UI.onDisable();
+        Deathbans.onDisable();
 
         factionsCore = null;
     }

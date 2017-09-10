@@ -19,8 +19,8 @@ public class DTCEvent extends Event {
     @Getter @Setter PlayerFaction cappingFaction;
     @Getter Map<PlayerFaction, Integer> tickets;
 
-    public DTCEvent(String eventName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, Location core, int winCond, int regenTimer, boolean palace) {
-        super(eventName, hookedFaction, lootChest, schedule, palace);
+    public DTCEvent(String eventName, String displayName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, Location core, int winCond, int regenTimer, boolean palace) {
+        super(eventName, displayName, hookedFaction, lootChest, schedule, palace);
         this.core = core;
         this.resetTime = -1L;
         this.winCond = winCond;

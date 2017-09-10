@@ -1,8 +1,10 @@
 package gg.revival.factions.core.events.task;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.engine.KOTHManager;
+import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
@@ -14,29 +16,25 @@ import java.util.*;
 
 public class KOTHTask extends BukkitRunnable {
 
+    private Set<KOTHEvent> recentlyBroadcasted = new HashSet<>();
+
+    private void silence(KOTHEvent event) {
+        if(recentlyBroadcasted.contains(event)) return;
+
+        recentlyBroadcasted.add(event);
+
+        new BukkitRunnable() {
+            public void run() {
+                recentlyBroadcasted.remove(event);
+            }
+        }.runTaskLater(FC.getFactionsCore(), 10 * 20L);
+    }
+
     @Override
     public void run() {
         if(KOTHManager.getActiveKOTHEvents().isEmpty()) return;
 
         for(KOTHEvent koth : KOTHManager.getActiveKOTHEvents()) {
-            if(koth.getCappingFaction() == null && koth.getNextTicketTime() != -1L) {
-                if(koth.isContested()) koth.setContested(false);
-
-                if(koth.getCapDuration() < koth.getDuration()) {
-                    if(koth.getCappingFaction() != null) {
-                        PlayerFaction oldCapper = koth.getCappingFaction();
-                        // TODO: Send no longer capping message to oldCapper
-                        oldCapper.sendMessage("You have lost control of " + koth.getEventName());
-
-                        koth.setCappingFaction(null);
-                    }
-                }
-
-                koth.setNextTicketTime(-1L);
-                koth.setCappingFaction(null);
-                continue;
-            }
-
             Set<UUID> capzonePlayers = new HashSet<>();
 
             for(Player players : Bukkit.getOnlinePlayers()) {
@@ -46,11 +44,30 @@ public class KOTHTask extends BukkitRunnable {
                 capzonePlayers.add(players.getUniqueId());
             }
 
-            if(!KOTHManager.shouldBeContested(capzonePlayers)) {
-                if(koth.isContested())
-                    koth.setContested(false);
+            if(capzonePlayers.isEmpty() && koth.getCappingFaction() != null) {
+                if(koth.getCapDuration() <= (koth.getDuration() - 10)) {
+                    if(!recentlyBroadcasted.contains(koth)) {
+                        if(koth.isPalace())
+                            Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
+                        else
+                            Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
 
-                if(koth.getNextTicketTime() > System.currentTimeMillis()) {
+                        silence(koth);
+                    }
+                }
+
+                koth.setCappingFaction(null);
+                koth.setNextTicketTime(-1L);
+                continue;
+            }
+
+            if(!KOTHManager.shouldBeContested(capzonePlayers)) {
+                if(koth.isContested()) {
+                    koth.setContested(false);
+                    koth.setPauseDuration(0L);
+                }
+
+                if(koth.getNextTicketTime() > System.currentTimeMillis() || koth.getNextTicketTime() == -1L) {
                     if(koth.getCappingFaction() == null) {
                         Set<PlayerFaction> factions = new HashSet<>();
 
@@ -69,6 +86,7 @@ public class KOTHTask extends BukkitRunnable {
                         if(factions.size() != 1) {
                             koth.setCappingFaction(null);
                             koth.setNextTicketTime(-1L);
+
                             continue;
                         } else {
                             PlayerFaction capper = factions.iterator().next();
@@ -76,8 +94,10 @@ public class KOTHTask extends BukkitRunnable {
                             koth.setCappingFaction(capper);
                             KOTHManager.updateCapTimer(koth);
 
-                            // TODO: Send capper faction now controlling message
-                            capper.sendMessage("You are now controlling " + koth.getEventName());
+                            if(koth.isPalace())
+                                capper.sendMessage(EventsMessages.asPalace(EventsMessages.nowControlling(koth)));
+                            else
+                                capper.sendMessage(EventsMessages.asKOTH(EventsMessages.nowControlling(koth)));
                         }
                     }
 
@@ -102,36 +122,67 @@ public class KOTHTask extends BukkitRunnable {
 
                     if(factions.size() > 1) {
                         koth.setContested(true);
+                        koth.setPauseDuration(koth.getNextTicketTime() - System.currentTimeMillis());
+                        koth.setNextTicketTime(System.currentTimeMillis() + koth.getPauseDuration());
+
                         continue;
                     }
 
                     if(koth.getCappingFaction() != null) {
                         for(PlayerFaction foundFactions : factions) {
                             if(!foundFactions.getFactionID().equals(koth.getCappingFaction().getFactionID())) {
-                                // TODO: Send no longer contesting message to capping faction
-                                koth.getCappingFaction().sendMessage("You are no longer controlling " + koth.getEventName());
+                                if(koth.isPalace())
+                                    Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
+                                else
+                                    Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
+
                                 KOTHManager.updateCapTimer(koth);
                                 koth.setCappingFaction(foundFactions);
-                                // TODO: Send now controlling message to foundFactions
-                                koth.getCappingFaction().sendMessage("You are now controlling " + koth.getEventName());
+
+                                if(koth.isPalace())
+                                    Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.nowControlling(koth)));
+                                else
+                                    Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.nowControlling(koth)));
                             }
                         }
                     }
 
-                    if(koth.getCapDuration() % 30 == 0 && koth.getCapDuration() > 0) {
-                        // TODO: Broadcast koth controlled message
-                        Bukkit.broadcastMessage(koth.getEventName() + " is being controlled");
-                    }
+                    if(koth.getCapDuration() % 30 == 0 && koth.getCapDuration() > 0 && koth.getCapDuration() < koth.getDuration()) {
+                        if(!recentlyBroadcasted.contains(koth)) {
+                            if(koth.isPalace())
+                                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.beingControlled(koth.getCappingFaction(), koth)));
+                            else
+                                Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.beingControlled(koth.getCappingFaction(), koth)));
 
-                    if(koth.getCapDuration() <= 0) {
-                        EventManager.tickEvent(koth);
+                            silence(koth);
+                        }
                     }
+                }
+
+                if(koth.getNextTicketTime() <= System.currentTimeMillis()) {
+                    KOTHManager.updateCapTimer(koth);
+
+                    EventManager.tickEvent(koth);
                 }
             }
 
             // Should be contested!
             else {
-                koth.setContested(true);
+                if(!koth.isContested()) {
+                    koth.setContested(true);
+                    koth.setPauseDuration(koth.getNextTicketTime() - System.currentTimeMillis());
+                }
+
+                koth.setNextTicketTime(System.currentTimeMillis() + koth.getPauseDuration());
+
+                if(!recentlyBroadcasted.contains(koth)) {
+                    if(koth.isPalace())
+                        Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.beingContested(koth)));
+                    else
+                        Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.beingContested(koth)));
+
+                    silence(koth);
+                }
             }
         }
     }

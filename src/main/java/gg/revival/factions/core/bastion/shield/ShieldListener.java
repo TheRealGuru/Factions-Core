@@ -48,7 +48,7 @@ public class ShieldListener implements Listener
         Player player = event.getPlayer();
         Location to = event.getTo(), from = event.getFrom();
 
-        if(from.getBlock() == to.getBlock() &&
+        if(from.getBlockX() == to.getBlockX() &&
                 from.getBlockY() == to.getBlockY() &&
                 from.getBlockZ() == to.getBlockZ()) return;
 

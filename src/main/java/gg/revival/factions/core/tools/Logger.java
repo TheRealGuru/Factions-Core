@@ -15,7 +15,7 @@ public class Logger
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("dd/mm '@' hh:mm:ss aa");
 
-        System.out.println("[" + format.format(date) + "][FactionsX][" + lvl.toString() + "] " + str);
+        System.out.println("[" + format.format(date) + "][Factions Core][" + lvl.toString() + "] " + str);
     }
 
 }

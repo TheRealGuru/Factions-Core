@@ -19,9 +19,10 @@ public class KOTHEvent extends Event {
     @Getter @Setter PlayerFaction cappingFaction;
     @Getter @Setter long nextTicketTime;
     @Getter @Setter boolean isContested;
+    @Getter @Setter long pauseDuration;
 
-    public KOTHEvent(String eventName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, CapZone capzone, int duration, int winCond, boolean palace) {
-        super(eventName, hookedFaction, lootChest, schedule, palace);
+    public KOTHEvent(String eventName, String displayName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, CapZone capzone, int duration, int winCond, boolean palace) {
+        super(eventName, displayName, hookedFaction, lootChest, schedule, palace);
         this.capZone = capzone;
         this.duration = duration;
         this.winCond = winCond;

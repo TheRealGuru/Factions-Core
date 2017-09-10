@@ -31,6 +31,7 @@ public class FileManager {
 
             if(!eventsFile.exists()) {
                 eventsFile.getParentFile().mkdirs();
+                FC.getFactionsCore().saveResource("events.yml", true);
             }
 
             configConfig = new YamlConfiguration();
@@ -84,6 +85,7 @@ public class FileManager {
 
             if(!eventsFile.exists()) {
                 eventsFile.getParentFile().mkdirs();
+                FC.getFactionsCore().saveResource("events.yml", true);
             }
 
             configConfig = new YamlConfiguration();

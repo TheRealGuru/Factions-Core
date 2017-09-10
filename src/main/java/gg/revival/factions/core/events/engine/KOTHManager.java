@@ -6,7 +6,6 @@ import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +38,6 @@ public class KOTHManager {
         for(UUID uuid : capzonePlayers) {
             if(Bukkit.getPlayer(uuid) == null) continue;
 
-            Player player = Bukkit.getPlayer(uuid);
             Faction faction = FactionManager.getFactionByPlayer(uuid);
 
             if(faction == null || !(faction instanceof PlayerFaction)) continue;
@@ -53,6 +51,6 @@ public class KOTHManager {
     }
 
     public static void updateCapTimer(KOTHEvent event) {
-        event.setNextTicketTime(event.getDuration() * 1000L);
+        event.setNextTicketTime(System.currentTimeMillis() + event.getDuration() * 1000L);
     }
 }

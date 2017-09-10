@@ -10,9 +10,6 @@ public class UI
 
     public static void onEnable()
     {
-        loadCommands();
-        loadListeners();
-
         new BukkitRunnable()
         {
             public void run()
@@ -23,21 +20,6 @@ public class UI
                 }
             }
         }.runTaskTimer(FC.getFactionsCore(), 0L, 1L);
-    }
-
-    public static void onDisable()
-    {
-
-    }
-
-    public static void loadCommands()
-    {
-
-    }
-
-    public static void loadListeners()
-    {
-
     }
 
 }

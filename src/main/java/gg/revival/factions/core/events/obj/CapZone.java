@@ -14,7 +14,9 @@ public class CapZone {
         this.cornerOne = cornerOne;
         this.cornerTwo = cornerTwo;
         this.worldName = worldName;
-        update();
+
+        if(cornerOne != null && cornerTwo != null)
+            update();
     }
 
     public void update() {
@@ -40,9 +42,7 @@ public class CapZone {
             ++x2; ++z2;
         }
 
-        return  location.getX() >= (double)x1 && location.getX() <= (double)x2 &&
-                location.getZ() >= (double)z1 && location.getZ() <= (double)z2 &&
-                location.getY() >= (double)y1 && location.getY() <= (double)y2;
+        return location.getX() >= (double)x1 && location.getX() <= (double)x2 && location.getZ() >= (double)z1 && location.getZ() <= (double)z2 && location.getY() >= (double)y1 && location.getY() <= (double)y2;
     }
 
 }

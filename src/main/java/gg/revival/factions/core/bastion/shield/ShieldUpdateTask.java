@@ -22,6 +22,7 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
 
     private final ShieldUpdateRequest request;
 
+    @SuppressWarnings("deprecation")
     @Override
     public void run() {
         Set<BlockPos> shownGlass = new HashSet<>();
@@ -38,6 +39,16 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
                     ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
 
                     if(serverFaction.getType().equals(ServerClaimType.SAFEZONE)) continue;
+                }
+            }
+
+            else
+            {
+                if(claims.getClaimOwner() instanceof ServerFaction)
+                {
+                    ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
+
+                    if(serverFaction.getType().equals(ServerClaimType.EVENT) && !facPlayer.isBeingTimed(TimerType.PROGRESSION) && !facPlayer.isBeingTimed(TimerType.PVPPROT)) continue;
                 }
             }
 
@@ -65,7 +76,7 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
                 {
                     ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
 
-                    if(!serverFaction.getType().equals(ServerClaimType.SAFEZONE) && !facPlayer.isBeingTimed(TimerType.TAG)) continue;
+                    if(!serverFaction.getType().equals(ServerClaimType.EVENT)) continue;
                 }
             }
 
@@ -95,9 +106,7 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
         }
 
         for(BlockPos toShow : shownGlass)
-        {
-            request.getBukkitPlayer().sendBlockChange(toShow.getBukkitLocation(), Material.STAINED_GLASS, (byte)14);
-        }
+            request.getBukkitPlayer().sendBlockChange(toShow.getBukkitLocation(), Material.STAINED_GLASS, (byte) 14);
 
         request.getPlayer().setLastShownBlocks(shownGlass);
         set(null);

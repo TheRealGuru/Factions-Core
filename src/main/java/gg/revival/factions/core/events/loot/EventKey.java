@@ -17,7 +17,8 @@ public class EventKey {
         meta.setDisplayName(ChatColor.DARK_RED + "Event Key");
 
         List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.AQUA + "Right-click one of the three" + "\n" + ChatColor.AQUA + "loot chests in spawn to claim");
+        lore.add(ChatColor.GRAY + "Right-click one of the three" + ChatColor.RESET);
+        lore.add(ChatColor.GRAY + "loot chests in spawn to claim");
         meta.setLore(lore);
 
         item.setItemMeta(meta);

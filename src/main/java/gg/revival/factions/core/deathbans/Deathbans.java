@@ -74,13 +74,9 @@ public class Deathbans
 
                 MongoCollection collection = DBManager.getDeathbans();
                 FindIterable<Document> query = collection.find();
-                Iterator<Document> iterator = query.iterator();
 
-                while(iterator.hasNext())
-                {
-                    Document current = iterator.next();
-
-                    if(current.getLong("expires") <= System.currentTimeMillis()) continue;
+                for (Document current : query) {
+                    if (current.getLong("expires") <= System.currentTimeMillis()) continue;
 
                     UUID uuid = UUID.fromString(current.getString("uuid"));
                     UUID killed = UUID.fromString(current.getString("killed"));
@@ -193,8 +189,9 @@ public class Deathbans
                 FindIterable<Document> query = collection.find(Filters.eq("killed", uuid.toString()));
                 Iterator<Document> iterator = query.iterator();
 
-                while(iterator.hasNext())
+                while(true)
                 {
+                    if (!(iterator.hasNext())) break;
                     Document current = iterator.next();
 
                     UUID uuid = UUID.fromString(current.getString("uuid"));

@@ -4,7 +4,6 @@ import gg.revival.core.scoreboards.RScoreboard;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.events.obj.BeaconEvent;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
@@ -19,7 +18,6 @@ import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -162,43 +160,43 @@ public class UIManager
 
         StringBuilder builder = new StringBuilder();
 
-        if(facPlayer.isBeingTimed(TimerType.HOME))
+        if(facPlayer.isBeingTimed(TimerType.HOME) && facPlayer.getTimer(TimerType.HOME) != null)
         {
             long dur = facPlayer.getTimer(TimerType.HOME).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Home Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.STUCK))
+        if(facPlayer.isBeingTimed(TimerType.STUCK) && facPlayer.getTimer(TimerType.STUCK) != null)
         {
             long dur = facPlayer.getTimer(TimerType.STUCK).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Stuck Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.LOGOUT))
+        if(facPlayer.isBeingTimed(TimerType.LOGOUT) && facPlayer.getTimer(TimerType.LOGOUT) != null)
         {
             long dur = facPlayer.getTimer(TimerType.LOGOUT).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.AQUA + "" + ChatColor.BOLD + "Logout" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL))
+        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL) && facPlayer.getTimer(TimerType.ENDERPEARL) != null)
         {
             long dur = facPlayer.getTimer(TimerType.ENDERPEARL).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enderpearl" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.TAG))
+        if(facPlayer.isBeingTimed(TimerType.TAG) && facPlayer.getTimer(TimerType.TAG) != null)
         {
             long dur = facPlayer.getTimer(TimerType.TAG).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.RED + "" + ChatColor.BOLD + "Combat-tag" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.SAFETY))
+        if(facPlayer.isBeingTimed(TimerType.SAFETY) && facPlayer.getTimer(TimerType.SAFETY) != null)
         {
             long dur = facPlayer.getTimer(TimerType.SAFETY).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Safety" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.PVPPROT))
+        if(facPlayer.isBeingTimed(TimerType.PVPPROT) && facPlayer.getTimer(TimerType.PVPPROT) != null)
         {
             long dur = facPlayer.getTimer(TimerType.PVPPROT).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
@@ -213,18 +211,18 @@ public class UIManager
                     KOTHEvent koth = (KOTHEvent)activeEvents;
 
                     if(koth.isContested()) {
-                        builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + koth.getEventName() + ChatColor.WHITE + ": " + ChatColor.RED + "Contested" + ChatColor.RESET + " ");
+                        builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.RED + "Contested" + ChatColor.RESET + " ");
                         continue;
                     }
 
                     if(koth.getNextTicketTime() == -1L) {
-                        long dur = System.currentTimeMillis() + (koth.getDuration() * 1000L);
-                        builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + koth.getEventName() + ChatColor.WHITE + ": " + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                        long dur = koth.getDuration() * 1000L;
+                        builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
                         continue;
                     }
 
                     long dur = koth.getNextTicketTime() - System.currentTimeMillis();
-                    builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + koth.getEventName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                    builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
 
                     continue;
                 }
@@ -233,29 +231,12 @@ public class UIManager
                     DTCEvent dtc = (DTCEvent)activeEvents;
 
                     if(dtc.getCappingFaction() != null) {
-                        builder.append(" " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + dtc.getEventName() + ChatColor.WHITE + ": " +
+                        builder.append(" " + dtc.getDisplayName() + ChatColor.WHITE + ": " +
                                 ChatColor.YELLOW + dtc.getCappingFaction().getDisplayName() + ChatColor.GOLD + "(" + ChatColor.BLUE + (dtc.getWinCond() - dtc.getTickets().get(dtc.getCappingFaction())) + ChatColor.GOLD + ")" + ChatColor.RESET + " ");
                         continue;
                     }
 
-                    builder.append(" " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + dtc.getEventName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + dtc.getWinCond() + ChatColor.RESET + " ");
-
-                    continue;
-                }
-
-                if(activeEvents instanceof BeaconEvent) {
-                    BeaconEvent beacon = (BeaconEvent)activeEvents;
-
-                    if(beacon.getTicketsInOrder().isEmpty()) {
-                        builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + beacon.getEventName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + beacon.getWinCond() + ChatColor.RESET + " ");
-                        continue;
-                    }
-
-                    PlayerFaction leader = beacon.getTicketsInOrder().keySet().iterator().next();
-                    builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + beacon.getEventName() + ChatColor.WHITE + ": " +
-                            ChatColor.YELLOW + leader.getDisplayName() + ChatColor.GOLD + "(" + ChatColor.BLUE + (beacon.getWinCond() - beacon.getTickets().get(leader)) + ChatColor.GOLD + ")" + ChatColor.RESET + " ");
-
-                    continue;
+                    builder.append(" " + dtc.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + dtc.getWinCond() + ChatColor.RESET + " ");
                 }
             }
         }

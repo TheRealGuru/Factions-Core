@@ -12,6 +12,7 @@ import java.util.Map;
 public class Event {
 
     @Getter @Setter String eventName;
+    @Getter @Setter String displayName;
     @Getter @Setter ServerFaction hookedFaction;
     @Getter @Setter Location lootChest;
     @Getter Map<Integer, Map<Integer, Integer>> schedule;
@@ -20,8 +21,9 @@ public class Event {
     @Getter @Setter long lootChestUnlockTime;
     @Getter @Setter boolean active;
 
-    Event(String eventName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, boolean palace) {
+    Event(String eventName, String displayName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, boolean palace) {
         this.eventName = eventName;
+        this.displayName = displayName;
         this.hookedFaction = hookedFaction;
         this.lootChest = lootChest;
         this.schedule = schedule;
