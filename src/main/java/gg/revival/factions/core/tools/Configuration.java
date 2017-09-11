@@ -12,6 +12,15 @@ public class Configuration
 
     public static String databaseName = "factions";
 
+    public static boolean automateEvents = true;
+    public static int defaultKothDuration = 60;
+    public static int defaultKothWinCondition = 15;
+    public static int defaultKothKeys = 3;
+    public static int defaultDtcRegen = 15;
+    public static int defaultDtcWincond = 500;
+    public static int defaultDtcKeys = 3;
+    public static int defaultPalaceKeys = 10;
+
     public static int logoutTimer = 30;
     public static int tagAttacker = 60;
     public static int tagAttacked = 30;
@@ -77,8 +86,18 @@ public class Configuration
         FileManager.createFiles();
 
         FileConfiguration config = FileManager.getConfig();
+        FileConfiguration events = FileManager.getEvents();
 
         databaseName = config.getString("database.database-name");
+
+        automateEvents = events.getBoolean("configuration.automated");
+        defaultKothDuration = events.getInt("configuration.koth.default-duration");
+        defaultKothWinCondition = events.getInt("configuration.koth.default-wincond");
+        defaultKothKeys = events.getInt("configuration.koth.default-keys");
+        defaultDtcRegen = events.getInt("configuration.dtc.default-regen");
+        defaultDtcWincond = events.getInt("configuration.dtc.default-wincond");
+        defaultDtcKeys = events.getInt("configuration.dtc.default-keys");
+        defaultPalaceKeys = events.getInt("configuration.palace.default-keys");
 
         logoutTimer = config.getInt("bastion.logout-timer");
         tagAttacker = config.getInt("bastion.combat-tag.attacker-duration");

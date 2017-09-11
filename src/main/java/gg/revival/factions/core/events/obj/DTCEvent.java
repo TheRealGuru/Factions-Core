@@ -18,6 +18,7 @@ public class DTCEvent extends Event {
     @Getter @Setter int regenTimer;
     @Getter @Setter PlayerFaction cappingFaction;
     @Getter Map<PlayerFaction, Integer> tickets;
+    @Getter @Setter PlayerFaction recentBreaker;
 
     public DTCEvent(String eventName, String displayName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, Location core, int winCond, int regenTimer, boolean palace) {
         super(eventName, displayName, hookedFaction, lootChest, schedule, palace);

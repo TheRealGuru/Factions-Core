@@ -16,14 +16,12 @@ import gg.revival.factions.core.ui.UI;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class FC extends JavaPlugin
-{
+public class FC extends JavaPlugin {
 
     @Getter static FC factionsCore;
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         factionsCore = this;
 
         Configuration.load();
@@ -43,8 +41,7 @@ public class FC extends JavaPlugin
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         Bastion.onDisable();
         Classes.onDisable();
         Lives.onDisable();

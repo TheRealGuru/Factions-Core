@@ -1,10 +1,12 @@
 configuration:
+  automated: true
   koth:
     default-duration: 60
     default-wincond: 15
+    default-keys: 3
   dtc:
     default-regen: 15
-    default-wincond: 300
-  beacon:
-    default-range: 30
-    default-wincond: 600
+    default-wincond: 500
+    default-keys: 3
+  palace:
+    default-keys: 10

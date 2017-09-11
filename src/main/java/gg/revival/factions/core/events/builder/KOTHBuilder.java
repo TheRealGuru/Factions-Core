@@ -49,22 +49,7 @@ public class KOTHBuilder {
     }
 
     public boolean isReady() {
-        if(eventName == null)
-            return false;
-
-        if(displayName == null)
-            return false;
-
-        if(lootChest == null)
-            return false;
-
-        if(capzone == null)
-            return false;
-
-        if(duration == 0 || winCond == 0)
-            return false;
-
-        return true;
+        return eventName != null && displayName != null && lootChest != null && capzone != null && duration != 0 && winCond != 0;
     }
 
     public KOTHEvent convertToKOTH() {
@@ -97,7 +82,7 @@ public class KOTHBuilder {
         }
 
         if(buildPhase == 4) {
-            return ChatColor.GREEN + "Right-click the Event Loot Chest'";
+            return ChatColor.GREEN + "Right-click the Event Loot Chest";
         }
 
         if(buildPhase == 5) {

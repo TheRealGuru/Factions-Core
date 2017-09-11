@@ -51,8 +51,8 @@ public class EventsMessages {
         if(event instanceof DTCEvent) {
             DTCEvent dtc = (DTCEvent)event;
 
-            // TODO: Finish this
-            return null;
+            return ChatColor.GOLD + dtc.getCappingFaction().getDisplayName() + ChatColor.YELLOW + " is destroying the core at " + event.getDisplayName() + ChatColor.GOLD +
+                    " [" + ChatColor.YELLOW + dtc.getTickets().get(dtc.getCappingFaction()) + ChatColor.GOLD + "/" + ChatColor.YELLOW + dtc.getWinCond() + ChatColor.GOLD + "]";
         }
 
         return null;

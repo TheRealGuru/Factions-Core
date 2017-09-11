@@ -1,10 +1,14 @@
 package gg.revival.factions.core.events.command;
 
 import com.google.common.base.Joiner;
+import gg.revival.factions.core.events.builder.DTCBuilder;
 import gg.revival.factions.core.events.builder.EventBuilder;
 import gg.revival.factions.core.events.builder.KOTHBuilder;
 import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
+import gg.revival.factions.core.events.obj.EventsGUI;
+import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -25,7 +29,7 @@ public class EventsCommand implements CommandExecutor {
         Player player = (Player)sender;
 
         if(args.length == 0) {
-            // TODO: Open events gui
+            EventsGUI.open(player);
             return false;
         }
 
@@ -36,7 +40,14 @@ public class EventsCommand implements CommandExecutor {
                     return false;
                 }
 
-                // TODO: Toggle automation on/off
+                Configuration.automateEvents = !Configuration.automateEvents;
+                FileManager.getEvents().set("configuration.automated", Configuration.automateEvents);
+                FileManager.saveEvents();
+
+                if(Configuration.automateEvents)
+                    player.sendMessage(ChatColor.GREEN + "Events will now run automatically");
+                else
+                    player.sendMessage(ChatColor.GREEN + "Events will no longer run automatically");
 
                 return false;
             }
@@ -146,8 +157,7 @@ public class EventsCommand implements CommandExecutor {
                         return false;
                     }
 
-                    // TODO: Load duration and win condition defaults from config
-                    KOTHBuilder builder = new KOTHBuilder(60, 15);
+                    KOTHBuilder builder = new KOTHBuilder(Configuration.defaultKothDuration, Configuration.defaultKothWinCondition);
                     EventBuilder.getKothBuilders().put(player.getUniqueId(), builder);
                     player.sendMessage(builder.getPhaseResponse());
 
@@ -160,7 +170,9 @@ public class EventsCommand implements CommandExecutor {
                         return false;
                     }
 
-                    // TODO: Add to DTCBuilder
+                    DTCBuilder builder = new DTCBuilder(Configuration.defaultDtcRegen, Configuration.defaultDtcWincond);
+                    EventBuilder.getDtcBuilders().put(player.getUniqueId(), builder);
+                    player.sendMessage(builder.getPhaseResponse());
                     return false;
                 }
 

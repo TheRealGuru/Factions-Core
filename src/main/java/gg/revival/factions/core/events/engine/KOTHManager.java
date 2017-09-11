@@ -51,6 +51,6 @@ public class KOTHManager {
     }
 
     public static void updateCapTimer(KOTHEvent event) {
-        event.setNextTicketTime(System.currentTimeMillis() + event.getDuration() * 1000L);
+        event.setNextTicketTime(System.currentTimeMillis() + (event.getDuration() * 1000L));
     }
 }

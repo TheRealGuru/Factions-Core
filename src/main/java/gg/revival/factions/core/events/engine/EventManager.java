@@ -8,6 +8,7 @@ import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
+import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Logger;
 import gg.revival.factions.obj.PlayerFaction;
@@ -143,7 +144,6 @@ public class EventManager {
                 Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.captured(event)));
 
             event.setLootChestFaction(koth.getCappingFaction());
-            // TODO: Get this value from config
             event.setLootChestUnlockTime(System.currentTimeMillis() + (30 * 1000L));
         }
 
@@ -159,12 +159,13 @@ public class EventManager {
                 Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.captured(event)));
 
             event.setLootChestFaction(dtc.getCappingFaction());
-            // TODO: Get this value from config
             event.setLootChestUnlockTime(System.currentTimeMillis() + (30 * 1000L));
         }
 
-        // TODO: Get value from config
-        spawnKeys(event, 3);
+        if(event.isPalace())
+            spawnKeys(event, Configuration.defaultPalaceKeys);
+        else
+            spawnKeys(event, Configuration.defaultKothKeys);
     }
 
     public static void tickEvent(Event event) {
@@ -222,23 +223,25 @@ public class EventManager {
 
             dtc.getTickets().clear();
 
-            for(PlayerFaction factions : ticketCache.keySet()) {
-                int newTicketCount = ticketCache.get(factions);
+            if(ticketCache.isEmpty()) {
+                dtc.getTickets().put(capper, 1);
+                return;
+            }
 
-                if(factions.getFactionID().equals(capper.getFactionID())) {
-                    newTicketCount += 1;
-                } else {
-                    newTicketCount -= 1;
-                }
+            int tickets = ticketCache.get(capper) + 1;
 
-                if(newTicketCount >= dtc.getWinCond()) {
-                    finishEvent(event);
-                    return;
-                }
+            if(tickets >= dtc.getWinCond()) {
+                finishEvent(event);
+                return;
+            }
 
-                if(newTicketCount <= 0) continue;
+            dtc.getTickets().put(capper, tickets);
 
-                dtc.getTickets().put(factions, newTicketCount);
+            if(tickets % 50 == 0 && tickets < dtc.getWinCond()) {
+                if(dtc.isPalace())
+                    Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.ticked(dtc)));
+                else
+                    Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.ticked(dtc)));
             }
         }
     }
@@ -293,6 +296,9 @@ public class EventManager {
             if(EventManager.getEventByName(eventNames) != null) continue;
 
             String displayName = ChatColor.translateAlternateColorCodes('&', FileManager.getEvents().getString("events." + eventNames + ".display-name"));
+            boolean palace = FileManager.getEvents().getBoolean("events." + eventNames + ".palace");
+            int winCond = FileManager.getEvents().getInt("events." + eventNames + ".win-cond");
+            ServerFaction serverFaction = (ServerFaction) FactionManager.getFactionByUUID(UUID.fromString(FileManager.getEvents().getString("events." + eventNames + ".hooked-claim")));
 
             int lootChestX = FileManager.getEvents().getInt("events." + eventNames + ".loot-chest.x");
             int lootChestY = FileManager.getEvents().getInt("events." + eventNames + ".loot-chest.y");
@@ -312,8 +318,6 @@ public class EventManager {
                 schedule.put(Integer.valueOf(days), time);
             }
 
-            boolean palace = FileManager.getEvents().getBoolean("events." + eventNames + ".palace");
-
             if(FileManager.getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("KOTH")) {
                 Location cornerOne = null, cornerTwo = null;
 
@@ -330,8 +334,6 @@ public class EventManager {
                 cornerTwo = new Location(Bukkit.getWorld(worldName), cornerTwoX, cornerTwoY, cornerTwoZ);
 
                 int duration = FileManager.getEvents().getInt("events." + eventNames + ".duration");
-                int winCond = FileManager.getEvents().getInt("events." + eventNames + ".win-cond");
-                ServerFaction serverFaction = (ServerFaction) FactionManager.getFactionByUUID(UUID.fromString(FileManager.getEvents().getString("events." + eventNames + ".hooked-claim")));
 
                 KOTHEvent kothEvent = new KOTHEvent(eventNames, displayName, serverFaction, lootChest, schedule, new CapZone(cornerOne, cornerTwo, worldName), duration, winCond, palace);
                 EventManager.getEvents().add(kothEvent);
@@ -340,8 +342,18 @@ public class EventManager {
             }
 
             if(FileManager.getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("DTC")) {
+                Location core = null;
 
-                continue;
+                int coreX = FileManager.getEvents().getInt("events." + eventNames + ".core.x");
+                int coreY = FileManager.getEvents().getInt("events." + eventNames + ".core.y");
+                int coreZ = FileManager.getEvents().getInt("events." + eventNames + ".core.z");
+                String coreWorld = FileManager.getEvents().getString("events." + eventNames + ".core.world");
+                core = new Location(Bukkit.getWorld(coreWorld), coreX, coreY, coreZ);
+
+                int regenTimer = FileManager.getEvents().getInt("events." + eventNames + ".regen-timer");
+
+                DTCEvent dtcEvent = new DTCEvent(eventNames, displayName, serverFaction, lootChest, schedule, core, winCond, regenTimer, palace);
+                EventManager.getEvents().add(dtcEvent);
             }
         }
 
