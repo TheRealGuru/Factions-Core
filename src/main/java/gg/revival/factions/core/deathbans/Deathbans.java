@@ -3,169 +3,71 @@ package gg.revival.factions.core.deathbans;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import gg.revival.core.accounts.Account;
-import gg.revival.core.punishments.Punishment;
 import gg.revival.driver.MongoAPI;
+import gg.revival.factions.claims.Claim;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.deathbans.command.DeathbanCommand;
 import gg.revival.factions.core.deathbans.command.DeathsCommand;
 import gg.revival.factions.core.deathbans.listener.DeathbanListener;
+import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.events.obj.Event;
+import gg.revival.factions.core.servermode.ServerMode;
+import gg.revival.factions.core.servermode.ServerState;
 import gg.revival.factions.core.tools.Configuration;
-import gg.revival.factions.core.tools.Logger;
-import lombok.Getter;
 import mkremins.fanciful.FancyMessage;
-import org.apache.commons.lang.StringUtils;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Deathbans
-{
-
-    /**
-     * Contains all active deathbans currently running on the server
-     */
-    @Getter static Set<Death> activeDeathbans = new HashSet<>();
+public class Deathbans {
 
     /**
      * Returns a Death object if the given UUID has an active deathban
      * @param uuid
      * @return
      */
-    public static Death getActiveDeathban(UUID uuid)
-    {
-        List<Death> cache = new CopyOnWriteArrayList<>(activeDeathbans);
-
-        for(Death deaths : cache)
-        {
-            if(deaths.getKilled().equals(uuid) && !deaths.isExpired())
-                return deaths;
-        }
-
-        return null;
-    }
-
-    /**
-     * Loads all deathbans from DB to cache
-     */
-    public static void loadDeathbans()
-    {
-        if(!MongoAPI.isConnected()) {
-            new BukkitRunnable() {
-                public void run() {
-                    loadDeathbans();
-                }
-            }.runTaskLaterAsynchronously(FC.getFactionsCore(), 2 * 20L);
-
-            return;
-        }
-
+    public static void getActiveDeathban(UUID uuid, ActiveDeathbanCallback callback) {
         new BukkitRunnable() {
             public void run() {
                 if(DBManager.getDeathbans() == null)
                     DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
 
                 MongoCollection collection = DBManager.getDeathbans();
-                FindIterable<Document> query = collection.find();
+                FindIterable<Document> query = collection.find(Filters.eq("killed", uuid.toString()));
 
                 for (Document current : query) {
-                    if (current.getLong("expires") <= System.currentTimeMillis()) continue;
+                    if (current.getLong("expires") > System.currentTimeMillis()) {
+                        UUID deathId = UUID.fromString(current.getString("uuid"));
+                        String reason = current.getString("reason");
+                        long created = current.getLong("created");
+                        long expires = current.getLong("expires");
 
-                    UUID uuid = UUID.fromString(current.getString("uuid"));
-                    UUID killed = UUID.fromString(current.getString("killed"));
-                    String reason = current.getString("reason");
-                    long created = current.getLong("created");
-                    long expires = current.getLong("expires");
+                        Death death = new Death(deathId, uuid, reason, created, expires);
 
-                    Death death = new Death(uuid, killed, reason, created, expires);
+                        new BukkitRunnable() {
+                            public void run() {
+                                callback.onQueryDone(death);
+                            }
+                        }.runTask(FC.getFactionsCore());
 
-                    activeDeathbans.add(death);
-                }
-
-                Logger.log("Loaded " + activeDeathbans.size() + " deathbans");
-            }
-        }.runTaskAsynchronously(FC.getFactionsCore());
-    }
-
-    /**
-     * Saves all deathbans from cache to DB
-     * @param unsafe Block the thread? Usually used in the onDisable
-     */
-    public static void saveDeathbans(boolean unsafe)
-    {
-        if(!MongoAPI.isConnected())
-            return;
-
-        if(unsafe)
-        {
-            if(DBManager.getDeathbans() == null)
-                DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
-
-            MongoCollection collection = DBManager.getDeathbans();
-
-            for(Death deaths : activeDeathbans)
-            {
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", deaths.getUuid().toString()));
-                Document document = query.first();
-
-                Document newDoc = new Document("uuid", deaths.getUuid().toString())
-                        .append("killed", deaths.getKilled().toString())
-                        .append("reason", deaths.getReason())
-                        .append("created", deaths.getCreatedTime())
-                        .append("expires", deaths.getExpiresTime());
-
-                if(document != null)
-                {
-                    collection.replaceOne(document, newDoc);
-                }
-
-                else
-                {
-                    collection.insertOne(newDoc);
-                }
-            }
-        }
-
-        else
-        {
-            new BukkitRunnable() {
-                public void run() {
-                    if(DBManager.getDeathbans() == null)
-                        DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
-
-                    MongoCollection collection = DBManager.getDeathbans();
-
-                    for(Death deaths : activeDeathbans)
-                    {
-                        FindIterable<Document> query = collection.find(Filters.eq("uuid", deaths.getUuid().toString()));
-                        Document document = query.first();
-
-                        Document newDoc = new Document("uuid", deaths.getUuid().toString())
-                                .append("killed", deaths.getKilled().toString())
-                                .append("reason", deaths.getReason())
-                                .append("created", deaths.getCreatedTime())
-                                .append("expires", deaths.getExpiresTime());
-
-                        if(document != null)
-                        {
-                            collection.replaceOne(document, newDoc);
-                        }
-
-                        else
-                        {
-                            collection.insertOne(newDoc);
-                        }
+                        return;
                     }
                 }
-            }.runTaskAsynchronously(FC.getFactionsCore());
-        }
+
+                new BukkitRunnable() {
+                    public void run() {
+                        callback.onQueryDone(null);
+                    }
+                }.runTask(FC.getFactionsCore());
+            }
+        }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
     /**
@@ -173,10 +75,8 @@ public class Deathbans
      * @param uuid
      * @param callback
      */
-    public static void getDeathsByUUID(UUID uuid, DeathbanCallback callback)
-    {
-        if(!MongoAPI.isConnected())
-        {
+    public static void getDeathsByUUID(UUID uuid, DeathbanCallback callback) {
+        if(!MongoAPI.isConnected()) {
             Set<Death> emptyResult = new HashSet<>();
             callback.onQueryDone(emptyResult);
         }
@@ -189,8 +89,7 @@ public class Deathbans
                 FindIterable<Document> query = collection.find(Filters.eq("killed", uuid.toString()));
                 Iterator<Document> iterator = query.iterator();
 
-                while(true)
-                {
+                while(true) {
                     if (!(iterator.hasNext())) break;
                     Document current = iterator.next();
 
@@ -214,28 +113,75 @@ public class Deathbans
         }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
+    public static void saveDeathban(Death death) {
+        new BukkitRunnable() {
+            public void run() {
+                if(DBManager.getDeathbans() == null)
+                    DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
+
+                MongoCollection collection = DBManager.getDeathbans();
+                FindIterable<Document> query = collection.find(Filters.eq("uuid", death.getUuid().toString()));
+                Document document = query.first();
+
+                Document newDoc = new Document("uuid", death.getUuid().toString())
+                        .append("killed", death.getKilled().toString())
+                        .append("reason", death.getReason())
+                        .append("created", death.getCreatedTime())
+                        .append("expires", death.getExpiresTime());
+
+                if(document != null) {
+                    collection.replaceOne(document, newDoc);
+                }
+
+                else {
+                    collection.insertOne(newDoc);
+                }
+
+            }
+        }.runTaskAsynchronously(FC.getFactionsCore());
+    }
+
     /**
      * Deathban and kick a player for a given duration and reason
      * @param uuid
      * @param reason
      * @param duration
      */
-    public static void deathbanPlayer(UUID uuid, String reason, int duration)
-    {
+    public static void deathbanPlayer(UUID uuid, String reason, int duration) {
         UUID dbID = UUID.randomUUID();
         long created = System.currentTimeMillis();
         long expires = System.currentTimeMillis() + (duration * 1000L);
 
         Death death = new Death(dbID, uuid, reason, created, expires);
 
-        activeDeathbans.add(death);
+        saveDeathban(death);
 
-        if(Bukkit.getPlayer(uuid) != null)
-        {
+        if(Bukkit.getPlayer(uuid) != null) {
             Player player = Bukkit.getPlayer(uuid);
 
             player.kickPlayer(getDeathbanMessage(death));
         }
+    }
+
+    public static int getDeathbanDurationByLocation(Location location) {
+        int deathbanDuration = Configuration.normalDeathban;
+
+        for(Event events : EventManager.getActiveEvents()) {
+            if(events.getHookedFaction() == null || events.getHookedFaction().getClaims().isEmpty()) continue;
+
+            for(Claim claims : events.getHookedFaction().getClaims()) {
+                if(!claims.inside(location, true)) continue;
+
+                deathbanDuration = Configuration.eventDeathban;
+            }
+        }
+
+        // TODO: Check if the player has > 1hr playtime
+
+        if(ServerMode.getCurrentState().equals(ServerState.SOTW))
+            deathbanDuration = Configuration.newDeathban;
+
+        return deathbanDuration;
     }
 
     /**
@@ -250,7 +196,6 @@ public class Deathbans
         int seconds = (int) (duration / 1000) % 60;
         int minutes = (int) (duration / (1000 * 60) % 60);
         int hours   = (int) (duration / (1000 * 60 * 60) % 24);
-
 
         if(seconds >= 60)
             seconds = 59;
@@ -321,22 +266,14 @@ public class Deathbans
         loadCommands();
         loadListeners();
         loadCommands();
-        loadDeathbans();
     }
 
-    public static void onDisable()
-    {
-        saveDeathbans(true);
-    }
-
-    public static void loadCommands()
-    {
+    public static void loadCommands() {
         FC.getFactionsCore().getCommand("deathban").setExecutor(new DeathbanCommand());
         FC.getFactionsCore().getCommand("deaths").setExecutor(new DeathsCommand());
     }
 
-    public static void loadListeners()
-    {
+    public static void loadListeners() {
         if(Configuration.deathbansEnabled)
             Bukkit.getPluginManager().registerEvents(new DeathbanListener(), FC.getFactionsCore());
     }

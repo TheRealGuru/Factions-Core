@@ -32,8 +32,7 @@ public class LogoutTask
      * @param uuid The player UUID
      * @return Players starting location
      */
-    public static Location getStartingLocation(UUID uuid)
-    {
+    public static Location getStartingLocation(UUID uuid) {
         if(startingLocations.containsKey(uuid))
             return startingLocations.get(uuid);
 
@@ -43,14 +42,11 @@ public class LogoutTask
     /**
      * Checks to make sure every player performing a /logout has not moved too far
      */
-    public static void checkLocations()
-    {
+    public static void checkLocations() {
         List<UUID> userCache = new CopyOnWriteArrayList<>(startingLocations.keySet());
 
-        for(UUID uuid : userCache)
-        {
-            if(Bukkit.getPlayer(uuid) == null)
-            {
+        for(UUID uuid : userCache) {
+            if(Bukkit.getPlayer(uuid) == null) {
                 startingLocations.remove(uuid);
                 continue;
             }
@@ -60,10 +56,8 @@ public class LogoutTask
             Location current = player.getLocation();
             Location expected = getStartingLocation(player.getUniqueId());
 
-            if(expected.distance(current) >= 1.0 || expected.getWorld() != current.getWorld())
-            {
-                if(facPlayer.isBeingTimed(TimerType.LOGOUT))
-                {
+            if(expected.distance(current) >= 1.0 || expected.getWorld() != current.getWorld()) {
+                if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
                     startingLocations.remove(player.getUniqueId());
                     safeloggers.remove(player.getUniqueId());
                     facPlayer.removeTimer(TimerType.LOGOUT);
@@ -77,12 +71,10 @@ public class LogoutTask
      * Logs the player out, essentially just a kick with a kind message
      * @param uuid The player UUID
      */
-    public static void logoutPlayer(UUID uuid)
-    {
+    public static void logoutPlayer(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
 
-        if(player == null)
-        {
+        if(player == null) {
             startingLocations.remove(uuid);
             return;
         }
@@ -92,8 +84,7 @@ public class LogoutTask
         startingLocations.remove(player.getUniqueId());
 
         new BukkitRunnable() {
-            public void run()
-            {
+            public void run() {
                 safeloggers.remove(uuid);
             }
         }.runTaskLater(FC.getFactionsCore(), 20L);

@@ -4,6 +4,7 @@ import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
+import gg.revival.factions.core.stats.StatsManager;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
@@ -14,8 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class Mining
-{
+public class Mining {
 
     /**
      * Contains all stone that has been placed below Y=32 since the server started up
@@ -27,8 +27,7 @@ public class Mining
      * @param player The drop player
      * @param location The location the drop should be placed at if it does happen
      */
-    public static void runLottery(Player player, Location location)
-    {
+    public static void runLottery(Player player, Location location) {
         if(placedBlocks.contains(location)) return;
 
         Random random = new Random();
@@ -38,28 +37,23 @@ public class Mining
         if(size < 2)
             size = 2;
 
-        if(location.getWorld().getEnvironment().equals(World.Environment.NETHER) && chance <= Configuration.miningGlowstoneChance)
-        {
+        if(location.getWorld().getEnvironment().equals(World.Environment.NETHER) && chance <= Configuration.miningGlowstoneChance) {
             generateVein(player, location, random, size, Material.GLOWSTONE);
             return;
         }
 
-        if(chance <= Configuration.miningGoldChance && chance > Configuration.miningDiamondChance && location.getBlockY() <= 32)
-        {
+        if(chance <= Configuration.miningGoldChance && chance > Configuration.miningDiamondChance && location.getBlockY() <= 32) {
             generateVein(player, location, random, size, Material.GOLD_ORE);
             return;
         }
 
-        if(chance <= Configuration.miningDiamondChance && chance > Configuration.miningEmeraldChance && location.getBlockY() <= 16)
-        {
+        if(chance <= Configuration.miningDiamondChance && chance > Configuration.miningEmeraldChance && location.getBlockY() <= 16) {
             generateVein(player, location, random, size, Material.DIAMOND_ORE);
             return;
         }
 
-        if(chance <= Configuration.miningEmeraldChance && location.getBlockY() <= 16)
-        {
+        if(chance <= Configuration.miningEmeraldChance && location.getBlockY() <= 16) {
             generateVein(player, location, random, size, Material.EMERALD_ORE);
-            return;
         }
     }
 
@@ -165,6 +159,8 @@ public class Mining
                 } else {
                     player.sendMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
                 }
+
+                StatsManager.getStats(player.getUniqueId()).addGold(found);
             }
 
             if(material.equals(Material.DIAMOND_ORE)) {
@@ -173,6 +169,8 @@ public class Mining
                 } else {
                     player.sendMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
                 }
+
+                StatsManager.getStats(player.getUniqueId()).addDiamond(found);
             }
 
             if(material.equals(Material.EMERALD_ORE)) {
@@ -181,6 +179,8 @@ public class Mining
                 } else {
                     player.sendMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
                 }
+
+                StatsManager.getStats(player.getUniqueId()).addEmerald(found);
             }
 
             if(material.equals(Material.GLOWSTONE)) {
@@ -193,13 +193,11 @@ public class Mining
         }
     }
 
-    public static void onEnable()
-    {
+    public static void onEnable() {
         loadListeners();
     }
 
-    public static void loadListeners()
-    {
+    public static void loadListeners() {
         if(Configuration.miningEnabled)
             Bukkit.getPluginManager().registerEvents(new MiningEventsListener(), FC.getFactionsCore());
     }

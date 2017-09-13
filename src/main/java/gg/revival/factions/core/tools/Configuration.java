@@ -1,11 +1,14 @@
 package gg.revival.factions.core.tools;
 
+import gg.revival.factions.core.servermode.ServerMode;
+import gg.revival.factions.core.servermode.ServerState;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class Configuration
 {
@@ -89,6 +92,18 @@ public class Configuration
         FileConfiguration events = FileManager.getEvents();
 
         databaseName = config.getString("database.database-name");
+
+        for(ServerState states : ServerState.values()) {
+            if(!states.toString().equalsIgnoreCase(config.getString("servermode"))) continue;
+            ServerMode.setCurrentState(states);
+        }
+
+        if(ServerMode.getCurrentState() == null) {
+            ServerMode.setCurrentState(ServerState.NORMAL);
+            Logger.log(Level.SEVERE, "Server state not found in config.yml! Defaulting to normal settings...");
+        } else {
+            Logger.log("Server state has been set to '" + ServerMode.getCurrentState().toString() + "'");
+        }
 
         automateEvents = events.getBoolean("configuration.automated");
         defaultKothDuration = events.getInt("configuration.koth.default-duration");

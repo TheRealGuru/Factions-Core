@@ -12,16 +12,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class LogoutCommand implements CommandExecutor
-{
+public class LogoutCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[])
-    {
+    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[]) {
         if(!command.getName().equalsIgnoreCase("logout")) return false;
 
-        if(!(sender instanceof Player))
-        {
+        if(!(sender instanceof Player)) {
             sender.sendMessage("This command can not be used by console");
             return false;
         }
@@ -29,8 +26,7 @@ public class LogoutCommand implements CommandExecutor
         Player player = (Player)sender;
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
-        if(facPlayer.isBeingTimed(TimerType.LOGOUT) || LogoutTask.getSafeloggers().contains(player.getUniqueId()))
-        {
+        if(facPlayer.isBeingTimed(TimerType.LOGOUT) || LogoutTask.getSafeloggers().contains(player.getUniqueId())) {
             int dur = (int)((facPlayer.getTimer(TimerType.LOGOUT).getExpire() - System.currentTimeMillis()) / 1000L);
             player.sendMessage(ChatColor.YELLOW + "You will be safely logged out from the server in " + ChatColor.GOLD + dur + ChatColor.YELLOW + " seconds");
             return false;

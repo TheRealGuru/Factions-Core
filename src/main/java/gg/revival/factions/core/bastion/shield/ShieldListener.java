@@ -21,30 +21,26 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Set;
 import java.util.UUID;
 
-public class ShieldListener implements Listener
-{
+public class ShieldListener implements Listener {
 
     private final Set<UUID> currentlyProcessing = Sets.newSetFromMap(Maps.<UUID, Boolean>newConcurrentMap());
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event)
-    {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         ShieldPlayer shieldPlayer = new ShieldPlayer(player.getUniqueId());
         Shield.getShieldPlayers().add(shieldPlayer);
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event)
-    {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         ShieldPlayer shieldPlayer = Shield.getShieldPlayer(player.getUniqueId());
         Shield.getShieldPlayers().remove(shieldPlayer);
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event)
-    {
+    public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         Location to = event.getTo(), from = event.getFrom();
 

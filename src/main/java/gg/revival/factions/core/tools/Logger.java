@@ -4,8 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 
-public class Logger
-{
+public class Logger {
 
     public static void log(String str) {
         log(Level.INFO, str);

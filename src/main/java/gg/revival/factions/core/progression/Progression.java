@@ -1,26 +1,21 @@
 package gg.revival.factions.core.progression;
 
-public class Progression
-{
+public class Progression {
 
-    public static void onEnable()
-    {
+    public static void onEnable() {
         loadCommands();
         loadListeners();
     }
 
-    public static void onDisable()
-    {
+    public static void onDisable() {
 
     }
 
-    public static void loadCommands()
-    {
+    private static void loadCommands() {
 
     }
 
-    public static void loadListeners()
-    {
+    private static void loadListeners() {
 
     }
 

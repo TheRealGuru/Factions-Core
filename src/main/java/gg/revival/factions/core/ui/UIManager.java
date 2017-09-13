@@ -26,8 +26,7 @@ import org.bukkit.scoreboard.Team;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class UIManager
-{
+public class UIManager {
 
     /**
      * Contains every players scoreboard information
@@ -39,8 +38,7 @@ public class UIManager
      * @param player The player
      * @return RScoreboard object
      */
-    public static RScoreboard getScoreboard(Player player)
-    {
+    public static RScoreboard getScoreboard(Player player) {
         if(scoreboards.containsKey(player.getUniqueId()))
             return scoreboards.get(player.getUniqueId());
 
@@ -51,14 +49,12 @@ public class UIManager
      * Updates all UI information for the player
      * @param player The player
      */
-    public static void update(Player player)
-    {
+    public static void update(Player player) {
         RScoreboard scoreboard = getScoreboard(player);
         Scoreboard mcBoard = null;
         Team fac = null, ally = null, admin = null, mod = null;
 
-        if(scoreboard == null)
-        {
+        if(scoreboard == null) {
             scoreboard = new RScoreboard("Test Scoreboard");
             mcBoard = scoreboard.getScoreboard();
 
@@ -77,8 +73,7 @@ public class UIManager
             mod.setPrefix("[" + ChatColor.DARK_AQUA + "Mod" + ChatColor.RESET + "]" + ChatColor.RESET);
         }
 
-        else
-        {
+        else {
             mcBoard = scoreboard.getScoreboard();
 
             fac = mcBoard.getTeam("f");
@@ -90,39 +85,33 @@ public class UIManager
         Faction faction = FactionManager.getFactionByPlayer(player.getUniqueId());
         PlayerFaction playerFaction = null;
 
-        if(faction != null)
-        {
+        if(faction != null) {
             playerFaction = (PlayerFaction)faction;
         }
 
-        for(Player players : Bukkit.getOnlinePlayers())
-        {
-            if(players.hasPermission(Permissions.CORE_ADMIN))
-            {
+        for(Player players : Bukkit.getOnlinePlayers()) {
+            if(players.hasPermission(Permissions.CORE_ADMIN)) {
                 if(!admin.hasEntry(players.getName()))
                     admin.addEntry(players.getName());
 
                 continue;
             }
 
-            if(players.hasPermission(Permissions.CORE_MOD) && !player.hasPermission(Permissions.CORE_ADMIN))
-            {
+            if(players.hasPermission(Permissions.CORE_MOD) && !player.hasPermission(Permissions.CORE_ADMIN)) {
                 if(!mod.hasEntry(players.getName()))
                     mod.addEntry(players.getName());
 
                 continue;
             }
 
-            if(playerFaction != null && playerFaction.getRoster(true).contains(players.getUniqueId()))
-            {
+            if(playerFaction != null && playerFaction.getRoster(true).contains(players.getUniqueId())) {
                 if(!fac.hasEntry(players.getName()))
                     fac.addEntry(players.getName());
 
                 continue;
             }
 
-            if(playerFaction != null && FactionManager.isAllyMember(player.getUniqueId(), players.getUniqueId()))
-            {
+            if(playerFaction != null && FactionManager.isAllyMember(player.getUniqueId(), players.getUniqueId())) {
                 if(!ally.hasEntry(players.getName()))
                     ally.addEntry(players.getName());
 
@@ -152,52 +141,44 @@ public class UIManager
      * Sends the hotbar message, used to display cooldowns/timers
      * @param player
      */
-    public static void sendActionbar(Player player)
-    {
+    public static void sendActionbar(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
         if(facPlayer == null) return;
 
         StringBuilder builder = new StringBuilder();
 
-        if(facPlayer.isBeingTimed(TimerType.HOME) && facPlayer.getTimer(TimerType.HOME) != null)
-        {
+        if(facPlayer.isBeingTimed(TimerType.HOME) && facPlayer.getTimer(TimerType.HOME) != null) {
             long dur = facPlayer.getTimer(TimerType.HOME).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Home Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.STUCK) && facPlayer.getTimer(TimerType.STUCK) != null)
-        {
+        if(facPlayer.isBeingTimed(TimerType.STUCK) && facPlayer.getTimer(TimerType.STUCK) != null) {
             long dur = facPlayer.getTimer(TimerType.STUCK).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Stuck Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.LOGOUT) && facPlayer.getTimer(TimerType.LOGOUT) != null)
-        {
+        if(facPlayer.isBeingTimed(TimerType.LOGOUT) && facPlayer.getTimer(TimerType.LOGOUT) != null) {
             long dur = facPlayer.getTimer(TimerType.LOGOUT).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.AQUA + "" + ChatColor.BOLD + "Logout" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL) && facPlayer.getTimer(TimerType.ENDERPEARL) != null)
-        {
+        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL) && facPlayer.getTimer(TimerType.ENDERPEARL) != null) {
             long dur = facPlayer.getTimer(TimerType.ENDERPEARL).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enderpearl" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.TAG) && facPlayer.getTimer(TimerType.TAG) != null)
-        {
+        if(facPlayer.isBeingTimed(TimerType.TAG) && facPlayer.getTimer(TimerType.TAG) != null) {
             long dur = facPlayer.getTimer(TimerType.TAG).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.RED + "" + ChatColor.BOLD + "Combat-tag" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.SAFETY) && facPlayer.getTimer(TimerType.SAFETY) != null)
-        {
+        if(facPlayer.isBeingTimed(TimerType.SAFETY) && facPlayer.getTimer(TimerType.SAFETY) != null) {
             long dur = facPlayer.getTimer(TimerType.SAFETY).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Safety" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
         }
 
-        if(facPlayer.isBeingTimed(TimerType.PVPPROT) && facPlayer.getTimer(TimerType.PVPPROT) != null)
-        {
+        if(facPlayer.isBeingTimed(TimerType.PVPPROT) && facPlayer.getTimer(TimerType.PVPPROT) != null) {
             long dur = facPlayer.getTimer(TimerType.PVPPROT).getExpire() - System.currentTimeMillis();
             builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
         }

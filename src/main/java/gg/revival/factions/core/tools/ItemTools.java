@@ -6,8 +6,7 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.Iterator;
 
-public class ItemTools
-{
+public class ItemTools {
 
     /**
      * Deletes a crafting recipe from the server

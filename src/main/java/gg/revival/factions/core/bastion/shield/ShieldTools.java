@@ -7,16 +7,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ShieldTools
-{
+public class ShieldTools {
 
-    public static Collection<Claim> getNearbyClaims(BlockPos pos)
-    {
+    public static Collection<Claim> getNearbyClaims(BlockPos pos) {
         Collection<Claim> nearbyClaims = new CopyOnWriteArrayList<>();
         List<Claim> claimCache = new CopyOnWriteArrayList<>(ClaimManager.getActiveClaims());
 
-        for(Claim claims : claimCache)
-        {
+        for(Claim claims : claimCache) {
             if(!isNearbyClaim(claims, pos, 10)) continue;
 
             nearbyClaims.add(claims);
@@ -25,8 +22,7 @@ public class ShieldTools
         return nearbyClaims;
     }
 
-    public static boolean isInsideClaim(Claim claim, BlockPos pos)
-    {
+    public static boolean isInsideClaim(Claim claim, BlockPos pos) {
         if (!pos.getWorldName().equals(claim.getWorldName())) return false;
 
         double xMin = Math.min(claim.getX1(), claim.getX2());
@@ -36,14 +32,10 @@ public class ShieldTools
         double zMin = Math.min(claim.getZ1(), claim.getZ2());
         double zMax = Math.max(claim.getZ1(), claim.getZ2());
 
-        if (pos.getX() >= xMin && pos.getX() <= xMax && pos.getY() >= yMin && pos.getY() <= yMax && pos.getZ() >= zMin && pos.getZ() <= zMax)
-            return true;
-
-        return false;
+        return pos.getX() >= xMin && pos.getX() <= xMax && pos.getY() >= yMin && pos.getY() <= yMax && pos.getZ() >= zMin && pos.getZ() <= zMax;
     }
 
-    public static boolean isNearbyClaim(Claim claim, BlockPos pos, int dist)
-    {
+    public static boolean isNearbyClaim(Claim claim, BlockPos pos, int dist) {
         if (!pos.getWorldName().equalsIgnoreCase(claim.getWorldName())) return false;
 
         if(isInsideClaim(claim, new BlockPos(pos.getX(), pos.getY(), pos.getZ() + dist, pos.getWorldName())))
@@ -73,8 +65,7 @@ public class ShieldTools
         return false;
     }
 
-    public static Collection<BlockPos> getClaimPerimeterAsBlockPos(Claim claim, int yLevel)
-    {
+    public static Collection<BlockPos> getClaimPerimeterAsBlockPos(Claim claim, int yLevel) {
         Collection<BlockPos> blocks = new CopyOnWriteArrayList<>();
 
         double xMin = Math.min(claim.getX1(), claim.getX2());
@@ -83,12 +74,9 @@ public class ShieldTools
         double zMax = Math.max(claim.getZ1(), claim.getZ2());
 
         for(int x = (int)xMin; x <= xMax; x++) {
-
             for(int z = (int)zMin; z <= zMax; z++) {
-
                 if(x == xMin || x == xMax || z == zMin || z == zMax) {
                     BlockPos block = new BlockPos(x, yLevel, z, claim.getWorldName());
-
                     blocks.add(block);
                 }
             }

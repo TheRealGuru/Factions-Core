@@ -1,6 +1,8 @@
 database:
   database-name: 'factions'
 
+servermode: 'NORMAL'
+
 bastion:
   logout-timer: 30
   combat-tag:

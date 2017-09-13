@@ -19,3 +19,8 @@ commands:
   events:
     description: Events command
     aliases: [e, event, koth, dtc, beacon, palace, citadel, conquest]
+  lives:
+    description: Lives command
+    aliases: [live, lifes, life]
+  revive:
+    description: Revive command

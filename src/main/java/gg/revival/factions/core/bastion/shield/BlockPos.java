@@ -11,8 +11,7 @@ public class BlockPos
     @Getter int x, y, z;
     @Getter String worldName;
 
-    public BlockPos(int x, int y, int z, String worldName)
-    {
+    public BlockPos(int x, int y, int z, String worldName) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -24,8 +23,7 @@ public class BlockPos
         return new Location(Bukkit.getWorld(worldName), x, y, z);
     }
 
-    public int distanceSquared(BlockPos otherPos)
-    {
+    public int distanceSquared(BlockPos otherPos) {
         if(!otherPos.getWorldName().equalsIgnoreCase(worldName)) return 0;
         return square(x - otherPos.x) + square(y - otherPos.y) + square(z - otherPos.z);
     }
@@ -35,8 +33,7 @@ public class BlockPos
         return i * i;
     }
 
-    public boolean isSolid()
-    {
+    public boolean isSolid() {
         if(getBukkitLocation().getBlock() != null && !getBukkitLocation().getBlock().getType().equals(Material.AIR))
             return true;
 

@@ -11,20 +11,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class DeathbanCommand implements CommandExecutor
-{
+public class DeathbanCommand implements CommandExecutor {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[])
-    {
+    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[]) {
         if(!command.getName().equalsIgnoreCase("deathban")) return false;
 
-        if(sender instanceof Player)
-        {
+        if(sender instanceof Player) {
             Player player = (Player)sender;
 
-            if(!player.hasPermission(Permissions.CORE_ADMIN))
-            {
+            if(!player.hasPermission(Permissions.CORE_ADMIN)) {
                 player.sendMessage(ChatColor.RED + "You do not have permission to use this command");
                 return false;
             }
@@ -40,25 +36,25 @@ public class DeathbanCommand implements CommandExecutor
 
         int duration = NumberUtils.toInt(namedDuration);
 
-        if(!NumberUtils.isNumber(namedDuration))
-        {
+        if(!NumberUtils.isNumber(namedDuration)) {
             sender.sendMessage(ChatColor.RED + "/deathban <player> <time>");
             return false;
         }
 
         OfflinePlayerLookup.getOfflinePlayerByName(namedPlayer, (uuid, username) -> {
-            if(uuid == null || username == null)
-            {
+            if(uuid == null || username == null) {
                 sender.sendMessage(ChatColor.RED + "Player not found");
                 return;
             }
 
             String creator = sender.getName();
 
-            if(Deathbans.getActiveDeathban(uuid) != null)
-            {
-                Deathbans.getActiveDeathbans().remove(Deathbans.getActiveDeathban(uuid));
-            }
+            Deathbans.getActiveDeathban(uuid, death -> {
+                if(death != null) {
+                    death.setExpiresTime(System.currentTimeMillis());
+                    Deathbans.saveDeathban(death);
+                }
+            });
 
             Deathbans.deathbanPlayer(uuid, "Applied by Admin", duration);
 

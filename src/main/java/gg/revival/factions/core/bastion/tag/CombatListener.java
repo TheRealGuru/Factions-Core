@@ -6,6 +6,7 @@ import gg.revival.factions.claims.ServerClaimType;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.bastion.logout.tasks.LogoutTask;
+import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.PlayerTools;
 import gg.revival.factions.obj.FPlayer;
@@ -34,20 +35,17 @@ public class CombatListener implements Listener
 {
 
     @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent event)
-    {
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
-        if(facPlayer.isBeingTimed(TimerType.TAG))
-        {
+        if(facPlayer.isBeingTimed(TimerType.TAG)) {
             facPlayer.removeTimer(TimerType.TAG);
         }
     }
 
     @EventHandler
-    public void onEntityInteract(PlayerInteractEntityEvent event)
-    {
+    public void onEntityInteract(PlayerInteractEntityEvent event) {
         Entity entity = event.getRightClicked();
 
         if(NPCTools.isLogger(entity))
@@ -55,8 +53,7 @@ public class CombatListener implements Listener
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerTeleport(PlayerTeleportEvent event)
-    {
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
         if(event.isCancelled())
             return;
 
@@ -68,12 +65,10 @@ public class CombatListener implements Listener
         Location to = event.getTo();
         Claim claim = ClaimManager.getClaimAt(to, true);
 
-        if(claim != null && claim.getClaimOwner() instanceof ServerFaction)
-        {
+        if(claim != null && claim.getClaimOwner() instanceof ServerFaction) {
             ServerFaction serverFaction = (ServerFaction)claim.getClaimOwner();
 
-            if(serverFaction.getType().equals(ServerClaimType.SAFEZONE) && facPlayer.isBeingTimed(TimerType.TAG))
-            {
+            if(serverFaction.getType().equals(ServerClaimType.SAFEZONE) && facPlayer.isBeingTimed(TimerType.TAG)) {
                 ItemStack enderpearl = new ItemStack(Material.ENDER_PEARL);
                 player.getInventory().addItem(enderpearl);
 
@@ -87,8 +82,7 @@ public class CombatListener implements Listener
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event)
-    {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         CombatLogger logger = NPCTools.getLoggerByUUID(player.getUniqueId());
 
@@ -103,8 +97,7 @@ public class CombatListener implements Listener
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerQuit(PlayerQuitEvent event)
-    {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
         final Location location = event.getPlayer().getLocation();
@@ -112,36 +105,30 @@ public class CombatListener implements Listener
         if(LogoutTask.getSafeloggers().contains(player.getUniqueId())) return;
         if(player.isDead() || player.getHealth() <= 0.0) return;
 
-        if(facPlayer.isBeingTimed(TimerType.TAG))
-        {
+        if(facPlayer.isBeingTimed(TimerType.TAG)) {
             NPCTools.spawnLogger(player, Configuration.loggerDuration);
             return;
         }
 
-        if(PlayerTools.isNearbyEnemy(player, Configuration.loggerEnemyDistance))
-        {
+        if(PlayerTools.isNearbyEnemy(player, Configuration.loggerEnemyDistance)) {
             NPCTools.spawnLogger(player, Configuration.loggerDuration);
             return;
         }
 
-        if(player.getFireTicks() > 0 || player.getFallDistance() > 0)
-        {
+        if(player.getFireTicks() > 0 || player.getFallDistance() > 0) {
             NPCTools.spawnLogger(player, Configuration.loggerDuration);
-            return;
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event)
-    {
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.isCancelled())
             return;
 
         Entity damaged = event.getEntity();
         Entity damager = event.getDamager();
 
-        if(damaged instanceof Player && damager instanceof Player)
-        {
+        if(damaged instanceof Player && damager instanceof Player) {
             Player playerDamaged = (Player)damaged;
             Player playerDamager = (Player)damager;
 
@@ -151,8 +138,7 @@ public class CombatListener implements Listener
             CombatManager.tagPlayer(playerDamager, TagReason.ATTACKER);
         }
 
-        if(damaged instanceof Player && damager instanceof Projectile)
-        {
+        if(damaged instanceof Player && damager instanceof Projectile) {
             Player playerDamaged = (Player)damaged;
             Projectile projectile = (Projectile)damager;
 
@@ -168,8 +154,7 @@ public class CombatListener implements Listener
     }
 
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent event)
-    {
+    public void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
 
         if(!NPCTools.isLogger(entity)) return;
@@ -178,20 +163,17 @@ public class CombatListener implements Listener
 
         logger.setDead(true);
 
-        if(!logger.getInventoryContents().isEmpty())
-        {
-            for(ItemStack contents : logger.getInventoryContents())
-            {
+        if(!logger.getInventoryContents().isEmpty()) {
+            for(ItemStack contents : logger.getInventoryContents()) {
                 event.getDrops().add(contents);
             }
         }
 
-        // TODO: Deathban player here
+        Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logged", Deathbans.getDeathbanDurationByLocation(logger.getLocation()));
 
         Faction faction = FactionManager.getFactionByPlayer(logger.getUuid());
 
-        if(faction != null && faction instanceof PlayerFaction)
-        {
+        if(faction != null && faction instanceof PlayerFaction) {
             PlayerFaction playerFaction = (PlayerFaction)faction;
 
             playerFaction.setDtr(playerFaction.getDtr().subtract(BigDecimal.valueOf(1.0)));
@@ -200,13 +182,11 @@ public class CombatListener implements Listener
             // TODO: Send member death message
         }
 
-        if(event.getEntity().getKiller() instanceof Player)
-        {
+        if(event.getEntity().getKiller() instanceof Player) {
             // TODO: Send combat logger death message
         }
 
-        else
-        {
+        else {
             // TODO: Send combat logger death messages
         }
     }

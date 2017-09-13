@@ -39,8 +39,7 @@ public class EnchantLimitListener implements Listener {
                         continue;
                     }
 
-                    if(currentLvl > maxLvl)
-                    {
+                    if(currentLvl > maxLvl) {
                         armor.removeEnchantment(foundEnchants);
                         armor.addEnchantment(foundEnchants, maxLvl);
                         damaged.sendMessage(ChatColor.BLUE + "Modified Enchantment" + ChatColor.WHITE + ": " +
@@ -69,13 +68,11 @@ public class EnchantLimitListener implements Listener {
                         continue;
                     }
 
-                    if(currentLvl > maxLvl)
-                    {
+                    if(currentLvl > maxLvl) {
                         hand.removeEnchantment(foundEnchants);
                         hand.addEnchantment(foundEnchants, maxLvl);
                         damager.sendMessage(ChatColor.BLUE + "Modified Enchantment" + ChatColor.WHITE + ": " +
                                 StringUtils.capitalize(foundEnchants.getName().toLowerCase().replace("_", " ") + " " + currentLvl + " -> " + maxLvl));
-                        continue;
                     }
                 }
             }

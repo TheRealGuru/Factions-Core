@@ -11,6 +11,7 @@ import gg.revival.factions.core.mining.Mining;
 import gg.revival.factions.core.progression.Progression;
 import gg.revival.factions.core.servermode.ServerMode;
 import gg.revival.factions.core.signs.Signs;
+import gg.revival.factions.core.stats.StatsManager;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.ui.UI;
 import lombok.Getter;
@@ -37,17 +38,17 @@ public class FC extends JavaPlugin {
         Signs.onEnable();
         Events.onEnable();
         Deathbans.onEnable();
+        StatsManager.onEnable();
         UI.onEnable();
     }
 
     @Override
     public void onDisable() {
         Bastion.onDisable();
+        StatsManager.onDisable();
         Classes.onDisable();
-        Lives.onDisable();
         Progression.onDisable();
         ServerMode.onDisable();
-        Deathbans.onDisable();
 
         factionsCore = null;
     }

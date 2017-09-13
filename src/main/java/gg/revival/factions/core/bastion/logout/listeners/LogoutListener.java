@@ -18,8 +18,7 @@ public class LogoutListener implements Listener
 {
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerDamage(EntityDamageEvent event)
-    {
+    public void onPlayerDamage(EntityDamageEvent event) {
         if(event.isCancelled()) return;
 
         if(!(event.getEntity() instanceof Player)) return;
@@ -27,8 +26,7 @@ public class LogoutListener implements Listener
         Player player = (Player)event.getEntity();
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
-        if(facPlayer.isBeingTimed(TimerType.LOGOUT))
-        {
+        if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
             facPlayer.removeTimer(TimerType.LOGOUT);
             LogoutTask.getSafeloggers().remove(player.getUniqueId());
             LogoutTask.getStartingLocations().remove(player.getUniqueId());
@@ -38,17 +36,14 @@ public class LogoutListener implements Listener
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event)
-    {
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.isCancelled()) return;
 
-        if(event.getDamager() instanceof Player)
-        {
+        if(event.getDamager() instanceof Player) {
             Player player = (Player)event.getDamager();
             FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
-            if(facPlayer.isBeingTimed(TimerType.LOGOUT))
-            {
+            if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
                 facPlayer.removeTimer(TimerType.LOGOUT);
                 LogoutTask.getSafeloggers().remove(player.getUniqueId());
                 LogoutTask.getStartingLocations().remove(player.getUniqueId());
@@ -57,17 +52,14 @@ public class LogoutListener implements Listener
             }
         }
 
-        if(event.getDamager() instanceof Projectile)
-        {
+        if(event.getDamager() instanceof Projectile) {
             ProjectileSource src = ((Projectile) event.getDamager()).getShooter();
 
-            if(src instanceof Player)
-            {
+            if(src instanceof Player) {
                 Player player = (Player)src;
                 FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
-                if(facPlayer.isBeingTimed(TimerType.LOGOUT))
-                {
+                if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
                     facPlayer.removeTimer(TimerType.LOGOUT);
                     LogoutTask.getSafeloggers().remove(player.getUniqueId());
                     LogoutTask.getStartingLocations().remove(player.getUniqueId());

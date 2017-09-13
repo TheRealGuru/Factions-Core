@@ -6,15 +6,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Getter
-public class ShieldUpdateRequest
-{
+public class ShieldUpdateRequest {
 
     @Getter BlockPos position;
     @Getter ShieldPlayer player;
     @Setter boolean completed = false;
 
-    public ShieldUpdateRequest(BlockPos position, ShieldPlayer player)
-    {
+    public ShieldUpdateRequest(BlockPos position, ShieldPlayer player) {
         this.position = position;
         this.player = player;
     }
