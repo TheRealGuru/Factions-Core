@@ -2,7 +2,6 @@ package gg.revival.factions.core.lives;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import gg.revival.driver.MongoAPI;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.db.DBManager;
@@ -24,7 +23,7 @@ public class Lives {
                     DBManager.setLives(MongoAPI.getCollection("factions", "lives"));
 
                 MongoCollection<Document> collection = DBManager.getLives();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
+                FindIterable<Document> query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
                 Document document = query.first();
 
                 if(document == null) {
@@ -55,7 +54,7 @@ public class Lives {
                     DBManager.setLives(MongoAPI.getCollection("factions", "lives"));
 
                 MongoCollection<Document> collection = DBManager.getLives();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
+                FindIterable<Document> query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
                 Document document = query.first();
                 Document newDoc = new Document("uuid", uuid.toString()).append("lives", newLives);
 

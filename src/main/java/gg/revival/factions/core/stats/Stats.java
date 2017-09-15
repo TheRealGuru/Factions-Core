@@ -2,7 +2,6 @@ package gg.revival.factions.core.stats;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import gg.revival.driver.MongoAPI;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.db.DBManager;
@@ -18,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class StatsManager {
+public class Stats {
 
     @Getter static Set<PlayerStats> activeStats = new HashSet<>();
 
@@ -40,12 +39,22 @@ public class StatsManager {
                 if(DBManager.getStats() == null)
                     DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
 
-                MongoCollection<Document> collection = DBManager.getStats();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
+                MongoCollection collection = DBManager.getStats();
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    loadStats(uuid);
+                    return;
+                }
+
                 Document document = query.first();
 
                 if(document != null) {
                     long playtime = document.getLong("playtime");
+                    int kills = document.getInteger("kills");
+                    int deaths = document.getInteger("deaths");
                     int foundGold = document.getInteger("foundGold");
                     int foundDiamond = document.getInteger("foundDiamond");
                     int foundEmerald = document.getInteger("foundEmerald");
@@ -57,7 +66,7 @@ public class StatsManager {
                             if(Bukkit.getPlayer(uuid) != null)
                                 loginTime = System.currentTimeMillis();
 
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, foundGold, foundDiamond, foundEmerald);
+                            PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
                             activeStats.add(newPlayerStats);
                         }
                     }.runTask(FC.getFactionsCore());
@@ -71,7 +80,7 @@ public class StatsManager {
                             if(Bukkit.getPlayer(uuid) != null)
                                 loginTime = System.currentTimeMillis();
 
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0);
+                            PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
                             activeStats.add(newPlayerStats);
                         }
                     }.runTask(FC.getFactionsCore());
@@ -91,12 +100,22 @@ public class StatsManager {
                 if(DBManager.getStats() == null)
                     DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
 
-                MongoCollection<Document> collection = DBManager.getStats();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
+                MongoCollection collection = DBManager.getStats();
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    loadAndReceiveStats(uuid, callback);
+                    return;
+                }
+
                 Document document = query.first();
 
                 if(document != null) {
                     long playtime = document.getLong("playtime");
+                    int kills = document.getInteger("kills");
+                    int deaths = document.getInteger("deaths");
                     int foundGold = document.getInteger("foundGold");
                     int foundDiamond = document.getInteger("foundDiamond");
                     int foundEmerald = document.getInteger("foundEmerald");
@@ -108,7 +127,7 @@ public class StatsManager {
                             if(Bukkit.getPlayer(uuid) != null)
                                 loginTime = System.currentTimeMillis();
 
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, foundGold, foundDiamond, foundEmerald);
+                            PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
                             activeStats.add(newPlayerStats);
                             callback.onQueryDone(newPlayerStats);
                         }
@@ -123,7 +142,7 @@ public class StatsManager {
                             if(Bukkit.getPlayer(uuid) != null)
                                 loginTime = System.currentTimeMillis();
 
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0);
+                            PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
                             activeStats.add(newPlayerStats);
                             callback.onQueryDone(newPlayerStats);
                         }
@@ -139,12 +158,22 @@ public class StatsManager {
                 if(DBManager.getStats() == null)
                     DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
 
-                MongoCollection<Document> collection = DBManager.getStats();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", stats.getUuid().toString()));
+                MongoCollection collection = DBManager.getStats();
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", stats.getUuid().toString());
+                } catch (LinkageError err) {
+                    saveStats(stats, unsafe);
+                    return;
+                }
+
                 Document document = query.first();
 
                 Document newDoc = new Document("uuid", stats.getUuid().toString())
-                        .append("playtine", stats.getPlaytime())
+                        .append("playtime", stats.getPlaytime())
+                        .append("kills", stats.getKills())
+                        .append("deaths", stats.getDeaths())
                         .append("foundGold", stats.getFoundGold())
                         .append("foundDiamond", stats.getFoundDiamonds())
                         .append("foundEmerald", stats.getFoundEmeralds());
@@ -164,12 +193,22 @@ public class StatsManager {
                 if(DBManager.getStats() == null)
                     DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
 
-                MongoCollection<Document> collection = DBManager.getStats();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", stats.getUuid().toString()));
+                MongoCollection collection = DBManager.getStats();
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", stats.getUuid().toString());
+                } catch (LinkageError err) {
+                    saveStats(stats, unsafe);
+                    return;
+                }
+
                 Document document = query.first();
 
                 Document newDoc = new Document("uuid", stats.getUuid().toString())
-                        .append("playtine", stats.getPlaytime())
+                        .append("playtime", stats.getPlaytime())
+                        .append("kills", stats.getKills())
+                        .append("deaths", stats.getDeaths())
                         .append("foundGold", stats.getFoundGold())
                         .append("foundDiamond", stats.getFoundDiamonds())
                         .append("foundEmerald", stats.getFoundEmeralds());
@@ -183,13 +222,16 @@ public class StatsManager {
     }
 
     public static void onEnable() {
-        loadListeners();
+        if(Configuration.statsEnabled)
+            loadListeners();
+
         loadCommands();
     }
 
     public static void onDisable() {
-        for(PlayerStats loaded : activeStats) {
-            saveStats(loaded, true);
+        if(Configuration.statsEnabled && Configuration.trackStats) {
+            for(PlayerStats loaded : activeStats)
+                saveStats(loaded, true);
         }
     }
 
@@ -198,7 +240,7 @@ public class StatsManager {
     }
 
     private static void loadCommands() {
-
+        // TODO: Stats commands
     }
 
 }

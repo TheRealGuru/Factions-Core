@@ -3,8 +3,11 @@ package gg.revival.factions.core.events.messages;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
+import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.PlayerFaction;
 import org.bukkit.ChatColor;
+
+import java.util.Calendar;
 
 public class EventsMessages {
 
@@ -80,6 +83,47 @@ public class EventsMessages {
         }
 
         return null;
+    }
+
+    public static String eventInfo(Event event) {
+        StringBuilder result = new StringBuilder();
+        Calendar calendar = Calendar.getInstance();
+
+        result.append(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "--------------------" + "\n");
+        result.append(ChatColor.WHITE + "Showing information for: " + ChatColor.RESET + event.getDisplayName() + "\n");
+        result.append("     " + "\n");
+
+        if(event.isActive())
+            result.append(ChatColor.YELLOW + "This event is currently " + ChatColor.GREEN + "Active" + "\n");
+        else
+            result.append(ChatColor.YELLOW + "THis event is currently " + ChatColor.RED + "Inactive" + "\n");
+
+        result.append("     " + "\n");
+
+        if(event.isPalace())
+            result.append(ChatColor.AQUA + "This is a Palace event, capturing this event would give your faction full access to the Palace for the following week" + "\n" + "     " + "\n");
+
+        result.append(ChatColor.YELLOW + "Located at: " + ChatColor.GOLD +
+                "World: " + ChatColor.AQUA + event.getLootChest().getWorld().getName() + ChatColor.GOLD +
+                " X: " + ChatColor.AQUA + event.getLootChest().getBlockX() + ChatColor.GOLD +
+                " Y: " + ChatColor.AQUA + event.getLootChest().getBlockY() + ChatColor.GOLD +
+                " Z: " + ChatColor.AQUA + event.getLootChest().getBlockZ() + "\n");
+
+        result.append("     " + "\n");
+
+        result.append(ChatColor.GOLD + "Schedule: " + "\n");
+
+        for(int days : event.getSchedule().keySet()) {
+            int hr = event.getSchedule().get(days).keySet().iterator().next();
+            int min = event.getSchedule().get(days).get(hr);
+
+            result.append(ChatColor.YELLOW + TimeTools.convertSchedule(days, hr, min) + "\n");
+        }
+
+        result.append("     " + "\n" + ChatColor.GOLD + "It is currently " + ChatColor.YELLOW + TimeTools.convertSchedule(Calendar.DAY_OF_WEEK, Calendar.HOUR_OF_DAY, Calendar.MINUTE) + "\n");
+        result.append(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "--------------------" + "\n");
+
+        return result.toString();
     }
 
 }

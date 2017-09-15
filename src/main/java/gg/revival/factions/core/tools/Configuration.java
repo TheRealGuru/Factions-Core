@@ -1,7 +1,10 @@
 package gg.revival.factions.core.tools;
 
+import gg.revival.factions.core.locations.Locations;
 import gg.revival.factions.core.servermode.ServerMode;
 import gg.revival.factions.core.servermode.ServerState;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
@@ -84,8 +87,10 @@ public class Configuration
     public static boolean limitPotions = true;
     public static Map<PotionEffectType, Integer> potionLimits = new HashMap<>();
 
-    public static void load()
-    {
+    public static boolean statsEnabled = true;
+    public static boolean trackStats = true;
+
+    public static void load() {
         FileManager.createFiles();
 
         FileConfiguration config = FileManager.getConfig();
@@ -166,28 +171,51 @@ public class Configuration
         limitEnchants = config.getBoolean("enchant-limits.enabled");
         limitPotions = config.getBoolean("potion-limits.enabled");
 
-        for(String enchantKeys : config.getConfigurationSection("enchant-limits.enchants").getKeys(false))
-        {
+        for(String enchantKeys : config.getConfigurationSection("enchant-limits.enchants").getKeys(false)) {
             Enchantment enchantment = Enchantment.getByName(enchantKeys);
             int lvl = config.getInt("enchant-limits.enchants." + enchantKeys);
 
             enchantmentLimits.put(enchantment, lvl);
         }
 
-        for(String potionKeys : config.getConfigurationSection("potion-limits.potions").getKeys(false))
-        {
+        for(String potionKeys : config.getConfigurationSection("potion-limits.potions").getKeys(false)) {
             PotionEffectType potionEffectType = PotionEffectType.getByName(potionKeys);
             int lvl = config.getInt("potion-limits.potions." + potionKeys);
 
             potionLimits.put(potionEffectType, lvl);
         }
 
+        statsEnabled = config.getBoolean("stats.enabled");
+        trackStats = config.getBoolean("stats.track-stats");
+
+        Location overworldSpawn = new Location(Bukkit.getWorlds().get(0), 0, 100, 0), endSpawn = new Location(Bukkit.getWorlds().get(2), 0, 100, 0);
+
+        if(config.getString("locations.overworld-spawn.world") != null) {
+            overworldSpawn.setX(config.getDouble("locations.overworld-spawn.x"));
+            overworldSpawn.setY(config.getDouble("locations.overworld-spawn.y"));
+            overworldSpawn.setZ(config.getDouble("locations.overworld.spawn.z"));
+            overworldSpawn.setYaw((float)config.getDouble("locations.overworld-spawn.yaw"));
+            overworldSpawn.setPitch((float)config.getDouble("locations.overworld-spawn.pitch"));
+            overworldSpawn.setWorld(Bukkit.getWorld(config.getString("locations.overworld-spawn.world")));
+        }
+
+        if(config.getString("locations.end-spawn.world") != null) {
+            endSpawn.setX(config.getDouble("locations.end-spawn.x"));
+            endSpawn.setY(config.getDouble("locations.end-spawn.y"));
+            endSpawn.setZ(config.getDouble("locations.end-spawn.z"));
+            endSpawn.setYaw((float)config.getDouble("locations.end-spawn.yaw"));
+            endSpawn.setPitch((float)config.getDouble("locations.end.spawn-pitch"));
+            endSpawn.setWorld(Bukkit.getWorld(config.getString("locations.end-spawn.world")));
+        }
+
+        Locations.setSpawnLocation(overworldSpawn);
+        Locations.setEndSpawnLocation(endSpawn);
+
         Logger.log("Loaded " + enchantmentLimits.size() + " Enchantment limits");
         Logger.log("Loaded " + potionLimits.size() + " Potion limits");
     }
 
-    public static void reload()
-    {
+    public static void reload() {
         FileManager.reloadFiles();
 
         load();

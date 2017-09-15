@@ -5,6 +5,7 @@ import gg.revival.factions.core.events.builder.DTCBuilder;
 import gg.revival.factions.core.events.builder.EventBuilder;
 import gg.revival.factions.core.events.builder.KOTHBuilder;
 import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.EventsGUI;
 import gg.revival.factions.core.tools.Configuration;
@@ -69,7 +70,7 @@ public class EventsCommand implements CommandExecutor {
             }
 
             Event event = EventManager.getEventByName(namedEvent);
-            // TODO: Display event information block here
+            player.sendMessage(EventsMessages.eventInfo(event));
 
             return false;
         }

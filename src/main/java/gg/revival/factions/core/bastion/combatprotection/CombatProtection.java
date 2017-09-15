@@ -2,7 +2,6 @@ package gg.revival.factions.core.bastion.combatprotection;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import gg.revival.driver.MongoAPI;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
@@ -27,8 +26,16 @@ public class CombatProtection {
                 if(DBManager.getProtection() == null)
                     DBManager.setProtection(MongoAPI.getCollection(Configuration.databaseName, "protection"));
 
-                MongoCollection<Document> collection = DBManager.getProtection();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
+                MongoCollection collection = DBManager.getProtection();
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    loadProtection(uuid, callback);
+                    return;
+                }
+
                 Document document = query.first();
 
                 if(document != null) {
@@ -60,8 +67,16 @@ public class CombatProtection {
                 if(DBManager.getProtection() == null)
                     DBManager.setProtection(MongoAPI.getCollection(Configuration.databaseName, "protection"));
 
-                MongoCollection<Document> collection = DBManager.getProtection();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
+                MongoCollection collection = DBManager.getProtection();
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    saveProtection(uuid, remainingProtection, unsafe);
+                    return;
+                }
+
                 Document document = query.first();
 
                 Document newDoc = new Document("uuid", uuid.toString()).append("protection", remainingProtection);
@@ -81,10 +96,17 @@ public class CombatProtection {
                 if(DBManager.getProtection() == null)
                     DBManager.setProtection(MongoAPI.getCollection(Configuration.databaseName, "protection"));
 
-                MongoCollection<Document> collection = DBManager.getProtection();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
-                Document document = query.first();
+                MongoCollection collection = DBManager.getProtection();
+                FindIterable<Document> query = null;
 
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    saveProtection(uuid, remainingProtection, unsafe);
+                    return;
+                }
+
+                Document document = query.first();
                 Document newDoc = new Document("uuid", uuid.toString()).append("protection", remainingProtection);
 
                 if(document != null)
@@ -101,8 +123,16 @@ public class CombatProtection {
                 if(DBManager.getProtection() == null)
                     DBManager.setProtection(MongoAPI.getCollection(Configuration.databaseName, "protection"));
 
-                MongoCollection<Document> collection = DBManager.getProtection();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", uuid.toString()));
+                MongoCollection collection = DBManager.getProtection();
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    deleteProtection(uuid);
+                    return;
+                }
+
                 Document document = query.first();
 
                 if(document != null)

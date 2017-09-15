@@ -9,12 +9,14 @@ public class PlayerStats {
 
     @Getter UUID uuid;
     @Getter @Setter long playtime, loginTime;
-    @Getter @Setter int foundGold, foundDiamonds, foundEmeralds;
+    @Getter @Setter int kills, deaths, foundGold, foundDiamonds, foundEmeralds;
 
-    public PlayerStats(UUID uuid, long playtime, long loginTime, int foundGold, int foundDiamonds, int foundEmeralds) {
+    public PlayerStats(UUID uuid, long playtime, long loginTime, int kills, int deaths, int foundGold, int foundDiamonds, int foundEmeralds) {
         this.uuid = uuid;
         this.playtime = playtime;
         this.loginTime = loginTime;
+        this.kills = kills;
+        this.deaths = deaths;
         this.foundGold = foundGold;
         this.foundDiamonds = foundDiamonds;
         this.foundEmeralds = foundEmeralds;
@@ -22,6 +24,18 @@ public class PlayerStats {
 
     public long getNewPlaytime() {
         return playtime + (System.currentTimeMillis() - loginTime);
+    }
+
+    public int getPlaytimeAsInt() {
+        return (int)(playtime / 1000L);
+    }
+
+    public void addKill() {
+        setKills(kills + 1);
+    }
+
+    public void addDeath() {
+        setDeaths(deaths + 1);
     }
 
     public void addGold(int amount) {

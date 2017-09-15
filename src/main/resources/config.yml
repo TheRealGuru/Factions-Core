@@ -87,3 +87,19 @@ potion-limits:
   enabled: true
   potions:
     REGENERATION: 1
+
+stats:
+  enabled: true
+  track-stats: true
+
+locations:
+  end-spawn:
+    x: 0
+    y: 100
+    z: 0
+    world: world_the_end
+  overworld-spawn:
+    x: 0
+    y: 100
+    z: 0
+    world: world

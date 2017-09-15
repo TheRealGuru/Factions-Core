@@ -6,12 +6,13 @@ import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.events.Events;
 import gg.revival.factions.core.limits.Limiter;
 import gg.revival.factions.core.lives.Lives;
+import gg.revival.factions.core.locations.Locations;
 import gg.revival.factions.core.mechanics.Mechanics;
 import gg.revival.factions.core.mining.Mining;
 import gg.revival.factions.core.progression.Progression;
 import gg.revival.factions.core.servermode.ServerMode;
 import gg.revival.factions.core.signs.Signs;
-import gg.revival.factions.core.stats.StatsManager;
+import gg.revival.factions.core.stats.Stats;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.ui.UI;
 import lombok.Getter;
@@ -38,17 +39,17 @@ public class FC extends JavaPlugin {
         Signs.onEnable();
         Events.onEnable();
         Deathbans.onEnable();
-        StatsManager.onEnable();
+        Stats.onEnable();
+        Locations.onEnable();
         UI.onEnable();
     }
 
     @Override
     public void onDisable() {
         Bastion.onDisable();
-        StatsManager.onDisable();
+        Stats.onDisable();
         Classes.onDisable();
         Progression.onDisable();
-        ServerMode.onDisable();
 
         factionsCore = null;
     }

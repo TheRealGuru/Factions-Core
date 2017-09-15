@@ -169,7 +169,7 @@ public class CombatListener implements Listener
             }
         }
 
-        Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logged", Deathbans.getDeathbanDurationByLocation(logger.getLocation()));
+        Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logged", Deathbans.getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation()));
 
         Faction faction = FactionManager.getFactionByPlayer(logger.getUuid());
 

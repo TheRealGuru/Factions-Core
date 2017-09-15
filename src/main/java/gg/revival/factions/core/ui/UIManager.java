@@ -7,11 +7,11 @@ import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
+import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
-import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.timers.TimerType;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -23,7 +23,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class UIManager {
@@ -183,8 +186,7 @@ public class UIManager {
             builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
         }
 
-        if(!EventManager.getActiveEvents().isEmpty())
-        {
+        if(!EventManager.getActiveEvents().isEmpty()) {
             List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
 
             for(Event activeEvents : cache) {

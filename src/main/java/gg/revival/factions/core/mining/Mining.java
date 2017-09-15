@@ -4,7 +4,7 @@ import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.stats.StatsManager;
+import gg.revival.factions.core.stats.Stats;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
@@ -13,7 +13,9 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Mining {
 
@@ -160,7 +162,7 @@ public class Mining {
                     player.sendMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
                 }
 
-                StatsManager.getStats(player.getUniqueId()).addGold(found);
+                Stats.getStats(player.getUniqueId()).addGold(found);
             }
 
             if(material.equals(Material.DIAMOND_ORE)) {
@@ -170,7 +172,7 @@ public class Mining {
                     player.sendMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
                 }
 
-                StatsManager.getStats(player.getUniqueId()).addDiamond(found);
+                Stats.getStats(player.getUniqueId()).addDiamond(found);
             }
 
             if(material.equals(Material.EMERALD_ORE)) {
@@ -180,7 +182,7 @@ public class Mining {
                     player.sendMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
                 }
 
-                StatsManager.getStats(player.getUniqueId()).addEmerald(found);
+                Stats.getStats(player.getUniqueId()).addEmerald(found);
             }
 
             if(material.equals(Material.GLOWSTONE)) {

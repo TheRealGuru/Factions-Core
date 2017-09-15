@@ -35,9 +35,7 @@ public class DeathbanListener implements Listener {
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
         // TODO: Get deathban reason here
-        Deathbans.deathbanPlayer(player.getUniqueId(), "Insert death reason here hehe", Deathbans.getDeathbanDurationByLocation(player.getLocation()));
+        Deathbans.deathbanPlayer(player.getUniqueId(), "Insert death reason here hehe", Deathbans.getDeathbanDurationByLocation(player.getUniqueId(), player.getLocation()));
     }
-
-    // TODO: Perform deathban action on player death, need to create player stats w/ playtime first though!
 
 }

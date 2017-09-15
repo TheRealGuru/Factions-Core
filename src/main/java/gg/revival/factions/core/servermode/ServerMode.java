@@ -15,12 +15,8 @@ public class ServerMode {
         loadListeners();
     }
 
-    public static void onDisable() {
-
-    }
-
     public static void loadCommands() {
-
+        // TODO: Add /servermode commands
     }
 
     public static void loadListeners() {

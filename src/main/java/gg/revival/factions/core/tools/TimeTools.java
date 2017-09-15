@@ -33,4 +33,38 @@ public class TimeTools
         return new StringBuilder().append(minutes).append(":").append(seconds < 10 ? "0" : "").append(seconds).toString();
     }
 
+    public static String convertSchedule(int day, int hr, int min) {
+        String dayName = "Unknown";
+        String timeOfDay = "AM";
+
+        switch(day) {
+            case 1: dayName = "Sunday";
+                break;
+            case 2: dayName = "Monday";
+                break;
+            case 3: dayName = "Tuesday";
+                break;
+            case 4: dayName = "Wednesday";
+                break;
+            case 5: dayName = "Thursday";
+                break;
+            case 6: dayName = "Friday";
+                break;
+            case 7: dayName = "Saturday";
+                break;
+        }
+
+        if(hr >= 12) {
+            timeOfDay = "PM";
+
+            if(hr > 12)
+                hr -= 12;
+        }
+
+        if(min == 0)
+            return dayName + " @ " + hr + ":" + min + 0 + " " + timeOfDay;
+        else
+            return dayName + " @ " + hr + ":" + min + " " + timeOfDay;
+    }
+
 }

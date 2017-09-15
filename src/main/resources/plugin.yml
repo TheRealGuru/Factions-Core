@@ -24,3 +24,7 @@ commands:
     aliases: [live, lifes, life]
   revive:
     description: Revive command
+  spawn:
+    description: Spawn command
+  end:
+    description: End command

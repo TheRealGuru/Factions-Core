@@ -28,7 +28,6 @@
                         <configuration>
                             <artifactSet>
                                 <excludes>
-                                    <exclude>gg.revival:mongo-bukkit-driver</exclude>
                                     <exclude>gg.revival:factions</exclude>
                                     <exclude>gg.revival:Revival</exclude>
                                 </excludes>
@@ -91,7 +90,6 @@
             <groupId>gg.revival</groupId>
             <artifactId>mongo-bukkit-driver</artifactId>
             <version>1.0.0</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Revival Factions -->

@@ -2,7 +2,6 @@ package gg.revival.factions.core.deathbans;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import gg.revival.driver.MongoAPI;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.core.FC;
@@ -14,6 +13,7 @@ import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.servermode.ServerMode;
 import gg.revival.factions.core.servermode.ServerState;
+import gg.revival.factions.core.stats.Stats;
 import gg.revival.factions.core.tools.Configuration;
 import mkremins.fanciful.FancyMessage;
 import org.bson.Document;
@@ -40,7 +40,14 @@ public class Deathbans {
                     DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
 
                 MongoCollection collection = DBManager.getDeathbans();
-                FindIterable<Document> query = collection.find(Filters.eq("killed", uuid.toString()));
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
+                } catch (LinkageError err) {
+                    getActiveDeathban(uuid, callback);
+                    return;
+                }
 
                 for (Document current : query) {
                     if (current.getLong("expires") > System.currentTimeMillis()) {
@@ -86,7 +93,15 @@ public class Deathbans {
                 Set<Death> result = new HashSet<>();
 
                 MongoCollection collection = DBManager.getDeathbans();
-                FindIterable<Document> query = collection.find(Filters.eq("killed", uuid.toString()));
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
+                } catch (LinkageError err) {
+                    getDeathsByUUID(uuid, callback);
+                    return;
+                }
+
                 Iterator<Document> iterator = query.iterator();
 
                 while(true) {
@@ -120,7 +135,15 @@ public class Deathbans {
                     DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
 
                 MongoCollection collection = DBManager.getDeathbans();
-                FindIterable<Document> query = collection.find(Filters.eq("uuid", death.getUuid().toString()));
+                FindIterable<Document> query = null;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", death.getUuid().toString());
+                } catch (LinkageError err) {
+                    saveDeathban(death);
+                    return;
+                }
+
                 Document document = query.first();
 
                 Document newDoc = new Document("uuid", death.getUuid().toString())
@@ -163,7 +186,7 @@ public class Deathbans {
         }
     }
 
-    public static int getDeathbanDurationByLocation(Location location) {
+    public static int getDeathbanDurationByLocation(UUID uuid, Location location) {
         int deathbanDuration = Configuration.normalDeathban;
 
         for(Event events : EventManager.getActiveEvents()) {
@@ -176,10 +199,13 @@ public class Deathbans {
             }
         }
 
-        // TODO: Check if the player has > 1hr playtime
-
         if(ServerMode.getCurrentState().equals(ServerState.SOTW))
             deathbanDuration = Configuration.newDeathban;
+
+        if(Configuration.statsEnabled && Stats.getStats(uuid) != null) {
+            if(Stats.getStats(uuid).getPlaytimeAsInt() < Configuration.newDeathban)
+                deathbanDuration = Configuration.newDeathban;
+        }
 
         return deathbanDuration;
     }
