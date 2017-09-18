@@ -6,6 +6,7 @@ import gg.revival.factions.core.mechanics.crowbars.CrowbarListener;
 import gg.revival.factions.core.mechanics.emeraldxp.EmeraldEXPListener;
 import gg.revival.factions.core.mechanics.endermite.EndermiteListener;
 import gg.revival.factions.core.mechanics.enderpearlcd.EnderpearlCDListener;
+import gg.revival.factions.core.mechanics.hardmode.HardmodeListener;
 import gg.revival.factions.core.mechanics.highspawners.HighSpawnerListener;
 import gg.revival.factions.core.mechanics.invalidpearl.InvalidPearlListener;
 import gg.revival.factions.core.mechanics.mobstacking.Mobstacker;
@@ -18,31 +19,24 @@ import gg.revival.factions.core.tools.ItemTools;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
-import java.util.Iterator;
+public class Mechanics {
 
-public class Mechanics
-{
-
-    public static void onEnable()
-    {
+    public static void onEnable() {
         loadListeners();
         loadCommands();
         loadRecipes();
     }
 
-    public static void loadListeners()
-    {
+    public static void loadListeners() {
         if(Configuration.emeraldXpEnabled)
             Bukkit.getPluginManager().registerEvents(new EmeraldEXPListener(), FC.getFactionsCore());
 
         if(Configuration.enderpearlCooldownsEnabled)
             Bukkit.getPluginManager().registerEvents(new EnderpearlCDListener(), FC.getFactionsCore());
 
-        if(Configuration.mobstackingEnabled)
-        {
+        if(Configuration.mobstackingEnabled) {
             Bukkit.getPluginManager().registerEvents(new MobstackingListener(), FC.getFactionsCore());
             Mobstacker.run();
         }
@@ -67,6 +61,9 @@ public class Mechanics
 
         if(Configuration.settingsDisableEndermites)
             Bukkit.getPluginManager().registerEvents(new EndermiteListener(), FC.getFactionsCore());
+
+        if(Configuration.hardmodeEnabled)
+            Bukkit.getPluginManager().registerEvents(new HardmodeListener(), FC.getFactionsCore());
     }
 
     public static void loadCommands()
@@ -74,10 +71,8 @@ public class Mechanics
         FC.getFactionsCore().getCommand("crowbar").setExecutor(new CrowbarCommand());
     }
 
-    public static void loadRecipes()
-    {
-        if(Configuration.emeraldXpEnabled)
-        {
+    public static void loadRecipes() {
+        if(Configuration.emeraldXpEnabled) {
             ItemStack expBottle = new ItemStack(Material.EXP_BOTTLE);
             ShapedRecipe expRecipe = new ShapedRecipe(expBottle);
             expRecipe.shape(new String[] { "*" } );
@@ -86,8 +81,7 @@ public class Mechanics
             FC.getFactionsCore().getServer().addRecipe(expRecipe);
         }
 
-        if(Configuration.settingsRemoveGApples)
-        {
+        if(Configuration.settingsRemoveGApples) {
             ItemStack gApple = new ItemStack(Material.GOLDEN_APPLE, 1, (short)1);
             ItemTools.deleteRecipe(gApple);
         }

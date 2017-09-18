@@ -2,6 +2,7 @@ package gg.revival.factions.core.locations;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.locations.command.EndCommand;
+import gg.revival.factions.core.locations.command.EndExitCommand;
 import gg.revival.factions.core.locations.command.SpawnCommand;
 import gg.revival.factions.core.locations.listener.LocationsListener;
 import gg.revival.factions.core.tools.FileManager;
@@ -13,7 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class Locations {
 
-    @Getter @Setter static Location spawnLocation, endSpawnLocation;
+    @Getter @Setter static Location spawnLocation, endSpawnLocation, endExitLocation;
 
     public static void saveSpawnLocation(Location location) {
         FileConfiguration config = FileManager.getConfig();
@@ -43,6 +44,20 @@ public class Locations {
         setEndSpawnLocation(location);
     }
 
+    public static void saveEndExitLocation(Location location) {
+        FileConfiguration config = FileManager.getConfig();
+
+        config.set("locations.end-exit.x", location.getX());
+        config.set("locations.end-exit.y", location.getY());
+        config.set("locations.end-exit.z", location.getZ());
+        config.set("locations.end-exit.yaw", location.getYaw());
+        config.set("locations.end-exit.pitch", location.getPitch());
+        config.set("locations.end-exit.world", location.getWorld().getName());
+        FileManager.saveConfig();
+
+        setEndExitLocation(location);
+    }
+
     public static void onEnable() {
         loadListeners();
         loadCommands();
@@ -55,6 +70,7 @@ public class Locations {
     public static void loadCommands() {
         FC.getFactionsCore().getCommand("spawn").setExecutor(new SpawnCommand());
         FC.getFactionsCore().getCommand("end").setExecutor(new EndCommand());
+        FC.getFactionsCore().getCommand("endexit").setExecutor(new EndExitCommand());
     }
 
 }

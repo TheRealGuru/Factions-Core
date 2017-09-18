@@ -15,26 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class NPCTools
-{
+public class NPCTools {
 
-    public static void spawnLogger(Player player, int duration)
-    {
+    public static void spawnLogger(Player player, int duration) {
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
         List<ItemStack> contents = new ArrayList<>();
 
-        for(ItemStack inventory : player.getInventory().getContents())
-        {
+        for(ItemStack inventory : player.getInventory().getContents()) {
             if(inventory == null || inventory.getType().equals(Material.AIR)) continue;
-
             contents.add(inventory);
         }
 
-        for(ItemStack armor : player.getInventory().getArmorContents())
-        {
+        for(ItemStack armor : player.getInventory().getArmorContents()) {
             if(armor == null || armor.getType().equals(Material.AIR)) continue;
-
             contents.add(armor);
         }
 
@@ -60,17 +54,13 @@ public class NPCTools
         }.runTaskLater(FC.getFactionsCore(), duration * 20L);
     }
 
-    public static void despawnLogger(CombatLogger logger)
-    {
+    public static void despawnLogger(CombatLogger logger) {
         logger.destroy();
-
         CombatManager.getCombatLoggers().remove(logger.getUuid());
     }
 
-    public static boolean isLogger(Entity entity)
-    {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values())
-        {
+    public static boolean isLogger(Entity entity) {
+        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(loggers.getNpc() != entity) continue;
 
             return true;
@@ -79,10 +69,8 @@ public class NPCTools
         return false;
     }
 
-    public static CombatLogger getLoggerByEntity(Entity entity)
-    {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values())
-        {
+    public static CombatLogger getLoggerByEntity(Entity entity) {
+        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(loggers.getNpc() != entity) continue;
 
             return loggers;
@@ -91,10 +79,8 @@ public class NPCTools
         return null;
     }
 
-    public static CombatLogger getLoggerByUUID(UUID uuid)
-    {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values())
-        {
+    public static CombatLogger getLoggerByUUID(UUID uuid) {
+        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(!loggers.getUuid().equals(uuid)) continue;
 
             return loggers;
@@ -103,10 +89,8 @@ public class NPCTools
         return null;
     }
 
-    public static CombatLogger getLoggerByName(String name)
-    {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values())
-        {
+    public static CombatLogger getLoggerByName(String name) {
+        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(!loggers.getDisplayName().equals(name)) continue;
 
             return loggers;

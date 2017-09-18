@@ -23,29 +23,23 @@ public class CombatManager
         return combatLoggers.containsKey(uuid);
     }
 
-    public static CombatLogger getLogger(UUID uuid)
-    {
+    public static CombatLogger getLogger(UUID uuid) {
         if(!hasLogger(uuid)) return null;
-
         return combatLoggers.get(uuid);
     }
 
-    public static long getTag(UUID uuid)
-    {
+    public static long getTag(UUID uuid) {
         FPlayer facPlayer = PlayerManager.getPlayer(uuid);
 
         if(facPlayer == null) return 0L;
 
         if(facPlayer.isBeingTimed(TimerType.TAG))
-        {
             return facPlayer.getTimer(TimerType.TAG).getExpire() - System.currentTimeMillis();
-        }
 
         return 0L;
     }
 
-    public static void tagPlayer(Player player, TagReason reason)
-    {
+    public static void tagPlayer(Player player, TagReason reason) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
         if(facPlayer == null) return;
@@ -53,17 +47,12 @@ public class CombatManager
         int duration = 0;
 
         if(reason.equals(TagReason.ATTACKED))
-        {
             duration = Configuration.tagAttacked;
-        }
 
         if(reason.equals(TagReason.ATTACKER))
-        {
             duration = Configuration.tagAttacker;
-        }
 
-        if(facPlayer.isBeingTimed(TimerType.TAG))
-        {
+        if(facPlayer.isBeingTimed(TimerType.TAG)) {
             int current = (int)((getTag(player.getUniqueId()) - System.currentTimeMillis()) / 1000L);
 
             if(current >= duration) return;

@@ -1,5 +1,10 @@
 package gg.revival.factions.core.tools;
 
+import gg.revival.factions.core.classes.Classes;
+import gg.revival.factions.core.classes.cont.Archer;
+import gg.revival.factions.core.classes.cont.Bard;
+import gg.revival.factions.core.classes.cont.Miner;
+import gg.revival.factions.core.classes.cont.Scout;
 import gg.revival.factions.core.locations.Locations;
 import gg.revival.factions.core.servermode.ServerMode;
 import gg.revival.factions.core.servermode.ServerState;
@@ -37,10 +42,16 @@ public class Configuration
     public static int loggerDuration = 20;
     public static int loggerEnemyDistance = 30;
 
+    public static int classWarmupDelay = 15;
+    public static int activeSpeedCooldown = 60;
+    public static int activeJumpCooldown = 60;
+    public static int activeRegenCooldown = 90;
+    public static int activeStrengthCooldown = 120;
     public static boolean archerEnabled = true;
     public static double maxArcherDamage = 4.0;
     public static boolean scoutEnabled = true;
     public static boolean bardEnabled = true;
+    public static boolean minerEnabled = true;
 
     public static boolean deathbansEnabled = true;
     public static int normalDeathban = 86400;
@@ -50,6 +61,7 @@ public class Configuration
     public static boolean livesEnabled = true;
 
     public static boolean emeraldXpEnabled = true;
+    public static boolean hardmodeEnabled = true;
     public static boolean enderpearlCooldownsEnabled = true;
     public static int enderpearlCooldownsDuration = 16;
     public static boolean mobstackingEnabled = true;
@@ -64,10 +76,10 @@ public class Configuration
     public static int highSpawnersHeight = 125;
 
     public static boolean miningEnabled = true;
-    public static float miningGoldChance = 0.02f;
-    public static float miningDiamondChance = 0.007f;
+    public static float miningGoldChance = 0.009f;
+    public static float miningDiamondChance = 0.006f;
     public static float miningEmeraldChance = 0.003f;
-    public static float miningGlowstoneChance = 0.009f;
+    public static float miningGlowstoneChance = 0.003f;
     public static boolean announceFoundGold = false;
     public static boolean announceFoundDiamond = true;
     public static boolean announceFoundEmerald = true;
@@ -129,10 +141,36 @@ public class Configuration
         loggerDuration = config.getInt("bastion.loggers.duration");
         loggerEnemyDistance = config.getInt("bastion.loggers.enemy-distance");
 
+        classWarmupDelay = config.getInt("classes.warmup");
+        activeSpeedCooldown = config.getInt("classes.active-cooldowns.speed");
+        activeJumpCooldown = config.getInt("classes.active-cooldowns.jump");
+        activeRegenCooldown = config.getInt("classes.active-cooldowns.regen");
+        activeStrengthCooldown = config.getInt("classes.active-cooldowns.strength");
         archerEnabled = config.getBoolean("classes.archer.enabled");
         maxArcherDamage = config.getDouble("classes.archer.max-damage");
         scoutEnabled = config.getBoolean("classes.scout.enabled");
         bardEnabled = config.getBoolean("classes.bard.enabled");
+        minerEnabled = config.getBoolean("classes.miner.enabled");
+
+        if(archerEnabled) {
+            Archer archer = new Archer();
+            Classes.getEnabledClasses().add(archer);
+        }
+
+        if(scoutEnabled) {
+            Scout scout = new Scout();
+            Classes.getEnabledClasses().add(scout);
+        }
+
+        if(bardEnabled) {
+            Bard bard = new Bard();
+            Classes.getEnabledClasses().add(bard);
+        }
+
+        if(minerEnabled) {
+            Miner miner = new Miner();
+            Classes.getEnabledClasses().add(miner);
+        }
 
         deathbansEnabled = config.getBoolean("deathbans.enabled");
         normalDeathban = config.getInt("deathbans.durations.normal");
@@ -142,6 +180,7 @@ public class Configuration
         livesEnabled = config.getBoolean("lives.enabled");
 
         emeraldXpEnabled = config.getBoolean("mechanics.emerald-xp");
+        hardmodeEnabled = config.getBoolean("mechanics.hardmode");
         enderpearlCooldownsEnabled = config.getBoolean("mechanics.enderpearl-cooldowns.enabled");
         enderpearlCooldownsDuration = config.getInt("mechanics.enderpearl-cooldowns.duration");
         mobstackingEnabled = config.getBoolean("mechanics.mobstacking.enabled");
@@ -188,7 +227,7 @@ public class Configuration
         statsEnabled = config.getBoolean("stats.enabled");
         trackStats = config.getBoolean("stats.track-stats");
 
-        Location overworldSpawn = new Location(Bukkit.getWorlds().get(0), 0, 100, 0), endSpawn = new Location(Bukkit.getWorlds().get(2), 0, 100, 0);
+        Location overworldSpawn = new Location(Bukkit.getWorlds().get(0), 0, 100, 0), endSpawn = new Location(Bukkit.getWorlds().get(2), 0, 100, 0), endExit = new Location(Bukkit.getWorlds().get(0), 0, 100, 0);
 
         if(config.getString("locations.overworld-spawn.world") != null) {
             overworldSpawn.setX(config.getDouble("locations.overworld-spawn.x"));
@@ -208,8 +247,18 @@ public class Configuration
             endSpawn.setWorld(Bukkit.getWorld(config.getString("locations.end-spawn.world")));
         }
 
+        if(config.getString("locations.end-exit.world") != null) {
+            endExit.setX(config.getDouble("locations.end-exit.x"));
+            endExit.setY(config.getDouble("locations.end-exit.y"));
+            endExit.setZ(config.getDouble("locations.end-exit.z"));
+            endExit.setYaw((float)config.getDouble("locations.end-exit.yaw"));
+            endExit.setPitch((float)config.getDouble("locations.end.exit-pitch"));
+            endExit.setWorld(Bukkit.getWorld(config.getString("locations.end-exit.world")));
+        }
+
         Locations.setSpawnLocation(overworldSpawn);
         Locations.setEndSpawnLocation(endSpawn);
+        Locations.setEndExitLocation(endExit);
 
         Logger.log("Loaded " + enchantmentLimits.size() + " Enchantment limits");
         Logger.log("Loaded " + potionLimits.size() + " Potion limits");

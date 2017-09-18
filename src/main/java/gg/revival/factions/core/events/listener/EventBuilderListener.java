@@ -71,12 +71,12 @@ public class EventBuilderListener implements Listener {
                 return;
             }
 
-            if(builder.getBuildPhase() == 6) {
+            if(builder.getBuildPhase() == 7) {
                 String response = message.substring(0, 1);
 
                 if(response.equalsIgnoreCase("y")) {
                     builder.setPalace(true);
-                    builder.setBuildPhase(7);
+                    builder.setBuildPhase(8);
                     player.sendMessage(builder.getPhaseResponse());
                     event.setCancelled(true);
 
@@ -85,7 +85,7 @@ public class EventBuilderListener implements Listener {
 
                 if(response.equalsIgnoreCase("n")) {
                     builder.setPalace(false);
-                    builder.setBuildPhase(7);
+                    builder.setBuildPhase(8);
                     player.sendMessage(builder.getPhaseResponse());
 
                     KOTHEvent kothEvent = builder.convertToKOTH();
@@ -191,29 +191,13 @@ public class EventBuilderListener implements Listener {
             KOTHBuilder builder = EventBuilder.getKOTHBuilder(player.getUniqueId());
             CapZone capZone = null;
 
-            if(builder.getBuildPhase() == 3) {
+            if(builder.getBuildPhase() == 4) {
                 if(!event.getClickedBlock().getType().equals(Material.CHEST)) {
                     player.sendMessage(ChatColor.RED + "This block is not a chest");
                     return;
                 }
 
                 builder.setLootChest(event.getClickedBlock().getLocation());
-                builder.setBuildPhase(4);
-                player.sendMessage(builder.getPhaseResponse());
-
-                event.setCancelled(true);
-                return;
-            }
-
-            if(builder.getBuildPhase() == 4) {
-                if(builder.getCapzone() == null) {
-                    capZone = new CapZone(null, null, player.getWorld().getName());
-                } else {
-                    capZone = builder.getCapzone();
-                }
-
-                capZone.setCornerOne(event.getClickedBlock().getLocation());
-                builder.setCapzone(capZone);
                 builder.setBuildPhase(5);
                 player.sendMessage(builder.getPhaseResponse());
 
@@ -222,12 +206,28 @@ public class EventBuilderListener implements Listener {
             }
 
             if(builder.getBuildPhase() == 5) {
+                if(builder.getCapzone() == null) {
+                    capZone = new CapZone(null, null, player.getWorld().getName());
+                } else {
+                    capZone = builder.getCapzone();
+                }
+
+                capZone.setCornerOne(event.getClickedBlock().getLocation());
+                builder.setCapzone(capZone);
+                builder.setBuildPhase(6);
+                player.sendMessage(builder.getPhaseResponse());
+
+                event.setCancelled(true);
+                return;
+            }
+
+            if(builder.getBuildPhase() == 6) {
                 capZone = builder.getCapzone();
 
                 capZone.setCornerTwo(event.getClickedBlock().getLocation());
                 capZone.update();
 
-                builder.setBuildPhase(6);
+                builder.setBuildPhase(7);
                 player.sendMessage(builder.getPhaseResponse());
 
                 event.setCancelled(true);

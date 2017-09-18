@@ -38,19 +38,19 @@ public class TimeTools
         String timeOfDay = "AM";
 
         switch(day) {
-            case 1: dayName = "Sunday";
+            case 1: dayName = "Saturday";
                 break;
-            case 2: dayName = "Monday";
+            case 2: dayName = "Sunday";
                 break;
-            case 3: dayName = "Tuesday";
+            case 3: dayName = "Monday";
                 break;
-            case 4: dayName = "Wednesday";
+            case 4: dayName = "Tuesday";
                 break;
-            case 5: dayName = "Thursday";
+            case 5: dayName = "Wednesday";
                 break;
-            case 6: dayName = "Friday";
+            case 6: dayName = "Thursday";
                 break;
-            case 7: dayName = "Saturday";
+            case 7: dayName = "Friday";
                 break;
         }
 

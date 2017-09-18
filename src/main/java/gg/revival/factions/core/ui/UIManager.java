@@ -186,6 +186,11 @@ public class UIManager {
             builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
         }
 
+        if(facPlayer.isBeingTimed(TimerType.CLASS) && facPlayer.getTimer(TimerType.CLASS) != null) {
+            long dur = facPlayer.getTimer(TimerType.CLASS).getExpire() - System.currentTimeMillis();
+            builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + "Class Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+        }
+
         if(!EventManager.getActiveEvents().isEmpty()) {
             List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
 

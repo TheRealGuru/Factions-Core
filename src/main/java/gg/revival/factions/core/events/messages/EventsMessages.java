@@ -5,9 +5,11 @@ import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.PlayerFaction;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class EventsMessages {
 
@@ -87,7 +89,9 @@ public class EventsMessages {
 
     public static String eventInfo(Event event) {
         StringBuilder result = new StringBuilder();
-        Calendar calendar = Calendar.getInstance();
+
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("E '@' hh:mm a");
 
         result.append(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "--------------------" + "\n");
         result.append(ChatColor.WHITE + "Showing information for: " + ChatColor.RESET + event.getDisplayName() + "\n");
@@ -104,7 +108,7 @@ public class EventsMessages {
             result.append(ChatColor.AQUA + "This is a Palace event, capturing this event would give your faction full access to the Palace for the following week" + "\n" + "     " + "\n");
 
         result.append(ChatColor.YELLOW + "Located at: " + ChatColor.GOLD +
-                "World: " + ChatColor.AQUA + event.getLootChest().getWorld().getName() + ChatColor.GOLD +
+                "World: " + ChatColor.AQUA + StringUtils.capitalize(event.getLootChest().getWorld().getEnvironment().toString().replace("_", " ")) + ChatColor.GOLD +
                 " X: " + ChatColor.AQUA + event.getLootChest().getBlockX() + ChatColor.GOLD +
                 " Y: " + ChatColor.AQUA + event.getLootChest().getBlockY() + ChatColor.GOLD +
                 " Z: " + ChatColor.AQUA + event.getLootChest().getBlockZ() + "\n");
@@ -120,7 +124,7 @@ public class EventsMessages {
             result.append(ChatColor.YELLOW + TimeTools.convertSchedule(days, hr, min) + "\n");
         }
 
-        result.append("     " + "\n" + ChatColor.GOLD + "It is currently " + ChatColor.YELLOW + TimeTools.convertSchedule(Calendar.DAY_OF_WEEK, Calendar.HOUR_OF_DAY, Calendar.MINUTE) + "\n");
+        result.append("     " + "\n" + ChatColor.GOLD + "It is currently " + ChatColor.YELLOW + formatter.format(date) + "\n");
         result.append(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "--------------------" + "\n");
 
         return result.toString();

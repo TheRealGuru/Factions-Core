@@ -1,7 +1,4 @@
 package gg.revival.factions.core.locations.command;
-/*
-** John @ 9/13/2017
-*/
 
 import gg.revival.factions.core.locations.Locations;
 import gg.revival.factions.core.tools.Permissions;
@@ -42,7 +39,7 @@ public class EndCommand implements CommandExecutor {
                     return false;
                 }
 
-                Locations.setEndSpawnLocation(player.getLocation());
+                Locations.saveEndSpawnLocation(player.getLocation());
                 player.sendMessage(ChatColor.GREEN + "End Spawn location has been updated");
                 return false;
             }

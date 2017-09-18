@@ -14,6 +14,7 @@ import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import gg.revival.factions.obj.ServerFaction;
 import gg.revival.factions.timers.TimerType;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -182,12 +183,12 @@ public class CombatListener implements Listener
             // TODO: Send member death message
         }
 
-        if(event.getEntity().getKiller() instanceof Player) {
-            // TODO: Send combat logger death message
+        if(event.getEntity().getKiller() != null) {
+            Bukkit.broadcastMessage(ChatColor.DARK_RED + "RIP: " + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain by " + ChatColor.GOLD + event.getEntity().getKiller().getName());
         }
 
         else {
-            // TODO: Send combat logger death messages
+            Bukkit.broadcastMessage(ChatColor.DARK_RED + "RIP: " + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain");
         }
     }
 

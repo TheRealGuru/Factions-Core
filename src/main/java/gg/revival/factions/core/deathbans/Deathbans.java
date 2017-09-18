@@ -215,8 +215,7 @@ public class Deathbans {
      * @param death
      * @return
      */
-    public static String getDeathbanMessage(Death death)
-    {
+    public static String getDeathbanMessage(Death death) {
         long duration = death.getExpiresTime() - System.currentTimeMillis();
 
         int seconds = (int) (duration / 1000) % 60;
@@ -234,17 +233,11 @@ public class Deathbans {
         if(minutes > 0)
             time.append(minutes + " minutes ");
 
-        if(seconds > 0)
-        {
+        if(seconds > 0) {
             if(time.toString().length() > 0)
-            {
                 time.append("and " + seconds + " seconds ");
-            }
-
             else
-            {
                 time.append(seconds + " seconds ");
-            }
         }
 
         return ChatColor.RED + "You are deathbanned for another " + time.toString().trim() + "." + "\n" +
@@ -257,8 +250,7 @@ public class Deathbans {
      * @param username
      * @param deaths
      */
-    public static void sendDeathbans(Player player, String username, Set<Death> deaths)
-    {
+    public static void sendDeathbans(Player player, String username, Set<Death> deaths) {
         player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------");
         player.sendMessage("Displaying most recent deathbans for " + ChatColor.RED + username);
         player.sendMessage(ChatColor.YELLOW + "Hover over each deathban to view more information.");
@@ -268,8 +260,7 @@ public class Deathbans {
 
         int cursor = 1;
 
-        for(Death death : deaths)
-        {
+        for(Death death : deaths) {
             if(cursor >= 10) break;
 
             Date create = new Date(death.getCreatedTime());
@@ -287,8 +278,7 @@ public class Deathbans {
         player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------");
     }
 
-    public static void onEnable()
-    {
+    public static void onEnable() {
         loadCommands();
         loadListeners();
         loadCommands();

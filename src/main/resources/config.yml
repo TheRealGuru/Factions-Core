@@ -19,6 +19,7 @@ bastion:
     enemy-distance: 30
 
 classes:
+  warmup: 15
   archer:
     enabled: true
     max-damage: 4.0
@@ -26,6 +27,14 @@ classes:
     enabled: true
   bard:
     enabled: true
+  miner:
+    enabled: true
+  active-cooldowns:
+    speed: 60
+    jump: 60
+    regen: 90
+    strength: 120
+
 
 deathbans:
   enabled: true
@@ -39,6 +48,7 @@ lives:
 
 mechanics:
   emerald-xp: true
+  hardmode: true
   enderpearl-cooldowns:
     enabled: true
     duration: 16
@@ -63,10 +73,10 @@ mechanics:
 mining:
   enabled: true
   odds:
-    gold: 0.02
-    diamond: 0.007
+    gold: 0.009
+    diamond: 0.006
     emerald: 0.003
-    glowstone: 0.009
+    glowstone: 0.003
   announce:
     gold: false
     diamond: true
@@ -93,6 +103,11 @@ stats:
   track-stats: true
 
 locations:
+  end-exit:
+    x: 0
+    y: 100
+    z: 0
+    world: world
   end-spawn:
     x: 0
     y: 100

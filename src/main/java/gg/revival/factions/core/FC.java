@@ -48,7 +48,6 @@ public class FC extends JavaPlugin {
     public void onDisable() {
         Bastion.onDisable();
         Stats.onDisable();
-        Classes.onDisable();
         Progression.onDisable();
 
         factionsCore = null;

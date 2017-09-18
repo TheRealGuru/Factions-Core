@@ -28,3 +28,5 @@ commands:
     description: Spawn command
   end:
     description: End command
+  endexit:
+    description: End Exit Command

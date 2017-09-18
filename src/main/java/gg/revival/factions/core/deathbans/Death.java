@@ -5,8 +5,7 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-public class Death
-{
+public class Death {
 
     @Getter UUID uuid;
     @Getter UUID killed;
@@ -14,8 +13,7 @@ public class Death
     @Getter long createdTime;
     @Getter @Setter long expiresTime;
 
-    public Death(UUID uuid, UUID killed, String reason, long createdTimed, long expiresTime)
-    {
+    public Death(UUID uuid, UUID killed, String reason, long createdTimed, long expiresTime) {
         this.uuid = uuid;
         this.killed = killed;
         this.reason = reason;
@@ -23,8 +21,7 @@ public class Death
         this.expiresTime = expiresTime;
     }
 
-    public boolean isExpired()
-    {
+    public boolean isExpired() {
         return expiresTime <= System.currentTimeMillis();
     }
 

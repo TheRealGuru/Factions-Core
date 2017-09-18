@@ -8,11 +8,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class SpawnCommand implements CommandExecutor {
+public class EndExitCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-        if(!command.getName().equalsIgnoreCase("spawn")) return false;
+        if(!command.getName().equalsIgnoreCase("endexit")) return false;
 
         if(!(sender instanceof Player)) {
             sender.sendMessage("This command can not be ran by console");
@@ -23,12 +23,12 @@ public class SpawnCommand implements CommandExecutor {
 
         if(args.length == 0) {
             if(!player.hasPermission(Permissions.CORE_MOD) && !player.hasPermission(Permissions.CORE_ADMIN)) {
-                player.sendMessage(ChatColor.RED + "The /spawn command is disabled on this server. You must run to the center of the map (0, 0) to get to spawn");
+                player.sendMessage(ChatColor.RED + "You do not have permission to use this command");
                 return false;
             }
 
             player.teleport(Locations.getSpawnLocation());
-            player.sendMessage(ChatColor.GREEN + "Returned to spawn");
+            player.sendMessage(ChatColor.GREEN + "Teleported to End Exit");
             return false;
         }
 
@@ -39,8 +39,8 @@ public class SpawnCommand implements CommandExecutor {
                     return false;
                 }
 
-                Locations.saveSpawnLocation(player.getLocation());
-                player.sendMessage(ChatColor.GREEN + "Spawn location has been updated");
+                Locations.saveEndSpawnLocation(player.getLocation());
+                player.sendMessage(ChatColor.GREEN + "End Exit location has been updated");
                 return false;
             }
         }

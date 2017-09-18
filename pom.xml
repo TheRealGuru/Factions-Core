@@ -28,6 +28,7 @@
                         <configuration>
                             <artifactSet>
                                 <excludes>
+                                    <exclude>gg.revival:mongo-bukkit-driver</exclude>
                                     <exclude>gg.revival:factions</exclude>
                                     <exclude>gg.revival:Revival</exclude>
                                 </excludes>
