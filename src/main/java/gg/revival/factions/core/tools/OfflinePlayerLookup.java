@@ -6,10 +6,15 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.UUID;
 
 public class OfflinePlayerLookup {
 
+    /**
+     * Performs a callback containing the offline players UUID and Username
+     * @param query
+     * @param callback
+     */
     public static void getOfflinePlayerByName(String query, OfflinePlayerCallback callback) {
         if(Bukkit.getPlayer(query) != null) {
             Player player = Bukkit.getPlayer(query);
@@ -47,6 +52,11 @@ public class OfflinePlayerLookup {
         }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
+    /**
+     * Performs a callback containing the offline players UUID and Username
+     * @param query
+     * @param callback
+     */
     public static void getOfflinePlayerByUUID(UUID query, OfflinePlayerCallback callback) {
         if(Bukkit.getPlayer(query) != null) {
             Player player = Bukkit.getPlayer(query);

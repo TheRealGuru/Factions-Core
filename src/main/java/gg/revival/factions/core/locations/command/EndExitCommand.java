@@ -27,7 +27,7 @@ public class EndExitCommand implements CommandExecutor {
                 return false;
             }
 
-            player.teleport(Locations.getSpawnLocation());
+            player.teleport(Locations.getEndExitLocation());
             player.sendMessage(ChatColor.GREEN + "Teleported to End Exit");
             return false;
         }
@@ -39,7 +39,7 @@ public class EndExitCommand implements CommandExecutor {
                     return false;
                 }
 
-                Locations.saveEndSpawnLocation(player.getLocation());
+                Locations.saveEndExitLocation(player.getLocation());
                 player.sendMessage(ChatColor.GREEN + "End Exit location has been updated");
                 return false;
             }

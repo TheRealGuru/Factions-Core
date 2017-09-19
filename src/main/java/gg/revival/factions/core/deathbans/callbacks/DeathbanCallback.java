@@ -1,4 +1,6 @@
-package gg.revival.factions.core.deathbans;
+package gg.revival.factions.core.deathbans.callbacks;
+
+import gg.revival.factions.core.deathbans.Death;
 
 import java.util.Set;
 

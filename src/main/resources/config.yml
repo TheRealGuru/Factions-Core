@@ -40,8 +40,7 @@ deathbans:
   enabled: true
   durations:
     normal: 86400
-    event: 10800
-    new: 3600
+    event: 3600
 
 lives:
   enabled: true

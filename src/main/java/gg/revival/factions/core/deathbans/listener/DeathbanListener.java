@@ -40,7 +40,7 @@ public class DeathbanListener implements Listener {
 
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
-        Deathbans.deathbanPlayer(player.getUniqueId(), originalDeathMessage, Deathbans.getDeathbanDurationByLocation(player.getUniqueId(), player.getLocation()));
+        Deathbans.getDeathbanDurationByLocation(player.getUniqueId(), player.getLocation(), duration -> Deathbans.deathbanPlayer(player.getUniqueId(), originalDeathMessage, duration));
     }
 
     @EventHandler

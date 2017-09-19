@@ -30,47 +30,29 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
         if(facPlayer == null) return;
 
         for(Claim claims : ShieldTools.getNearbyClaims(request.getPosition())) {
-            if(!facPlayer.isBeingTimed(TimerType.TAG)) {
-                if(claims.getClaimOwner() instanceof ServerFaction) {
-                    ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
+            if(claims.getClaimOwner() instanceof PlayerFaction) {
+                PlayerFaction playerFaction = (PlayerFaction)claims.getClaimOwner();
 
-                    if(serverFaction.getType().equals(ServerClaimType.SAFEZONE)) continue;
-                }
+                if(!facPlayer.isBeingTimed(TimerType.PVPPROT) && !facPlayer.isBeingTimed(TimerType.PROGRESSION)) continue;
+                if(playerFaction.getRoster(true).contains(facPlayer.getUuid()) && !facPlayer.isBeingTimed(TimerType.PVPPROT)) continue;
+                if(playerFaction.getRoster(true).contains(facPlayer.getUuid()) && facPlayer.isBeingTimed(TimerType.PROGRESSION)) continue;
             }
 
-            else {
-                if(claims.getClaimOwner() instanceof ServerFaction) {
-                    ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
+            if(claims.getClaimOwner() instanceof ServerFaction) {
+                ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
 
-                    if(serverFaction.getType().equals(ServerClaimType.EVENT) && !facPlayer.isBeingTimed(TimerType.PROGRESSION) && !facPlayer.isBeingTimed(TimerType.PVPPROT)) continue;
-                }
-            }
+                if(!facPlayer.isBeingTimed(TimerType.PVPPROT) && !facPlayer.isBeingTimed(TimerType.PROGRESSION) && !facPlayer.isBeingTimed(TimerType.TAG)) continue;
+                if(serverFaction.getType().equals(ServerClaimType.ROAD)) continue;
 
-            if(facPlayer.isBeingTimed(TimerType.PROGRESSION)) {
-                if(claims.getClaimOwner() instanceof PlayerFaction) {
-                    PlayerFaction playerFaction = (PlayerFaction)claims.getClaimOwner();
+                if(serverFaction.getType().equals(ServerClaimType.EVENT))
+                    if(!facPlayer.isBeingTimed(TimerType.PVPPROT) && !facPlayer.isBeingTimed(TimerType.PROGRESSION)) continue;
 
-                    if(playerFaction.getRoster(true).contains(facPlayer.getUuid()) && !facPlayer.isBeingTimed(TimerType.PVPPROT)) continue;
-                }
-
-                if(claims.getClaimOwner() instanceof ServerFaction) {
-                    ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
-
-                    if(serverFaction.getType().equals(ServerClaimType.ROAD)) continue;
-                    if(serverFaction.getType().equals(ServerClaimType.SAFEZONE) && !facPlayer.isBeingTimed(TimerType.TAG)) continue;
-                }
-            }
-
-            if(facPlayer.isBeingTimed(TimerType.PVPPROT)) {
-                if(claims.getClaimOwner() instanceof ServerFaction) {
-                    ServerFaction serverFaction = (ServerFaction)claims.getClaimOwner();
-
-                    if(!serverFaction.getType().equals(ServerClaimType.EVENT)) continue;
-                }
+                if(serverFaction.getType().equals(ServerClaimType.SAFEZONE))
+                    if(!facPlayer.isBeingTimed(TimerType.TAG)) continue;
             }
 
             int y = request.getPosition().getY() - 2;
-            int endingY = y + 5;
+            int endingY = y + 7;
 
             for(int i = y; i < endingY; i++) {
                 for(BlockPos nearby : ShieldTools.getClaimPerimeterAsBlockPos(claims, i)) {

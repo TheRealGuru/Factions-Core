@@ -1,10 +1,6 @@
 package gg.revival.factions.core.bastion.combatprotection;
 
-import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.tools.Configuration;
-import gg.revival.factions.obj.FPlayer;
-import gg.revival.factions.timers.TimerManager;
-import gg.revival.factions.timers.TimerType;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -14,40 +10,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CombatProtectionListener implements Listener {
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
-
-        CombatProtection.loadProtection(player.getUniqueId(), protectionDuration -> {
-            if(protectionDuration == 0) return;
-            facPlayer.addTimer(TimerManager.createTimer(TimerType.PVPPROT, protectionDuration));
-        });
-
-        if(!player.hasPlayedBefore() && !facPlayer.isBeingTimed(TimerType.PVPPROT))
-            facPlayer.addTimer(TimerManager.createTimer(TimerType.PVPPROT, Configuration.pvpProtDuration));
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
-
-        if(!facPlayer.isBeingTimed(TimerType.PVPPROT)) return;
-
-        int remainingProtection = (int)((facPlayer.getTimer(TimerType.PVPPROT).getExpire() - System.currentTimeMillis()) / 1000L);
-
-        CombatProtection.saveProtection(player.getUniqueId(), remainingProtection, false);
-    }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
@@ -93,6 +65,9 @@ public class CombatProtectionListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(event.isCancelled())
+            return;
+
         Entity damaged = event.getEntity();
         Entity damager = event.getDamager();
 

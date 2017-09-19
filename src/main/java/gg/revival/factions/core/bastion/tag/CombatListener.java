@@ -32,8 +32,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 
-public class CombatListener implements Listener
-{
+public class CombatListener implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
@@ -121,7 +120,7 @@ public class CombatListener implements Listener
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.isCancelled())
             return;
@@ -170,7 +169,7 @@ public class CombatListener implements Listener
             }
         }
 
-        Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logged", Deathbans.getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation()));
+        Deathbans.getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation(), duration -> Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logged", duration));
 
         Faction faction = FactionManager.getFactionByPlayer(logger.getUuid());
 
@@ -183,13 +182,10 @@ public class CombatListener implements Listener
             // TODO: Send member death message
         }
 
-        if(event.getEntity().getKiller() != null) {
+        if(event.getEntity().getKiller() != null)
             Bukkit.broadcastMessage(ChatColor.DARK_RED + "RIP: " + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain by " + ChatColor.GOLD + event.getEntity().getKiller().getName());
-        }
-
-        else {
+        else
             Bukkit.broadcastMessage(ChatColor.DARK_RED + "RIP: " + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain");
-        }
     }
 
 }

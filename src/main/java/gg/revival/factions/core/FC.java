@@ -2,6 +2,7 @@ package gg.revival.factions.core;
 
 import gg.revival.factions.core.bastion.Bastion;
 import gg.revival.factions.core.classes.Classes;
+import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.events.Events;
 import gg.revival.factions.core.limits.Limiter;
@@ -28,6 +29,7 @@ public class FC extends JavaPlugin {
 
         Configuration.load();
 
+        DBManager.onEnable();
         Bastion.onEnable();
         Classes.onEnable();
         Lives.onEnable();
@@ -48,7 +50,6 @@ public class FC extends JavaPlugin {
     public void onDisable() {
         Bastion.onDisable();
         Stats.onDisable();
-        Progression.onDisable();
 
         factionsCore = null;
     }

@@ -6,13 +6,14 @@ import gg.revival.driver.MongoAPI;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.db.DBManager;
+import gg.revival.factions.core.deathbans.callbacks.ActiveDeathbanCallback;
+import gg.revival.factions.core.deathbans.callbacks.DeathbanCallback;
+import gg.revival.factions.core.deathbans.callbacks.DeathbanDurationCallback;
 import gg.revival.factions.core.deathbans.command.DeathbanCommand;
 import gg.revival.factions.core.deathbans.command.DeathsCommand;
 import gg.revival.factions.core.deathbans.listener.DeathbanListener;
 import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
-import gg.revival.factions.core.servermode.ServerMode;
-import gg.revival.factions.core.servermode.ServerState;
 import gg.revival.factions.core.stats.Stats;
 import gg.revival.factions.core.tools.Configuration;
 import mkremins.fanciful.FancyMessage;
@@ -186,28 +187,31 @@ public class Deathbans {
         }
     }
 
-    public static int getDeathbanDurationByLocation(UUID uuid, Location location) {
-        int deathbanDuration = Configuration.normalDeathban;
+    public static void getDeathbanDurationByLocation(UUID uuid, Location location, DeathbanDurationCallback callback) {
+        Stats.loadAndReceiveStats(uuid, stats -> {
+            if(stats.getLoginTime() != -1L)
+                stats.setPlaytime(stats.getNewPlaytime());
 
-        for(Event events : EventManager.getActiveEvents()) {
-            if(events.getHookedFaction() == null || events.getHookedFaction().getClaims().isEmpty()) continue;
+            for(Event events : EventManager.getActiveEvents()) {
+                if(events.getHookedFaction() == null || events.getHookedFaction().getClaims().isEmpty()) continue;
 
-            for(Claim claims : events.getHookedFaction().getClaims()) {
-                if(!claims.inside(location, true)) continue;
+                for(Claim claims : events.getHookedFaction().getClaims()) {
+                    if(!claims.inside(location, true)) continue;
 
-                deathbanDuration = Configuration.eventDeathban;
+                    if(stats.getPlaytimeAsInt() >= Configuration.eventDeathban) {
+                        callback.onLookupComplete(Configuration.eventDeathban);
+                        return;
+                    }
+                }
             }
-        }
 
-        if(ServerMode.getCurrentState().equals(ServerState.SOTW))
-            deathbanDuration = Configuration.newDeathban;
+            if(stats.getPlaytimeAsInt() >= Configuration.normalDeathban) {
+                callback.onLookupComplete(Configuration.normalDeathban);
+                return;
+            }
 
-        if(Configuration.statsEnabled && Stats.getStats(uuid) != null) {
-            if(Stats.getStats(uuid).getPlaytimeAsInt() < Configuration.newDeathban)
-                deathbanDuration = Configuration.newDeathban;
-        }
-
-        return deathbanDuration;
+            callback.onLookupComplete(stats.getPlaytimeAsInt());
+        });
     }
 
     /**

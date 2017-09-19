@@ -55,8 +55,7 @@ public class Configuration
 
     public static boolean deathbansEnabled = true;
     public static int normalDeathban = 86400;
-    public static int eventDeathban = 10800;
-    public static int newDeathban = 3600;
+    public static int eventDeathban = 3600;
 
     public static boolean livesEnabled = true;
 
@@ -175,7 +174,6 @@ public class Configuration
         deathbansEnabled = config.getBoolean("deathbans.enabled");
         normalDeathban = config.getInt("deathbans.durations.normal");
         eventDeathban = config.getInt("deathbans.durations.event");
-        newDeathban = config.getInt("deathbans.durations.new");
 
         livesEnabled = config.getBoolean("lives.enabled");
 

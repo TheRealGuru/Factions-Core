@@ -29,4 +29,7 @@ commands:
   end:
     description: End command
   endexit:
-    description: End Exit Command
+    description: End Exit command
+  progression:
+    description: Progression command
+    aliases: [progress, p]

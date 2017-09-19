@@ -36,6 +36,12 @@ public class PlayerTools {
         return false;
     }
 
+    /**
+     * Returns a Set of nearby faction members
+     * @param playerFaction
+     * @param location
+     * @return
+     */
     public static Set<UUID> getNearbyFactionMembers(PlayerFaction playerFaction, Location location) {
         Set<UUID> result = new HashSet<>();
 

@@ -1,9 +1,6 @@
 package gg.revival.factions.core.deathbans.command;
 
-import gg.revival.factions.core.deathbans.Death;
-import gg.revival.factions.core.deathbans.DeathbanCallback;
 import gg.revival.factions.core.deathbans.Deathbans;
-import gg.revival.factions.core.tools.OfflinePlayerCallback;
 import gg.revival.factions.core.tools.OfflinePlayerLookup;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

@@ -10,49 +10,42 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
 
 public class Locations {
 
     @Getter @Setter static Location spawnLocation, endSpawnLocation, endExitLocation;
 
     public static void saveSpawnLocation(Location location) {
-        FileConfiguration config = FileManager.getConfig();
-
-        config.set("locations.overworld-spawn.x", location.getX());
-        config.set("locations.overworld-spawn.y", location.getY());
-        config.set("locations.overworld-spawn.z", location.getZ());
-        config.set("locations.overworld-spawn.yaw", location.getYaw());
-        config.set("locations.overworld-spawn.pitch", location.getPitch());
-        config.set("locations.overworld-spawn.world", location.getWorld().getName());
+        FileManager.getConfig().set("locations.overworld-spawn.x", location.getX());
+        FileManager.getConfig().set("locations.overworld-spawn.y", location.getY());
+        FileManager.getConfig().set("locations.overworld-spawn.z", location.getZ());
+        FileManager.getConfig().set("locations.overworld-spawn.yaw", location.getYaw());
+        FileManager.getConfig().set("locations.overworld-spawn.pitch", location.getPitch());
+        FileManager.getConfig().set("locations.overworld-spawn.world", location.getWorld().getName());
         FileManager.saveConfig();
 
         setSpawnLocation(location);
     }
 
     public static void saveEndSpawnLocation(Location location) {
-        FileConfiguration config = FileManager.getConfig();
-
-        config.set("locations.end-spawn.x", location.getX());
-        config.set("locations.end-spawn.y", location.getY());
-        config.set("locations.end-spawn.z", location.getZ());
-        config.set("locations.end-spawn.yaw", location.getYaw());
-        config.set("locations.end-spawn.pitch", location.getPitch());
-        config.set("locations.end-spawn.world", location.getWorld().getName());
+        FileManager.getConfig().set("locations.end-spawn.x", location.getX());
+        FileManager.getConfig().set("locations.end-spawn.y", location.getY());
+        FileManager.getConfig().set("locations.end-spawn.z", location.getZ());
+        FileManager.getConfig().set("locations.end-spawn.yaw", location.getYaw());
+        FileManager.getConfig().set("locations.end-spawn.pitch", location.getPitch());
+        FileManager.getConfig().set("locations.end-spawn.world", location.getWorld().getName());
         FileManager.saveConfig();
 
         setEndSpawnLocation(location);
     }
 
     public static void saveEndExitLocation(Location location) {
-        FileConfiguration config = FileManager.getConfig();
-
-        config.set("locations.end-exit.x", location.getX());
-        config.set("locations.end-exit.y", location.getY());
-        config.set("locations.end-exit.z", location.getZ());
-        config.set("locations.end-exit.yaw", location.getYaw());
-        config.set("locations.end-exit.pitch", location.getPitch());
-        config.set("locations.end-exit.world", location.getWorld().getName());
+        FileManager.getConfig().set("locations.end-exit.x", location.getX());
+        FileManager.getConfig().set("locations.end-exit.y", location.getY());
+        FileManager.getConfig().set("locations.end-exit.z", location.getZ());
+        FileManager.getConfig().set("locations.end-exit.yaw", location.getYaw());
+        FileManager.getConfig().set("locations.end-exit.pitch", location.getPitch());
+        FileManager.getConfig().set("locations.end-exit.world", location.getWorld().getName());
         FileManager.saveConfig();
 
         setEndExitLocation(location);

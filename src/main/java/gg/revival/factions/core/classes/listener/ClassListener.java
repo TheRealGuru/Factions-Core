@@ -64,9 +64,7 @@ public class ClassListener implements Listener {
         Player player = event.getPlayer();
         ClassProfile classProfile = Classes.getClassProfile(player.getUniqueId());
 
-        if(classProfile == null) return;
-
-        if(!classProfile.getConsumeCooldowns().isEmpty()) return;
+        if(classProfile == null || !classProfile.getConsumeCooldowns().isEmpty()) return;
 
         Classes.removeClassProfile(player.getUniqueId());
     }
@@ -120,7 +118,7 @@ public class ClassListener implements Listener {
         ItemStack hand = player.getItemInHand();
         ClassProfile classProfile = Classes.getClassProfile(player.getUniqueId());
 
-        if(classProfile.getSelectedClass() == null || !classProfile.isActive()) return;
+        if(classProfile == null || classProfile.getSelectedClass() == null || !classProfile.isActive()) return;
 
         RClass playerClass = Classes.getClassByClassType(classProfile.getSelectedClass());
 
@@ -181,6 +179,18 @@ public class ClassListener implements Listener {
 
                 for(UUID nearby : PlayerTools.getNearbyFactionMembers(playerFaction, player.getLocation())) {
                     Player nearbyPlayer = Bukkit.getPlayer(nearby);
+                    ClassProfile nearbyClass = Classes.getClassProfile(nearbyPlayer.getUniqueId());
+
+                    PotionEffect foundPotionEffect = null;
+
+                    if(nearbyClass == null || nearbyClass.getSelectedClass() == null || !nearbyClass.isActive()) {
+                        for(PotionEffect potionEffects : nearbyPlayer.getActivePotionEffects()) {
+                            if(potionEffects.getType().equals(playerClass.getActives().get(consumeable).getType()))
+                                foundPotionEffect = potionEffects;
+                        }
+                    }
+
+                    final PotionEffect savedPotionEffect = foundPotionEffect;
 
                     nearbyPlayer.removePotionEffect(playerClass.getActives().get(consumeable).getType());
                     nearbyPlayer.addPotionEffect(playerClass.getActives().get(consumeable));
@@ -188,11 +198,18 @@ public class ClassListener implements Listener {
                     new BukkitRunnable() {
                         public void run() {
                             if(nearbyPlayer == null) return;
-                            if(Classes.getClassProfile(uuid) == null) return;
 
-                            for(PotionEffect passives : Classes.getClassByClassType(Classes.getClassProfile(nearby).getSelectedClass()).getPassives()) {
-                                if(passives.getType().equals(playerClass.getActives().get(consumeable).getType()))
-                                    nearbyPlayer.addPotionEffect(passives);
+                            if(Classes.getClassProfile(nearbyPlayer.getUniqueId()) != null && Classes.getClassProfile(nearbyPlayer.getUniqueId()).getSelectedClass() != null) {
+                                for(PotionEffect passives : Classes.getClassByClassType(Classes.getClassProfile(nearby).getSelectedClass()).getPassives()) {
+                                    if(passives.getType().equals(playerClass.getActives().get(consumeable).getType())) {
+                                        nearbyPlayer.addPotionEffect(passives);
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            if(savedPotionEffect != null && !Classes.getClassProfile(nearbyPlayer.getUniqueId()).isActive()) {
+                                player.addPotionEffect(savedPotionEffect);
                             }
                         }
                     }.runTaskLater(FC.getFactionsCore(), (playerClass.getActives().get(consumeable).getDuration() + 5L));
@@ -240,7 +257,7 @@ public class ClassListener implements Listener {
                         Classes.removeClassProfile(classProfile.getUuid());
                 }
             }
-        }.runTaskLater(FC.getFactionsCore(), cooldown * 20L); // TODO: Update this with config value
+        }.runTaskLater(FC.getFactionsCore(), cooldown * 20L);
     }
 
 }
