@@ -21,6 +21,9 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
 
     private final ShieldUpdateRequest request;
 
+    /**
+     * Performs the shield updating for a given player, draws blocks that should be seen and unrenders blocks that should not
+     */
     @SuppressWarnings("deprecation")
     @Override
     public void run() {

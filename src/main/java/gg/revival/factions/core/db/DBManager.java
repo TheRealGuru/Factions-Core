@@ -23,11 +23,30 @@ import java.util.UUID;
 
 public class DBManager {
 
+    /**
+     * Combat-Tag, PvP Protection and Progression
+     */
     @Getter @Setter static MongoCollection<Document> bastion;
+
+    /**
+     * Deathbans
+     */
     @Getter @Setter static MongoCollection<Document> deathbans;
+
+    /**
+     * Lives
+     */
     @Getter @Setter static MongoCollection<Document> lives;
+
+    /**
+     * Statistics
+     */
     @Getter @Setter static MongoCollection<Document> stats;
 
+    /**
+     * Saves a given FPlayer objects timer data to DB
+     * @param player
+     */
     public static void saveTimerData(final FPlayer player) {
         final List<Timer> timers = new ArrayList<>(player.getTimers());
 
@@ -71,6 +90,10 @@ public class DBManager {
         }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
+    /**
+     * Loads a given UUIDs timer data and applys it to the given player if they are online
+     * @param uuid
+     */
     public static void loadTimerData(UUID uuid) {
         new BukkitRunnable() {
             public void run() {

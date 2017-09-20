@@ -131,11 +131,13 @@ public class ClassListener implements Listener {
                 isConsumeable = true;
         }
 
+        // No item to consume, no reason to go further
         if(!isConsumeable) return;
 
         Material consumeable = hand.getType();
         int cooldown = 0;
 
+        // Set the cooldown based on the item in hand
         if(consumeable.equals(Material.SUGAR))
             cooldown = Configuration.activeSpeedCooldown;
         else if(consumeable.equals(Material.FEATHER))
@@ -145,32 +147,41 @@ public class ClassListener implements Listener {
         else if(consumeable.equals(Material.BLAZE_POWDER))
             cooldown = Configuration.activeStrengthCooldown;
 
+        // Check to make sure the player hasn't recently used this active effect, if they have cancel it and notify them
         if(classProfile.getConsumeCooldowns().containsKey(consumeable)) {
             long dur = classProfile.getConsumeCooldowns().get(consumeable) - System.currentTimeMillis();
             player.sendMessage(ChatColor.RED + "This active ability is locked for " + ChatColor.RED + "" + ChatColor.BOLD + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RED + " seconds");
             return;
         }
 
+        // Subtract the item in hand or completely remove it if they only had 1 left
         if(player.getItemInHand().getAmount() <= 1)
             player.setItemInHand(null);
         else
             player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
 
+        // Bard gives effects to nearby faction members, so this check needs to be done separate from the others
         if(classProfile.getSelectedClass().equals(ClassType.BARD)) {
             Faction faction = FactionManager.getFactionByPlayer(player.getUniqueId());
 
+            // Only bother checking for nearby faction members IF they have a faction
             if(faction != null && faction instanceof PlayerFaction) {
                 PlayerFaction playerFaction = (PlayerFaction)faction;
 
+                // Put the player on cooldown for using this active
                 classProfile.getConsumeCooldowns().put(consumeable, System.currentTimeMillis() + (cooldown * 1000L));
 
+                // Scheduler for notifying the player they are off cooldown
                 new BukkitRunnable() {
                     public void run() {
+                        // Take away the cooldown
                         classProfile.getConsumeCooldowns().remove(consumeable);
 
+                        // If the player is still online, send them the notification
                         if(Bukkit.getPlayer(uuid) != null) {
                             Bukkit.getPlayer(uuid).sendMessage(ChatColor.GREEN + StringUtils.capitalize(playerClass.getActives().get(consumeable).getType().getName().replace("_", " ").toLowerCase()) + " has been unlocked");
                         } else {
+                            // The player is not online, if they don't have cooldowns remove their class profile
                             if(classProfile.getConsumeCooldowns().isEmpty())
                                 Classes.removeClassProfile(classProfile.getUuid());
                         }
@@ -181,6 +192,7 @@ public class ClassListener implements Listener {
                     Player nearbyPlayer = Bukkit.getPlayer(nearby);
                     ClassProfile nearbyClass = Classes.getClassProfile(nearbyPlayer.getUniqueId());
 
+                    // Here we'll store the affected players effect that was overwritten, and we'll give it back when the active effect expires
                     PotionEffect foundPotionEffect = null;
 
                     if(nearbyClass == null || nearbyClass.getSelectedClass() == null || !nearbyClass.isActive()) {
@@ -192,9 +204,11 @@ public class ClassListener implements Listener {
 
                     final PotionEffect savedPotionEffect = foundPotionEffect;
 
+                    // Remove and re-assign the effect
                     nearbyPlayer.removePotionEffect(playerClass.getActives().get(consumeable).getType());
                     nearbyPlayer.addPotionEffect(playerClass.getActives().get(consumeable));
 
+                    // Scheduler to re-apply effects to affected players after the active expires
                     new BukkitRunnable() {
                         public void run() {
                             if(nearbyPlayer == null) return;
@@ -202,18 +216,20 @@ public class ClassListener implements Listener {
                             if(Classes.getClassProfile(nearbyPlayer.getUniqueId()) != null && Classes.getClassProfile(nearbyPlayer.getUniqueId()).getSelectedClass() != null) {
                                 for(PotionEffect passives : Classes.getClassByClassType(Classes.getClassProfile(nearby).getSelectedClass()).getPassives()) {
                                     if(passives.getType().equals(playerClass.getActives().get(consumeable).getType())) {
+                                        nearbyPlayer.removePotionEffect(passives.getType());
                                         nearbyPlayer.addPotionEffect(passives);
-                                        continue;
                                     }
                                 }
                             }
 
                             if(savedPotionEffect != null && !Classes.getClassProfile(nearbyPlayer.getUniqueId()).isActive()) {
+                                player.removePotionEffect(savedPotionEffect.getType());
                                 player.addPotionEffect(savedPotionEffect);
                             }
                         }
                     }.runTaskLater(FC.getFactionsCore(), (playerClass.getActives().get(consumeable).getDuration() + 5L));
 
+                    // Notify all nearby players they have been given the effect
                     nearbyPlayer.sendMessage(ChatColor.YELLOW + "You now have " + ChatColor.BLUE +
                             StringUtils.capitalize(playerClass.getActives().get(consumeable).getType().getName().replace("_", " ").toLowerCase()) +
                             ChatColor.YELLOW + " for " +
@@ -224,9 +240,11 @@ public class ClassListener implements Listener {
             }
         }
 
+        // This is now back to non-bard classes, here we remove the players effect and replace it with the active one
         player.removePotionEffect(playerClass.getActives().get(consumeable).getType());
         player.addPotionEffect(playerClass.getActives().get(consumeable));
 
+        // Scheduler to re-apply passive effects if they were overwritten when using the active
         new BukkitRunnable() {
             public void run() {
                 if(player == null) return;
@@ -234,25 +252,31 @@ public class ClassListener implements Listener {
 
                 for(PotionEffect passives : playerClass.getPassives()) {
                     if(passives.getType().equals(playerClass.getActives().get(consumeable).getType()))
+                        player.removePotionEffect(passives.getType());
                         player.addPotionEffect(passives);
                 }
             }
         }.runTaskLater(FC.getFactionsCore(), (playerClass.getActives().get(consumeable).getDuration() + 5L));
 
+        // Notify the player that they have consumed the active
         player.sendMessage(ChatColor.YELLOW + "You now have " + ChatColor.BLUE +
                 StringUtils.capitalize(playerClass.getActives().get(consumeable).getType().getName().replace("_", " ").toLowerCase()) +
                 ChatColor.YELLOW + " for " +
                 ChatColor.GREEN + playerClass.getActives().get(consumeable).getDuration() / 20 + " seconds");
 
+        // Put the player on cooldown
         classProfile.getConsumeCooldowns().put(consumeable, System.currentTimeMillis() + (cooldown * 1000L));
 
+        // Scheduler to remove active cooldown after it has expired
         new BukkitRunnable() {
             public void run() {
                 classProfile.getConsumeCooldowns().remove(consumeable);
 
+                // Notify the player if they are online
                 if(Bukkit.getPlayer(uuid) != null) {
                     Bukkit.getPlayer(uuid).sendMessage(ChatColor.GREEN + StringUtils.capitalize(playerClass.getActives().get(consumeable).getType().getName().replace("_", " ").toLowerCase()) + " has been unlocked");
                 } else {
+                    // Otherwise, if they aren't online check to see if they have timers and if not, remove their class profile
                     if(classProfile.getConsumeCooldowns().isEmpty())
                         Classes.removeClassProfile(classProfile.getUuid());
                 }

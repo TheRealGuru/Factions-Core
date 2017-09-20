@@ -10,8 +10,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Shield {
 
+    /**
+     * Contains all ShiledPlayer sessions loaded on the server
+     */
     @Getter static Set<ShieldPlayer> shieldPlayers = new HashSet<>();
 
+    /**
+     * Returns a ShieldPlayer object for the given UUID
+     * @param uuid
+     * @return
+     */
     static ShieldPlayer getShieldPlayer(UUID uuid) {
         List<ShieldPlayer> playerCache = new CopyOnWriteArrayList<>(shieldPlayers);
 

@@ -25,9 +25,21 @@ import java.util.UUID;
 
 public class Classes {
 
+    /**
+     * Contains all active classes currently running on the server
+     */
     @Getter static Set<ClassProfile> activeClasses = Sets.newHashSet();
+
+    /**
+     * Contains all enabled class modules for the server
+     */
     @Getter static Set<RClass> enabledClasses = Sets.newHashSet();
 
+    /**
+     * Returns a RClass object based on the given ClassType
+     * @param type
+     * @return
+     */
     public static RClass getClassByClassType(ClassType type) {
         for(RClass classes : enabledClasses)
             if(classes.getType().equals(type)) return classes;
@@ -35,6 +47,11 @@ public class Classes {
         return null;
     }
 
+    /**
+     * Returns a ClassProfile based on the given UUID
+     * @param uuid
+     * @return
+     */
     public static ClassProfile getClassProfile(UUID uuid) {
         for(ClassProfile loadedClasses : activeClasses)
             if(loadedClasses.getUuid().equals(uuid)) return loadedClasses;
@@ -42,6 +59,11 @@ public class Classes {
         return null;
     }
 
+    /**
+     * Creates and adds a new class profile for the given UUID. ClassType is the class they are being initially assigned
+     * @param uuid
+     * @param classType
+     */
     public static void createClassProfile(UUID uuid, ClassType classType) {
         ClassProfile profile = getClassProfile(uuid);
         FPlayer facPlayer = PlayerManager.getPlayer(uuid);
@@ -59,6 +81,10 @@ public class Classes {
             Bukkit.getPlayer(uuid).sendMessage(ChatColor.BLUE + StringUtils.capitalize(classType.toString().toLowerCase()) + ChatColor.YELLOW + " is now " + ChatColor.GOLD + "warming up");
     }
 
+    /**
+     * Removes a given UUIDs ClassProfile
+     * @param uuid
+     */
     public static void removeClassProfile(UUID uuid) {
         ClassProfile profile = getClassProfile(uuid);
         FPlayer facPlayer = PlayerManager.getPlayer(uuid);
@@ -72,6 +98,11 @@ public class Classes {
         }
     }
 
+    /**
+     * Adds the player to the given class and applys passive effects
+     * @param player
+     * @param type
+     */
     public static void addToClass(Player player, ClassType type) {
         RClass classToGive = getClassByClassType(type);
         ClassProfile classProfile = getClassProfile(player.getUniqueId());
@@ -86,6 +117,10 @@ public class Classes {
         player.sendMessage(ChatColor.BLUE + StringUtils.capitalize(type.toString().toLowerCase()) + ChatColor.YELLOW + " is now " + ChatColor.GREEN + "ready");
     }
 
+    /**
+     * Removes the player from their current class and removes and passive effects
+     * @param uuid
+     */
     public static void removeFromClass(UUID uuid) {
         ClassProfile profile = getClassProfile(uuid);
         RClass classToRemove = getClassByClassType(profile.getSelectedClass());
@@ -101,6 +136,14 @@ public class Classes {
         removeClassProfile(uuid);
     }
 
+    /**
+     * Returns a ClassType enum based on the given armor loadout
+     * @param helmet
+     * @param chestplate
+     * @param leggings
+     * @param boots
+     * @return
+     */
     public static ClassType getClassByArmor(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
         if(helmet == null || chestplate == null || leggings == null || boots == null) return null;
 

@@ -32,6 +32,7 @@ public class Events {
         FC.getFactionsCore().getCommand("events").setExecutor(new EventsCommand());
     }
 
+    @SuppressWarnings("deprecation")
     private static void loadThreads() {
         Bukkit.getScheduler().runTaskTimer(FC.getFactionsCore(), new KOTHTask(), 0L, 5L);
         Bukkit.getScheduler().runTaskTimer(FC.getFactionsCore(), new DTCTask(), 0L, 5L);

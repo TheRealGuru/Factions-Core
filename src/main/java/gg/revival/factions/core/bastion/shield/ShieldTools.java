@@ -9,6 +9,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ShieldTools {
 
+    /**
+     * Returns a collection of nearby claims based on the given BlockPos object
+     * @param pos
+     * @return
+     */
     public static Collection<Claim> getNearbyClaims(BlockPos pos) {
         Collection<Claim> nearbyClaims = new CopyOnWriteArrayList<>();
         List<Claim> claimCache = new CopyOnWriteArrayList<>(ClaimManager.getActiveClaims());
@@ -22,6 +27,12 @@ public class ShieldTools {
         return nearbyClaims;
     }
 
+    /**
+     * Returns true if the given BlockPos is inside the given Claim
+     * @param claim
+     * @param pos
+     * @return
+     */
     public static boolean isInsideClaim(Claim claim, BlockPos pos) {
         if (!pos.getWorldName().equals(claim.getWorldName())) return false;
 
@@ -35,6 +46,13 @@ public class ShieldTools {
         return pos.getX() >= xMin && pos.getX() <= xMax && pos.getY() >= yMin && pos.getY() <= yMax && pos.getZ() >= zMin && pos.getZ() <= zMax;
     }
 
+    /**
+     * Returns true if the given BlockPos is nearby the given Claim
+     * @param claim
+     * @param pos
+     * @param dist
+     * @return
+     */
     public static boolean isNearbyClaim(Claim claim, BlockPos pos, int dist) {
         if (!pos.getWorldName().equalsIgnoreCase(claim.getWorldName())) return false;
 
@@ -65,6 +83,12 @@ public class ShieldTools {
         return false;
     }
 
+    /**
+     * Gets perimeter blocks of a claim in BlockPos form, useful for quick async calculations
+     * @param claim
+     * @param yLevel
+     * @return
+     */
     public static Collection<BlockPos> getClaimPerimeterAsBlockPos(Claim claim, int yLevel) {
         Collection<BlockPos> blocks = new CopyOnWriteArrayList<>();
 

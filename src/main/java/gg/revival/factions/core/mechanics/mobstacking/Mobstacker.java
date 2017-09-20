@@ -30,18 +30,15 @@ public class Mobstacker
      * @param entity The entity to be protected
      * @param time Time it should be protected for
      */
-    public static void setProtected(Entity entity, int time)
-    {
+    public static void setProtected(Entity entity, int time) {
         if(protectedEntities.contains(entity.getUniqueId())) return;
 
         UUID uuid = entity.getUniqueId();
 
         protectedEntities.add(uuid);
 
-        new BukkitRunnable()
-        {
-            public void run()
-            {
+        new BukkitRunnable() {
+            public void run() {
                 protectedEntities.remove(uuid);
             }
         }.runTaskLaterAsynchronously(FC.getFactionsCore(), time * 20L);
@@ -53,20 +50,17 @@ public class Mobstacker
      * @param entityTwo
      * @return Both entities are the same
      */
-    public static boolean isSame(Entity entityOne, Entity entityTwo)
-    {
+    public static boolean isSame(Entity entityOne, Entity entityTwo) {
         if(!entityOne.getType().equals(entityTwo.getType())) return false;
 
-        if(entityOne.getType().equals(EntityType.SHEEP) && entityTwo.getType().equals(EntityType.SHEEP))
-        {
+        if(entityOne.getType().equals(EntityType.SHEEP) && entityTwo.getType().equals(EntityType.SHEEP)) {
             Sheep sheepOne = (Sheep)entityOne;
             Sheep sheepTwo = (Sheep)entityTwo;
 
             if(!sheepOne.getColor().equals(sheepTwo.getColor())) return false;
         }
 
-        if(entityOne.getType().equals(EntityType.ZOMBIE) && entityTwo.getType().equals(EntityType.ZOMBIE))
-        {
+        if(entityOne.getType().equals(EntityType.ZOMBIE) && entityTwo.getType().equals(EntityType.ZOMBIE)) {
             Zombie zombieOne = (Zombie)entityOne;
             Zombie zombieTwo = (Zombie)entityTwo;
 
@@ -84,8 +78,7 @@ public class Mobstacker
      * @param entity
      * @return
      */
-    public static boolean isStack(Entity entity)
-    {
+    public static boolean isStack(Entity entity) {
         if(getStackSize(entity) > 0) return true;
 
         return false;
@@ -96,8 +89,7 @@ public class Mobstacker
      * @param entity The stacked entity
      * @return How many entities are stacked on given entity
      */
-    public static int getStackSize(Entity entity)
-    {
+    public static int getStackSize(Entity entity) {
         if(entity.getCustomName() == null) return 0;
 
         String name = entity.getCustomName();
@@ -117,8 +109,7 @@ public class Mobstacker
      * @param entity
      * @param anotherEntity
      */
-    public static void attemptStack(Entity entity, Entity anotherEntity)
-    {
+    public static void attemptStack(Entity entity, Entity anotherEntity) {
         LivingEntity entityOne = (LivingEntity)entity, entityTwo = (LivingEntity)anotherEntity;
 
         if(!isSame(entityOne, entityTwo)) return;
@@ -138,14 +129,12 @@ public class Mobstacker
         setProtected(entityOne, 5);
         setProtected(entityTwo, 5);
 
-        if(entityOneStackSize >= entityTwoStackSize)
-        {
+        if(entityOneStackSize >= entityTwoStackSize) {
             entityTwo.remove();
             entityOne.setCustomName(ChatColor.YELLOW + "x" + newStackSize);
         }
 
-        else
-        {
+        else {
             entityOne.remove();
             entityTwo.setCustomName(ChatColor.YELLOW + "x" + newStackSize);
         }
@@ -155,8 +144,7 @@ public class Mobstacker
      * Subtracts a stack from a given entity stack
      * @param entity The entity stack
      */
-    public static void subtractFromStack(Entity entity)
-    {
+    public static void subtractFromStack(Entity entity) {
         if(!isStack(entity)) return;
 
         int currentStack = getStackSize(entity);
@@ -178,8 +166,7 @@ public class Mobstacker
                     newSheep.setColor(oldSheep.getColor());
                 }
 
-                if(entity.getType().equals(EntityType.ZOMBIE))
-                {
+                if(entity.getType().equals(EntityType.ZOMBIE)) {
                     Zombie oldZombie = (Zombie)entity;
                     Zombie newZombie = (Zombie)newEntity;
 
@@ -199,33 +186,27 @@ public class Mobstacker
      * Splits a stack in half and spawns two protected entity stacks
      * @param entity The entity to be split
      */
-    public static void splitStack(Entity entity)
-    {
+    public static void splitStack(Entity entity) {
         if(!isStack(entity)) return;
-
+        if(entity instanceof Monster) return;
         if(getStackSize(entity) <= 1) return;
 
         int newStackSize = getStackSize(entity) / 2;
 
         Entity splitEntity = entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
-        if(newStackSize % 2 == 0)
-        {
-            if(newStackSize > 1)
-            {
+        if(newStackSize % 2 == 0) {
+            if(newStackSize > 1) {
                 splitEntity.setCustomName(ChatColor.YELLOW + "x" + newStackSize);
                 entity.setCustomName(ChatColor.YELLOW + "x" + newStackSize);
             }
         }
 
-        else
-        {
+        else {
             splitEntity.setCustomName(ChatColor.YELLOW + "x" + (newStackSize + 1));
 
             if(newStackSize > 1)
-            {
                 entity.setCustomName(ChatColor.YELLOW + "x" + newStackSize);
-            }
         }
 
         setProtected(entity, 30);
@@ -241,10 +222,8 @@ public class Mobstacker
         {
             public void run()
             {
-                for(World worlds : Bukkit.getServer().getWorlds())
-                {
-                    for(LivingEntity entity : worlds.getLivingEntities())
-                    {
+                for(World worlds : Bukkit.getServer().getWorlds()) {
+                    for(LivingEntity entity : worlds.getLivingEntities()) {
                         if(protectedEntities.contains(entity.getUniqueId())) continue;
                         if(getStackSize(entity) >= Configuration.mobstackingMaxStack) continue;
 
@@ -266,8 +245,7 @@ public class Mobstacker
                                         type.equals(EntityType.ZOMBIE) ||
                                         type.equals(EntityType.SKELETON)) {
 
-                            for(Entity nearbyEntities : entity.getNearbyEntities(10, 3, 10))
-                            {
+                            for(Entity nearbyEntities : entity.getNearbyEntities(10, 3, 10)) {
                                 if(!nearbyEntities.getType().equals(type)) continue;
                                 if(!(nearbyEntities instanceof LivingEntity)) continue;
                                 if(protectedEntities.contains(nearbyEntities.getUniqueId())) continue;

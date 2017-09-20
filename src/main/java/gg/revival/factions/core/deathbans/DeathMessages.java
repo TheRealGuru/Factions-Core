@@ -10,8 +10,17 @@ import org.bukkit.projectiles.ProjectileSource;
 
 public class DeathMessages {
 
+    /**
+     * Standard prefix used for all death notifications
+     */
     private static final String prefix = ChatColor.RED + "RIP: ";
 
+    /**
+     * Returns a String of the formatted Death message based on PvP
+     * @param killed
+     * @param killer
+     * @return
+     */
     public static String getDeathMessage(Player killed, Entity killer) {
         if(killer instanceof Player) {
             Player playerKiller = (Player)killer;
@@ -39,6 +48,11 @@ public class DeathMessages {
         return prefix + ChatColor.GOLD + killed.getName() + ChatColor.RED + " slain by a " + ChatColor.GOLD + StringUtils.capitalize(killer.getType().toString().replace("_", " ").toLowerCase());
     }
 
+    /**
+     * Returns a String of the formatted Death message based on PvE
+     * @param killed
+     * @return
+     */
     public static String getDeathMessage(Player killed) {
         EntityDamageEvent.DamageCause cause = killed.getLastDamageCause().getCause();
 

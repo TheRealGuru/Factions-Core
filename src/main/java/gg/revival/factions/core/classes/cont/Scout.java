@@ -12,7 +12,6 @@ public class Scout extends RClass {
     public Scout() {
         super(Lists.newArrayList(), Maps.newHashMap(), ClassType.SCOUT);
 
-        // TODO: Get values from config
         PotionEffect passiveSpeed = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2);
         PotionEffect passiveJumpboost = new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0);
 

@@ -12,7 +12,6 @@ public class Archer extends RClass {
     public Archer() {
         super(Lists.newArrayList(), Maps.newHashMap(), ClassType.ARCHER);
 
-        // TODO: Get values from config
         PotionEffect passiveSpeed = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2);
 
         PotionEffect activeSpeed = new PotionEffect(PotionEffectType.SPEED, 20 * 8, 3);

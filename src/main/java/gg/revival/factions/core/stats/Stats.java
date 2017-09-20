@@ -5,12 +5,14 @@ import com.mongodb.client.MongoCollection;
 import gg.revival.driver.MongoAPI;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.db.DBManager;
+import gg.revival.factions.core.stats.command.StatsCommand;
 import gg.revival.factions.core.stats.listener.StatsListener;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.Processor;
 import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -24,6 +26,9 @@ public class Stats {
     public static PlayerStats getStats(UUID uuid) {
         for(PlayerStats stats : activeStats) {
             if(!stats.getUuid().equals(uuid)) continue;
+
+            if(Bukkit.getPlayer(uuid) != null)
+                stats.setPlaytime(stats.getNewPlaytime());
 
             return stats;
         }
@@ -221,6 +226,48 @@ public class Stats {
         }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
+    public static String getFormattedStats(PlayerStats stats, String statsUsername) {
+        StringBuilder message = new StringBuilder();
+
+        message.append(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------" + "\n");
+        message.append(ChatColor.RESET + "Displaying statistics for " + ChatColor.AQUA + statsUsername + "\n");
+        message.append("     " + "\n");
+        message.append(ChatColor.GREEN + "Kills" + ChatColor.WHITE + ": " + stats.getKills() + "\n");
+        message.append(ChatColor.RED + "Deaths" + ChatColor.WHITE + ": " + stats.getDeaths() + "\n");
+        message.append("     " + "\n");
+
+        int seconds = (int) (stats.getPlaytime() / 1000) % 60;
+        int minutes = (int) (stats.getPlaytime() / (1000 * 60) % 60);
+        int hours   = (int) (stats.getPlaytime() / (1000 * 60 * 60) % 24);
+
+        if(seconds >= 60)
+            seconds = 59;
+
+        StringBuilder time = new StringBuilder();
+
+        if(hours > 0)
+            time.append(hours + " hours ");
+
+        if(minutes > 0)
+            time.append(minutes + " minutes ");
+
+        if(seconds > 0) {
+            if(time.toString().length() > 0)
+                time.append("and " + seconds + " seconds ");
+            else
+                time.append(seconds + " seconds ");
+        }
+
+        message.append(ChatColor.LIGHT_PURPLE + "Playtime" + ChatColor.WHITE + ": " + time.toString().trim() + "\n");
+        message.append("     " + "\n");
+        message.append(ChatColor.YELLOW + "Found " + ChatColor.GOLD + "Gold" + ChatColor.WHITE + ": " + stats.getFoundGold() + "\n");
+        message.append(ChatColor.YELLOW + "Found " + ChatColor.AQUA + "Diamond" + ChatColor.WHITE + ": " + stats.getFoundDiamonds() + "\n");
+        message.append(ChatColor.YELLOW + "Found " + ChatColor.GREEN + "Emerald" + ChatColor.WHITE + ": " + stats.getFoundEmeralds() + "\n");
+        message.append(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------" + "\n");
+
+        return message.toString();
+    }
+
     public static void onEnable() {
         if(Configuration.statsEnabled)
             loadListeners();
@@ -240,7 +287,7 @@ public class Stats {
     }
 
     private static void loadCommands() {
-        // TODO: Stats commands
+        FC.getFactionsCore().getCommand("statistics").setExecutor(new StatsCommand());
     }
 
 }

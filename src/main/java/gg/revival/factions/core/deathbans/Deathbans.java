@@ -129,6 +129,10 @@ public class Deathbans {
         }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
+    /**
+     * Saves a Death object to DB
+     * @param death
+     */
     public static void saveDeathban(Death death) {
         new BukkitRunnable() {
             public void run() {
@@ -187,6 +191,12 @@ public class Deathbans {
         }
     }
 
+    /**
+     * Determines a Deathban duration based on the location of the death. Callsback when the result is finished
+     * @param uuid
+     * @param location
+     * @param callback
+     */
     public static void getDeathbanDurationByLocation(UUID uuid, Location location, DeathbanDurationCallback callback) {
         Stats.loadAndReceiveStats(uuid, stats -> {
             if(stats.getLoginTime() != -1L)

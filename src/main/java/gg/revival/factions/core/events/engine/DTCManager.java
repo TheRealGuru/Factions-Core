@@ -11,6 +11,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DTCManager {
 
+    /**
+     * Returns a Set containing all active DTC events
+     * @return
+     */
     public static Set<DTCEvent> getActiveDTCEvents() {
         List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
         Set<DTCEvent> result = new HashSet<>();
@@ -26,6 +30,11 @@ public class DTCManager {
         return result;
     }
 
+    /**
+     * Returns a DTC event based on given Core location
+     * @param coreLocation
+     * @return
+     */
     public static DTCEvent getDTCByCore(Location coreLocation) {
         List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
 
@@ -41,6 +50,10 @@ public class DTCManager {
         return null;
     }
 
+    /**
+     * Updates a DTC event core timer based on its configuration
+     * @param event
+     */
     public static void updateResetTimer(DTCEvent event) {
         event.setResetTime(System.currentTimeMillis() + (event.getRegenTimer() * 1000L));
     }

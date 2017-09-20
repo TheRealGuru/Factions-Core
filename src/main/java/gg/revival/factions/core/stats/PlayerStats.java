@@ -23,7 +23,11 @@ public class PlayerStats {
     }
 
     public long getNewPlaytime() {
-        return playtime + (System.currentTimeMillis() - loginTime);
+        final long previousLoginTime = loginTime;
+
+        this.loginTime = System.currentTimeMillis();
+
+        return playtime + (System.currentTimeMillis() - previousLoginTime);
     }
 
     public int getPlaytimeAsInt() {

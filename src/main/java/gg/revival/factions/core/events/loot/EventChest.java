@@ -9,8 +9,7 @@ import java.util.List;
 
 public class EventChest {
 
-    @Getter
-    EventChestType type;
+    @Getter EventChestType type;
     @Getter @Setter Location location;
     @Getter List<ItemStack> lootTable;
 

@@ -1,6 +1,7 @@
 package gg.revival.factions.core.ui;
 
 import gg.revival.core.scoreboards.RScoreboard;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.events.engine.EventManager;
@@ -20,6 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -41,7 +43,7 @@ public class UIManager {
      * @param player The player
      * @return RScoreboard object
      */
-    public static RScoreboard getScoreboard(Player player) {
+    private static RScoreboard getScoreboard(Player player) {
         if(scoreboards.containsKey(player.getUniqueId()))
             return scoreboards.get(player.getUniqueId());
 
@@ -54,8 +56,8 @@ public class UIManager {
      */
     public static void update(Player player) {
         RScoreboard scoreboard = getScoreboard(player);
-        Scoreboard mcBoard = null;
-        Team fac = null, ally = null, admin = null, mod = null;
+        Scoreboard mcBoard;
+        Team fac, ally, admin, mod;
 
         if(scoreboard == null) {
             scoreboard = new RScoreboard("Test Scoreboard");
@@ -144,103 +146,107 @@ public class UIManager {
      * Sends the hotbar message, used to display cooldowns/timers
      * @param player
      */
-    public static void sendActionbar(Player player) {
-        FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+    private static void sendActionbar(Player player) {
+        new BukkitRunnable() {
+            public void run() {
+                FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
-        if(facPlayer == null) return;
+                if(facPlayer == null) return;
 
-        StringBuilder builder = new StringBuilder();
+                StringBuilder builder = new StringBuilder();
 
-        if(facPlayer.isBeingTimed(TimerType.HOME) && facPlayer.getTimer(TimerType.HOME) != null) {
-            long dur = facPlayer.getTimer(TimerType.HOME).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Home Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.STUCK) && facPlayer.getTimer(TimerType.STUCK) != null) {
-            long dur = facPlayer.getTimer(TimerType.STUCK).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Stuck Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.LOGOUT) && facPlayer.getTimer(TimerType.LOGOUT) != null) {
-            long dur = facPlayer.getTimer(TimerType.LOGOUT).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.AQUA + "" + ChatColor.BOLD + "Logout" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL) && facPlayer.getTimer(TimerType.ENDERPEARL) != null) {
-            long dur = facPlayer.getTimer(TimerType.ENDERPEARL).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enderpearl" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.TAG) && facPlayer.getTimer(TimerType.TAG) != null) {
-            long dur = facPlayer.getTimer(TimerType.TAG).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.RED + "" + ChatColor.BOLD + "Combat-tag" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.SAFETY) && facPlayer.getTimer(TimerType.SAFETY) != null) {
-            long dur = facPlayer.getTimer(TimerType.SAFETY).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Safety" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.PVPPROT) && facPlayer.getTimer(TimerType.PVPPROT) != null) {
-            long dur = facPlayer.getTimer(TimerType.PVPPROT).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.PROGRESSION) && facPlayer.getTimer(TimerType.PROGRESSION) != null) {
-            long dur = facPlayer.getTimer(TimerType.PROGRESSION).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Progression" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
-        }
-
-        if(facPlayer.isBeingTimed(TimerType.CLASS) && facPlayer.getTimer(TimerType.CLASS) != null) {
-            long dur = facPlayer.getTimer(TimerType.CLASS).getExpire() - System.currentTimeMillis();
-            builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + "Class Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-        }
-
-        if(!EventManager.getActiveEvents().isEmpty()) {
-            List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
-
-            for(Event activeEvents : cache) {
-                if(activeEvents instanceof KOTHEvent) {
-                    KOTHEvent koth = (KOTHEvent)activeEvents;
-
-                    if(koth.isContested()) {
-                        builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.RED + "Contested" + ChatColor.RESET + " ");
-                        continue;
-                    }
-
-                    if(koth.getNextTicketTime() == -1L) {
-                        long dur = koth.getDuration() * 1000L;
-                        builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-                        continue;
-                    }
-
-                    long dur = koth.getNextTicketTime() - System.currentTimeMillis();
-                    builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
-
-                    continue;
+                if(facPlayer.isBeingTimed(TimerType.HOME) && facPlayer.getTimer(TimerType.HOME) != null) {
+                    long dur = facPlayer.getTimer(TimerType.HOME).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Home Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
                 }
 
-                if(activeEvents instanceof DTCEvent) {
-                    DTCEvent dtc = (DTCEvent)activeEvents;
-
-                    if(dtc.getCappingFaction() != null) {
-                        builder.append(" " + dtc.getDisplayName() + ChatColor.WHITE + ": " +
-                                ChatColor.YELLOW + dtc.getCappingFaction().getDisplayName() + ChatColor.GOLD + "(" + ChatColor.BLUE + (dtc.getWinCond() - dtc.getTickets().get(dtc.getCappingFaction())) + ChatColor.GOLD + ")" + ChatColor.RESET + " ");
-                        continue;
-                    }
-
-                    builder.append(" " + dtc.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + dtc.getWinCond() + ChatColor.RESET + " ");
+                if(facPlayer.isBeingTimed(TimerType.STUCK) && facPlayer.getTimer(TimerType.STUCK) != null) {
+                    long dur = facPlayer.getTimer(TimerType.STUCK).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.GOLD + "" + ChatColor.BOLD + "Stuck Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
                 }
+
+                if(facPlayer.isBeingTimed(TimerType.LOGOUT) && facPlayer.getTimer(TimerType.LOGOUT) != null) {
+                    long dur = facPlayer.getTimer(TimerType.LOGOUT).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.AQUA + "" + ChatColor.BOLD + "Logout" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                }
+
+                if(facPlayer.isBeingTimed(TimerType.ENDERPEARL) && facPlayer.getTimer(TimerType.ENDERPEARL) != null) {
+                    long dur = facPlayer.getTimer(TimerType.ENDERPEARL).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enderpearl" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                }
+
+                if(facPlayer.isBeingTimed(TimerType.TAG) && facPlayer.getTimer(TimerType.TAG) != null) {
+                    long dur = facPlayer.getTimer(TimerType.TAG).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.RED + "" + ChatColor.BOLD + "Combat-tag" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                }
+
+                if(facPlayer.isBeingTimed(TimerType.SAFETY) && facPlayer.getTimer(TimerType.SAFETY) != null) {
+                    long dur = facPlayer.getTimer(TimerType.SAFETY).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Safety" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                }
+
+                if(facPlayer.isBeingTimed(TimerType.PVPPROT) && facPlayer.getTimer(TimerType.PVPPROT) != null) {
+                    long dur = facPlayer.getTimer(TimerType.PVPPROT).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Protection" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
+                }
+
+                if(facPlayer.isBeingTimed(TimerType.PROGRESSION) && facPlayer.getTimer(TimerType.PROGRESSION) != null) {
+                    long dur = facPlayer.getTimer(TimerType.PROGRESSION).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.GREEN + "" + ChatColor.BOLD + "Progression" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.formatIntoHHMMSS((int)(dur / 1000L)) + ChatColor.RESET + " ");
+                }
+
+                if(facPlayer.isBeingTimed(TimerType.CLASS) && facPlayer.getTimer(TimerType.CLASS) != null) {
+                    long dur = facPlayer.getTimer(TimerType.CLASS).getExpire() - System.currentTimeMillis();
+                    builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + "Class Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                }
+
+                if(!EventManager.getActiveEvents().isEmpty()) {
+                    List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
+
+                    for(Event activeEvents : cache) {
+                        if(activeEvents instanceof KOTHEvent) {
+                            KOTHEvent koth = (KOTHEvent)activeEvents;
+
+                            if(koth.isContested()) {
+                                builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.RED + "Contested" + ChatColor.RESET + " ");
+                                continue;
+                            }
+
+                            if(koth.getNextTicketTime() == -1L) {
+                                long dur = koth.getDuration() * 1000L;
+                                builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+                                continue;
+                            }
+
+                            long dur = koth.getNextTicketTime() - System.currentTimeMillis();
+                            builder.append(" " + koth.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
+
+                            continue;
+                        }
+
+                        if(activeEvents instanceof DTCEvent) {
+                            DTCEvent dtc = (DTCEvent)activeEvents;
+
+                            if(dtc.getCappingFaction() != null) {
+                                builder.append(" " + dtc.getDisplayName() + ChatColor.WHITE + ": " +
+                                        ChatColor.YELLOW + dtc.getCappingFaction().getDisplayName() + ChatColor.GOLD + "(" + ChatColor.BLUE + (dtc.getWinCond() - dtc.getTickets().get(dtc.getCappingFaction())) + ChatColor.GOLD + ")" + ChatColor.RESET + " ");
+                                continue;
+                            }
+
+                            builder.append(" " + dtc.getDisplayName() + ChatColor.WHITE + ": " + ChatColor.YELLOW + dtc.getWinCond() + ChatColor.RESET + " ");
+                        }
+                    }
+                }
+
+                if(builder.toString().length() == 0) return;
+
+                IChatBaseComponent packet = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" +
+                        ChatColor.translateAlternateColorCodes('&', builder.toString() + "\"}"));
+
+                PacketPlayOutChat bar = new PacketPlayOutChat(packet, (byte)2);
+                ((CraftPlayer)player).getHandle().playerConnection.sendPacket(bar);
             }
-        }
-
-        if(builder.toString().length() == 0) return;
-
-        IChatBaseComponent icbc = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" +
-                ChatColor.translateAlternateColorCodes('&', builder.toString() + "\"}"));
-
-        PacketPlayOutChat bar = new PacketPlayOutChat(icbc, (byte)2);
-        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(bar);
+        }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
 }

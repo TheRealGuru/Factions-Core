@@ -11,16 +11,30 @@ import org.bukkit.entity.Player;
 
 public class CombatProtection {
 
+    /**
+     * Returns true if the given player has PvP protection
+     * @param player
+     * @return
+     */
     public static boolean hasProt(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
         return facPlayer.isBeingTimed(TimerType.PVPPROT);
     }
 
+    /**
+     * Returns true if the given player has PvP safety
+     * @param player
+     * @return
+     */
     public static boolean hasSafety(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
         return facPlayer.isBeingTimed(TimerType.SAFETY);
     }
 
+    /**
+     * Removes a given players PvP protection
+     * @param player
+     */
     public static void takeProtection(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
@@ -32,6 +46,10 @@ public class CombatProtection {
         DBManager.saveTimerData(facPlayer);
     }
 
+    /**
+     * Returns a given players PvP safety
+     * @param player
+     */
     public static void takeSafety(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
@@ -41,6 +59,11 @@ public class CombatProtection {
         player.sendMessage(ChatColor.RED + "Your PvP safety has been removed");
     }
 
+    /**
+     * Gives a given player PvP protection for a set amount of time (in seconds)
+     * @param player
+     * @param duration
+     */
     public static void giveProtection(Player player, int duration) {
         if(!Configuration.pvpProtEnabled) return;
 
@@ -52,6 +75,11 @@ public class CombatProtection {
             facPlayer.addTimer(TimerManager.createTimer(TimerType.PVPPROT, duration));
     }
 
+    /**
+     * Gives a given player PvP safety for a set amount of time (in seconds)
+     * @param player
+     * @param duration
+     */
     public static void giveSafety(Player player, int duration) {
         if(!Configuration.pvpSafetyEnabled) return;
 

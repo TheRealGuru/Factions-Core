@@ -33,3 +33,6 @@ commands:
   progression:
     description: Progression command
     aliases: [progress, p]
+  statistics:
+    description: Stats command
+    aliases: [stats, ores, playtime, kd]

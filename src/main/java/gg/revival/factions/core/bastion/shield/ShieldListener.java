@@ -23,6 +23,9 @@ import java.util.UUID;
 
 public class ShieldListener implements Listener {
 
+    /**
+     * Contains all players who currently have data being processed for their shields
+     */
     private final Set<UUID> currentlyProcessing = Sets.newSetFromMap(Maps.<UUID, Boolean>newConcurrentMap());
 
     @EventHandler

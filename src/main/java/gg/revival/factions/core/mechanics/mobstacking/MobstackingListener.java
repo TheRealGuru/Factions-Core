@@ -16,12 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class MobstackingListener implements Listener
-{
+public class MobstackingListener implements Listener {
 
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent event)
-    {
+    public void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
 
         if(!(entity instanceof LivingEntity)) return;
@@ -37,8 +35,7 @@ public class MobstackingListener implements Listener
     }
 
     @EventHandler
-    public void onEntityInteract(PlayerInteractEntityEvent event)
-    {
+    public void onEntityInteract(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         Entity entity = event.getRightClicked();
@@ -50,10 +47,8 @@ public class MobstackingListener implements Listener
 
         List<EntityType> types;
 
-        if(Mobstacker.getSplitCooldowns().containsKey(player.getUniqueId()))
-        {
-            if(Mobstacker.getSplitCooldowns().get(player.getUniqueId()).contains(entity.getType()))
-            {
+        if(Mobstacker.getSplitCooldowns().containsKey(player.getUniqueId())) {
+            if(Mobstacker.getSplitCooldowns().get(player.getUniqueId()).contains(entity.getType())) {
                 player.sendMessage(ChatColor.RED + "Try again in a few minutes");
                 event.setCancelled(true);
                 return;
@@ -62,8 +57,7 @@ public class MobstackingListener implements Listener
             types = Mobstacker.getSplitCooldowns().get(player.getUniqueId());
         }
 
-        else
-        {
+        else {
             types = new ArrayList<>();
         }
 
@@ -72,14 +66,10 @@ public class MobstackingListener implements Listener
         Mobstacker.getSplitCooldowns().put(player.getUniqueId(), types);
         Mobstacker.splitStack(entity);
 
-        new BukkitRunnable()
-        {
-            public void run()
-            {
+        new BukkitRunnable() {
+            public void run() {
                 if(Mobstacker.getSplitCooldowns().containsKey(uuid))
-                {
                     Mobstacker.getSplitCooldowns().get(uuid).remove(entity.getType());
-                }
             }
         }.runTaskLater(FC.getFactionsCore(), 300 * 20L);
     }

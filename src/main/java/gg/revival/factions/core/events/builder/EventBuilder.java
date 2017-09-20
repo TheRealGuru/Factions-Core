@@ -1,7 +1,10 @@
 package gg.revival.factions.core.events.builder;
 
 import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.events.obj.*;
+import gg.revival.factions.core.events.obj.CapZone;
+import gg.revival.factions.core.events.obj.DTCEvent;
+import gg.revival.factions.core.events.obj.Event;
+import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Logger;
 import gg.revival.factions.obj.ServerFaction;
@@ -14,9 +17,21 @@ import java.util.UUID;
 
 public class EventBuilder {
 
+    /**
+     * Map containing all players currently building KOTH events
+     */
     @Getter static Map<UUID, KOTHBuilder> kothBuilders = new HashMap<>();
+
+    /**
+     * Map containing all players currently building DTC events
+     */
     @Getter static Map<UUID, DTCBuilder> dtcBuilders = new HashMap<>();
 
+    /**
+     * Returns a KOTHBuilder object based on a players UUID
+     * @param uuid
+     * @return
+     */
     public static KOTHBuilder getKOTHBuilder(UUID uuid) {
         if(kothBuilders.containsKey(uuid))
             return kothBuilders.get(uuid);
@@ -24,6 +39,11 @@ public class EventBuilder {
         return null;
     }
 
+    /**
+     * Returns a DTCBuilder object based on a players UUID
+     * @param uuid
+     * @return
+     */
     public static DTCBuilder getDTCBuilder(UUID uuid) {
         if(dtcBuilders.containsKey(uuid))
             return dtcBuilders.get(uuid);
@@ -31,10 +51,19 @@ public class EventBuilder {
         return null;
     }
 
+    /**
+     * Retruns true if the given UUID is actively building an event
+     * @param uuid
+     * @return
+     */
     public static boolean isBuilding(UUID uuid) {
         return dtcBuilders.containsKey(uuid) || kothBuilders.containsKey(uuid);
     }
 
+    /**
+     * Saves the given event to file
+     * @param event
+     */
     public static void saveEvent(Event event) {
         Location lootChest = event.getLootChest();
         ServerFaction hookedFaction = event.getHookedFaction();
@@ -96,6 +125,10 @@ public class EventBuilder {
         Logger.log("Event '" + event.getEventName() + "' has been updated and saved");
     }
 
+    /**
+     * Deletes a given event from file
+     * @param event
+     */
     public static void deleteEvent(Event event) {
         EventManager.getActiveEvents().remove(event);
 

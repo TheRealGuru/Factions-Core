@@ -17,6 +17,11 @@ import java.util.UUID;
 
 public class NPCTools {
 
+    /**
+     * Spawns a combat-logger for the given Player. Duration is the time (in seconds) the logger should stay alive until it is despawned
+     * @param player
+     * @param duration
+     */
     public static void spawnLogger(Player player, int duration) {
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
@@ -54,11 +59,20 @@ public class NPCTools {
         }.runTaskLater(FC.getFactionsCore(), duration * 20L);
     }
 
+    /**
+     * Removes a CombatLogger object's logger NPC from the world
+     * @param logger
+     */
     public static void despawnLogger(CombatLogger logger) {
         logger.destroy();
         CombatManager.getCombatLoggers().remove(logger.getUuid());
     }
 
+    /**
+     * Returns true if the given entity is a combat-logger
+     * @param entity
+     * @return
+     */
     public static boolean isLogger(Entity entity) {
         for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(loggers.getNpc() != entity) continue;
@@ -69,6 +83,11 @@ public class NPCTools {
         return false;
     }
 
+    /**
+     * Returns a CombatLogger object based on a given Entity
+     * @param entity
+     * @return
+     */
     public static CombatLogger getLoggerByEntity(Entity entity) {
         for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(loggers.getNpc() != entity) continue;
@@ -79,6 +98,11 @@ public class NPCTools {
         return null;
     }
 
+    /**
+     * Returns a CombatLogger object based on a players UUID
+     * @param uuid
+     * @return
+     */
     public static CombatLogger getLoggerByUUID(UUID uuid) {
         for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(!loggers.getUuid().equals(uuid)) continue;
@@ -89,6 +113,11 @@ public class NPCTools {
         return null;
     }
 
+    /**
+     * Returns a CombatLogger object based on a username
+     * @param name
+     * @return
+     */
     public static CombatLogger getLoggerByName(String name) {
         for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
             if(!loggers.getDisplayName().equals(name)) continue;

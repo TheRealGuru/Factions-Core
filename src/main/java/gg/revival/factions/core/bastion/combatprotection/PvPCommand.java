@@ -1,6 +1,7 @@
 package gg.revival.factions.core.bastion.combatprotection;
 
 import gg.revival.factions.core.PlayerManager;
+import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.FPlayer;
@@ -26,6 +27,11 @@ public class PvPCommand implements CommandExecutor {
         }
 
         Player player = (Player)sender;
+
+        if(!Configuration.pvpProtEnabled) {
+            player.sendMessage(ChatColor.RED + "PvP protection is disabled on this server");
+            return false;
+        }
 
         if(args.length == 0) {
             player.sendMessage(ChatColor.RED + "/pvp enable");

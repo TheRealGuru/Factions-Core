@@ -13,21 +13,38 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CombatManager
-{
+public class CombatManager {
 
+    /**
+     * Contains all active combat-loggers loaded on the server
+     */
     @Getter static Map<UUID, CombatLogger> combatLoggers = new HashMap<>();
 
+    /**
+     * Returns true if the given UUID has an active combat-logger
+     * @param uuid
+     * @return
+     */
     public static boolean hasLogger(UUID uuid)
     {
         return combatLoggers.containsKey(uuid);
     }
 
+    /**
+     * Returns a CombatLogger object if the given UUID has one
+     * @param uuid
+     * @return
+     */
     public static CombatLogger getLogger(UUID uuid) {
         if(!hasLogger(uuid)) return null;
         return combatLoggers.get(uuid);
     }
 
+    /**
+     * Returns a NumberLong of the players remaining combat-tag duration
+     * @param uuid
+     * @return
+     */
     public static long getTag(UUID uuid) {
         FPlayer facPlayer = PlayerManager.getPlayer(uuid);
 
@@ -39,6 +56,11 @@ public class CombatManager
         return 0L;
     }
 
+    /**
+     * Performs a combat-tag on the given player. TagReason determines if the player should be tagged for being attacked or for attacking
+     * @param player
+     * @param reason
+     */
     public static void tagPlayer(Player player, TagReason reason) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
