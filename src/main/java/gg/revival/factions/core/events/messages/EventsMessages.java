@@ -1,15 +1,21 @@
 package gg.revival.factions.core.events.messages;
 
+import com.google.common.base.Joiner;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.PlayerFaction;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class EventsMessages {
 
@@ -29,6 +35,10 @@ public class EventsMessages {
         return ChatColor.GOLD + "[End of the World] " + ChatColor.RESET + message;
     }
 
+    public static String asGeneral(String message) {
+        return ChatColor.GOLD + "[Events] " + ChatColor.RESET + message;
+    }
+
     public static String nowControlling(Event event) {
         return ChatColor.GOLD + "You" + ChatColor.YELLOW + " are now controlling " + event.getDisplayName();
     }
@@ -43,6 +53,29 @@ public class EventsMessages {
 
     public static String beingContested(Event event) {
         return event.getDisplayName() + ChatColor.YELLOW + " is being " + ChatColor.RED + "contested";
+    }
+
+    public static String receivedLoot(String claimer, List<ItemStack> loot) {
+        StringBuilder response = new StringBuilder();
+
+        response.append(ChatColor.DARK_GREEN + claimer + ChatColor.YELLOW + " has claimed an " + ChatColor.GOLD + "Event Key" + ChatColor.YELLOW + " and received:" + "\n");
+
+        for(ItemStack contents : loot) {
+            response.append(ChatColor.GREEN + " - " + contents.getAmount() + "x " + WordUtils.capitalize(contents.getType().name().replace("_", " ").toLowerCase()));
+
+            if(!contents.getEnchantments().isEmpty()) {
+                List<String> enchantments = new ArrayList<>();
+
+                for(Enchantment enchant : contents.getEnchantments().keySet())
+                    enchantments.add(WordUtils.capitalize(enchant.getName().toLowerCase().replace("_", " ") + " " + contents.getEnchantmentLevel(enchant)));
+
+                response.append(" " + ChatColor.GREEN + "w/ " + ChatColor.BLUE + Joiner.on(ChatColor.AQUA + ", " + ChatColor.BLUE).join(enchantments) + ChatColor.RESET + "\n");
+            } else {
+                response.append("\n");
+            }
+        }
+
+        return response.toString();
     }
 
     public static String ticked(Event event) {

@@ -18,6 +18,9 @@ public class CombatProtection {
      */
     public static boolean hasProt(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+
+        if(facPlayer == null) return false;
+
         return facPlayer.isBeingTimed(TimerType.PVPPROT);
     }
 
@@ -28,6 +31,9 @@ public class CombatProtection {
      */
     public static boolean hasSafety(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+
+        if(facPlayer == null) return false;
+
         return facPlayer.isBeingTimed(TimerType.SAFETY);
     }
 
@@ -38,10 +44,12 @@ public class CombatProtection {
     public static void takeProtection(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
+        if(facPlayer == null) return;
+
         if(facPlayer.isBeingTimed(TimerType.PVPPROT))
             facPlayer.removeTimer(TimerType.PVPPROT);
 
-        player.sendMessage(ChatColor.RED + "Your PvP protection has been removed");
+        player.sendMessage(ChatColor.YELLOW + "Your PvP protection has been removed");
 
         DBManager.saveTimerData(facPlayer);
     }
@@ -53,10 +61,12 @@ public class CombatProtection {
     public static void takeSafety(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
+        if(facPlayer == null) return;
+
         if(facPlayer.isBeingTimed(TimerType.SAFETY))
             facPlayer.removeTimer(TimerType.SAFETY);
 
-        player.sendMessage(ChatColor.RED + "Your PvP safety has been removed");
+        player.sendMessage(ChatColor.YELLOW + "Your PvP safety has been removed");
     }
 
     /**
@@ -68,6 +78,8 @@ public class CombatProtection {
         if(!Configuration.pvpProtEnabled) return;
 
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+
+        if(facPlayer == null) return;
 
         if(facPlayer.isBeingTimed(TimerType.PVPPROT))
             facPlayer.getTimer(TimerType.PVPPROT).setExpire(System.currentTimeMillis() + (duration * 1000L));
@@ -84,6 +96,8 @@ public class CombatProtection {
         if(!Configuration.pvpSafetyEnabled) return;
 
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+
+        if(facPlayer == null) return;
 
         if(facPlayer.isBeingTimed(TimerType.SAFETY))
             facPlayer.getTimer(TimerType.SAFETY).setExpire(System.currentTimeMillis() + (duration * 1000L));

@@ -8,6 +8,7 @@ import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
+import gg.revival.factions.core.events.palace.PalaceManager;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Logger;
@@ -94,6 +95,12 @@ public class EventManager {
             else
                 Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.started(event)));
         }
+
+        if(event.isPalace()) {
+            PalaceManager.setPublicChestLevel(0);
+            PalaceManager.setCappingFaction(null);
+            PalaceManager.setCaptured(false);
+        }
     }
 
     public static void stopEvent(Event event) {
@@ -138,10 +145,15 @@ public class EventManager {
             koth.setContested(false);
             koth.getTickets().clear();
 
-            if(event.isPalace())
+            if(event.isPalace()) {
                 Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
-            else
+
+                PalaceManager.setCappingFaction(koth.getCappingFaction());
+                PalaceManager.setCaptured(true);
+                PalaceManager.setPublicChestLevel(0);
+            } else {
                 Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.captured(event)));
+            }
 
             event.setLootChestFaction(koth.getCappingFaction());
             event.setLootChestUnlockTime(System.currentTimeMillis() + (30 * 1000L));
@@ -153,10 +165,15 @@ public class EventManager {
             dtc.setResetTime(-1L);
             dtc.getTickets().clear();
 
-            if(event.isPalace())
+            if(event.isPalace()) {
                 Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
-            else
+
+                PalaceManager.setCappingFaction(dtc.getCappingFaction());
+                PalaceManager.setCaptured(true);
+                PalaceManager.setPublicChestLevel(0);
+            } else {
                 Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.captured(event)));
+            }
 
             event.setLootChestFaction(dtc.getCappingFaction());
             event.setLootChestUnlockTime(System.currentTimeMillis() + (30 * 1000L));

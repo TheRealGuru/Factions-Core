@@ -27,7 +27,7 @@ public class EndCommand implements CommandExecutor {
                 return false;
             }
 
-            player.teleport(Locations.getSpawnLocation());
+            player.teleport(Locations.getEndSpawnLocation());
             player.sendMessage(ChatColor.GREEN + "Teleported to The End");
             return false;
         }

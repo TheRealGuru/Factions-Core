@@ -34,6 +34,18 @@ public class HardmodeListener implements Listener {
 
         if(!(entity instanceof Monster) || entity instanceof Enderman) return;
 
+        if(entity instanceof Zombie) {
+            Zombie zombie = (Zombie)entity;
+
+            if(zombie.isBaby()) return;
+        }
+
+        if(entity instanceof PigZombie) {
+            PigZombie pigZombie = (PigZombie)entity;
+
+            if(pigZombie.isBaby()) return;
+        }
+
         livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
     }
 }

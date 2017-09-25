@@ -1,5 +1,6 @@
 package gg.revival.factions.core.stats;
 
+import com.google.common.collect.ImmutableList;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import gg.revival.driver.MongoAPI;
@@ -24,7 +25,9 @@ public class Stats {
     @Getter static Set<PlayerStats> activeStats = new HashSet<>();
 
     public static PlayerStats getStats(UUID uuid) {
-        for(PlayerStats stats : activeStats) {
+        ImmutableList<PlayerStats> cache = ImmutableList.copyOf(activeStats);
+
+        for(PlayerStats stats : cache) {
             if(!stats.getUuid().equals(uuid)) continue;
 
             if(Bukkit.getPlayer(uuid) != null)
@@ -36,62 +39,108 @@ public class Stats {
         return null;
     }
 
-    public static void loadStats(UUID uuid) {
+    public static void loadStats(UUID uuid, boolean unsafe) {
         if(getStats(uuid) != null) return;
 
-        new BukkitRunnable() {
-            public void run() {
-                if(DBManager.getStats() == null)
-                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
+        if(unsafe) {
+            if(DBManager.getStats() == null)
+                DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
 
-                MongoCollection collection = DBManager.getStats();
-                FindIterable<Document> query = null;
+            MongoCollection collection = DBManager.getStats();
+            FindIterable<Document> query = null;
 
-                try {
-                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
-                } catch (LinkageError err) {
-                    loadStats(uuid);
-                    return;
-                }
-
-                Document document = query.first();
-
-                if(document != null) {
-                    long playtime = document.getLong("playtime");
-                    int kills = document.getInteger("kills");
-                    int deaths = document.getInteger("deaths");
-                    int foundGold = document.getInteger("foundGold");
-                    int foundDiamond = document.getInteger("foundDiamond");
-                    int foundEmerald = document.getInteger("foundEmerald");
-
-                    new BukkitRunnable() {
-                        public void run() {
-                            long loginTime = -1L;
-
-                            if(Bukkit.getPlayer(uuid) != null)
-                                loginTime = System.currentTimeMillis();
-
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
-                            activeStats.add(newPlayerStats);
-                        }
-                    }.runTask(FC.getFactionsCore());
-                }
-
-                else {
-                    new BukkitRunnable() {
-                        public void run() {
-                            long loginTime = -1L;
-
-                            if(Bukkit.getPlayer(uuid) != null)
-                                loginTime = System.currentTimeMillis();
-
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
-                            activeStats.add(newPlayerStats);
-                        }
-                    }.runTask(FC.getFactionsCore());
-                }
+            try {
+                query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+            } catch (LinkageError err) {
+                loadStats(uuid, unsafe);
+                return;
             }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+
+            Document document = query.first();
+
+            if(document != null) {
+                long playtime = document.getLong("playtime");
+                int kills = document.getInteger("kills");
+                int deaths = document.getInteger("deaths");
+                int foundGold = document.getInteger("foundGold");
+                int foundDiamond = document.getInteger("foundDiamond");
+                int foundEmerald = document.getInteger("foundEmerald");
+
+                long loginTime = -1L;
+
+                if(Bukkit.getPlayer(uuid) != null)
+                    loginTime = System.currentTimeMillis();
+
+                PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
+                activeStats.add(newPlayerStats);
+            }
+
+            else {
+                long loginTime = -1L;
+
+                if(Bukkit.getPlayer(uuid) != null)
+                    loginTime = System.currentTimeMillis();
+
+                PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
+                activeStats.add(newPlayerStats);
+            }
+        }
+
+        else {
+            new BukkitRunnable() {
+                public void run() {
+                    if(DBManager.getStats() == null)
+                        DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
+
+                    MongoCollection collection = DBManager.getStats();
+                    FindIterable<Document> query = null;
+
+                    try {
+                        query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                    } catch (LinkageError err) {
+                        loadStats(uuid, unsafe);
+                        return;
+                    }
+
+                    Document document = query.first();
+
+                    if(document != null) {
+                        long playtime = document.getLong("playtime");
+                        int kills = document.getInteger("kills");
+                        int deaths = document.getInteger("deaths");
+                        int foundGold = document.getInteger("foundGold");
+                        int foundDiamond = document.getInteger("foundDiamond");
+                        int foundEmerald = document.getInteger("foundEmerald");
+
+                        new BukkitRunnable() {
+                            public void run() {
+                                long loginTime = -1L;
+
+                                if(Bukkit.getPlayer(uuid) != null)
+                                    loginTime = System.currentTimeMillis();
+
+                                PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
+                                activeStats.add(newPlayerStats);
+                            }
+                        }.runTask(FC.getFactionsCore());
+                    }
+
+                    else {
+                        new BukkitRunnable() {
+                            public void run() {
+                                long loginTime = -1L;
+
+                                if(Bukkit.getPlayer(uuid) != null)
+                                    loginTime = System.currentTimeMillis();
+
+                                PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
+                                activeStats.add(newPlayerStats);
+                            }
+                        }.runTask(FC.getFactionsCore());
+                    }
+                }
+            }.runTaskAsynchronously(FC.getFactionsCore());
+        }
     }
 
     public static void loadAndReceiveStats(UUID uuid, StatsCallback callback) {

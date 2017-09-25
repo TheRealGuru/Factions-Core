@@ -1,13 +1,15 @@
 package gg.revival.factions.core.tools;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.util.BlockIterator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockTools
-{
+public class BlockTools {
 
     /**
      * Returns a list of all nearby blocks
@@ -27,6 +29,19 @@ public class BlockTools
         }
 
         return blocks;
+    }
+
+    public static Block getTargetBlock(Player player, int dist) {
+        BlockIterator iterator = new BlockIterator(player, dist);
+        Block lastBlock = iterator.next();
+
+        while (iterator.hasNext()) {
+            lastBlock = iterator.next();
+            if (lastBlock.getType().equals(Material.AIR)) continue;
+            break;
+        }
+
+        return lastBlock;
     }
 
 }

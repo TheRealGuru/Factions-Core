@@ -15,12 +15,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class CrowbarListener implements Listener
-{
+public class CrowbarListener implements Listener {
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event)
-    {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         if(event.isCancelled()) return;
         if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if(event.getClickedBlock() == null || event.getClickedBlock().getType().equals(Material.AIR)) return;
@@ -34,16 +32,14 @@ public class CrowbarListener implements Listener
     }
 
     @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event)
-    {
+    public void onBlockPlace(BlockPlaceEvent event) {
         if(event.isCancelled()) return;
         if(!event.getBlock().getType().equals(Material.MOB_SPAWNER)) return;
 
         Block block = event.getBlock();
         CreatureSpawner creatureSpawner = (CreatureSpawner)block.getState();
 
-        if(event.getItemInHand() != null && event.getItemInHand().getItemMeta() != null)
-        {
+        if(event.getItemInHand() != null && event.getItemInHand().getItemMeta() != null) {
             ItemMeta meta = event.getItemInHand().getItemMeta();
 
             if(meta.getDisplayName().contains(ChatColor.DARK_RED + StringUtils.capitalize(creatureSpawner.getSpawnedType().toString().toLowerCase()))) return;

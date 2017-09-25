@@ -5,6 +5,9 @@ import gg.revival.factions.core.classes.cont.Archer;
 import gg.revival.factions.core.classes.cont.Bard;
 import gg.revival.factions.core.classes.cont.Miner;
 import gg.revival.factions.core.classes.cont.Scout;
+import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.events.loot.EventChestManager;
+import gg.revival.factions.core.events.loot.LootTableManager;
 import gg.revival.factions.core.locations.Locations;
 import gg.revival.factions.core.servermode.ServerMode;
 import gg.revival.factions.core.servermode.ServerState;
@@ -24,6 +27,7 @@ public class Configuration
     public static String databaseName = "factions";
 
     public static boolean automateEvents = true;
+    public static boolean playChestEffects = true;
     public static int defaultKothDuration = 60;
     public static int defaultKothWinCondition = 15;
     public static int defaultKothKeys = 3;
@@ -51,6 +55,7 @@ public class Configuration
     public static double maxArcherDamage = 4.0;
     public static boolean scoutEnabled = true;
     public static boolean bardEnabled = true;
+    public static double bardNearbyCheckDistance = 15.0;
     public static boolean minerEnabled = true;
 
     public static boolean deathbansEnabled = true;
@@ -101,6 +106,21 @@ public class Configuration
     public static boolean statsEnabled = true;
     public static boolean trackStats = true;
 
+    public static void reload() {
+        FileManager.reloadFiles();
+
+        Classes.getEnabledClasses().clear();
+        EventManager.getEvents().clear();
+        EventChestManager.getEventChests().clear();
+        LootTableManager.getLootTables().clear();
+        enchantmentLimits.clear();
+        potionLimits.clear();
+
+        load();
+
+        Logger.log("Reloaded Configuration");
+    }
+
     public static void load() {
         FileManager.createFiles();
 
@@ -122,6 +142,7 @@ public class Configuration
         }
 
         automateEvents = events.getBoolean("configuration.automated");
+        playChestEffects = events.getBoolean("configuration.play-chest-effects");
         defaultKothDuration = events.getInt("configuration.koth.default-duration");
         defaultKothWinCondition = events.getInt("configuration.koth.default-wincond");
         defaultKothKeys = events.getInt("configuration.koth.default-keys");
@@ -149,6 +170,7 @@ public class Configuration
         maxArcherDamage = config.getDouble("classes.archer.max-damage");
         scoutEnabled = config.getBoolean("classes.scout.enabled");
         bardEnabled = config.getBoolean("classes.bard.enabled");
+        bardNearbyCheckDistance = config.getDouble("classes.bard.nearby-check-distance");
         minerEnabled = config.getBoolean("classes.miner.enabled");
 
         if(archerEnabled) {
@@ -260,12 +282,6 @@ public class Configuration
 
         Logger.log("Loaded " + enchantmentLimits.size() + " Enchantment limits");
         Logger.log("Loaded " + potionLimits.size() + " Potion limits");
-    }
-
-    public static void reload() {
-        FileManager.reloadFiles();
-
-        load();
     }
 
 }

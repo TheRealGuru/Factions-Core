@@ -1,5 +1,6 @@
 package gg.revival.factions.core.deathbans;
 
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
@@ -13,7 +14,7 @@ public class DeathMessages {
     /**
      * Standard prefix used for all death notifications
      */
-    private static final String prefix = ChatColor.RED + "RIP: ";
+    @Getter  public static final String prefix = ChatColor.RED + "RIP: ";
 
     /**
      * Returns a String of the formatted Death message based on PvP

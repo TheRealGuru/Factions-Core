@@ -2,9 +2,12 @@ name: FactionsCore
 main: gg.revival.factions.core.FC
 version: 1.0.0
 author: johnsama
-description: Powers HCFR's Spawntag, Cooldowns, Deathbans, Lives, Progression and Scoreboards
+description: Powers Timers, Classes, Essentials, Deathbans, Events, Mechanic Changes, Locations, Mining, Progression, yada yada
 depends: [Revival]
 commands:
+  factionscore:
+    description: Core functions command
+    aliases: [fc, fcore]
   logout:
     description: Safely logout from the server without leaving a Combat Logger
     aliases: [safelog]
@@ -19,6 +22,12 @@ commands:
   events:
     description: Events command
     aliases: [e, event, koth, dtc, beacon, palace, citadel, conquest]
+  eventchest:
+    description: Event Chest command
+    aliases: [ec]
+  tables:
+    description: Table command
+    aliases: [table, loottables, loot]
   lives:
     description: Lives command
     aliases: [live, lifes, life]

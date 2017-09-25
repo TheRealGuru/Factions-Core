@@ -18,19 +18,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class InvalidPearlListener implements Listener
-{
+public class InvalidPearlListener implements Listener {
 
-    private ImmutableSet<Material> invalidBlocks = ImmutableSet.of(Material.IRON_TRAPDOOR, Material.ACACIA_DOOR, Material.BIRCH_DOOR, Material.DARK_OAK_DOOR, Material.IRON_DOOR, Material.IRON_DOOR_BLOCK,
+    private final ImmutableSet<Material> invalidBlocks = ImmutableSet.of(Material.IRON_TRAPDOOR, Material.ACACIA_DOOR, Material.BIRCH_DOOR, Material.DARK_OAK_DOOR, Material.IRON_DOOR, Material.IRON_DOOR_BLOCK,
             Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.TRAP_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.IRON_DOOR, Material.HOPPER, Material.BREWING_STAND, Material.ANVIL,
             Material.BED, Material.FENCE_GATE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE, Material.JUNGLE_FENCE_GATE,
             Material.SPRUCE_FENCE_GATE, Material.ARMOR_STAND, Material.CHEST, Material.TRAPPED_CHEST, Material.ENCHANTMENT_TABLE,
             Material.BARRIER, Material.THIN_GLASS, Material.STAINED_GLASS_PANE, Material.SLIME_BLOCK);
 
-    public boolean isInvalidBlock(Location location)
-    {
-        for(Block nearbyBlocks : BlockTools.getNearbyBlocks(location, 1))
-        {
+    public boolean isInvalidBlock(Location location) {
+        for(Block nearbyBlocks : BlockTools.getNearbyBlocks(location, 1)) {
             if(invalidBlocks.contains(nearbyBlocks.getType()))
                 return true;
         }
@@ -39,8 +36,7 @@ public class InvalidPearlListener implements Listener
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerInteract(PlayerInteractEvent event)
-    {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         if(event.isCancelled())
             return;
 
@@ -60,8 +56,7 @@ public class InvalidPearlListener implements Listener
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onTeleport(PlayerTeleportEvent event)
-    {
+    public void onTeleport(PlayerTeleportEvent event) {
         if(event.isCancelled())
             return;
 
@@ -72,6 +67,8 @@ public class InvalidPearlListener implements Listener
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
         Location to = event.getTo();
 
+        if(facPlayer == null) return;
+
         if(!isInvalidBlock(to.getBlock().getLocation())) return;
 
         ItemStack item = new ItemStack(Material.ENDER_PEARL);
@@ -79,9 +76,7 @@ public class InvalidPearlListener implements Listener
         player.getInventory().addItem(item);
 
         if(facPlayer.isBeingTimed(TimerType.ENDERPEARL))
-        {
             facPlayer.removeTimer(TimerType.ENDERPEARL);
-        }
 
         player.sendMessage(ChatColor.RED + "Your enderpearl has been cancelled because it landed on an invalid block");
 

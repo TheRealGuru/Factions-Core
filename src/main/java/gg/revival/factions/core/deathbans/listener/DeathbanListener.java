@@ -19,13 +19,10 @@ public class DeathbanListener implements Listener {
     @EventHandler
     public void onPlayerLoginAttempt(AsyncPlayerPreLoginEvent event) {
         UUID uuid = event.getUniqueId();
-        Deathbans.getActiveDeathban(uuid, death -> {
+
+        Deathbans.getActiveDeathban(uuid, true, death -> {
             if(death == null) return;
-
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Deathbans.getDeathbanMessage(death));
-
-            if(Bukkit.getPlayer(death.getKilled()) != null && Bukkit.getPlayer(death.getKilled()).isOnline())
-                Bukkit.getPlayer(death.getKilled()).kickPlayer(Deathbans.getDeathbanMessage(death));
         });
     }
 

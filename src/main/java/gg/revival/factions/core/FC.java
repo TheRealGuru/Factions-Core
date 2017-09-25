@@ -2,6 +2,7 @@ package gg.revival.factions.core;
 
 import gg.revival.factions.core.bastion.Bastion;
 import gg.revival.factions.core.classes.Classes;
+import gg.revival.factions.core.command.FactionsCoreCommand;
 import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.events.Events;
@@ -44,6 +45,8 @@ public class FC extends JavaPlugin {
         Stats.onEnable();
         Locations.onEnable();
         UI.onEnable();
+
+        getCommand("factionscore").setExecutor(new FactionsCoreCommand());
     }
 
     @Override

@@ -6,12 +6,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ExpBottleEvent;
 
-public class EmeraldEXPListener implements Listener
-{
+public class EmeraldEXPListener implements Listener {
 
     @EventHandler
-    public void onExpUseEvent(ExpBottleEvent event)
-    {
+    public void onExpUseEvent(ExpBottleEvent event) {
         ThrownExpBottle bottle = event.getEntity();
 
         if(!(bottle.getShooter() instanceof Player)) return;

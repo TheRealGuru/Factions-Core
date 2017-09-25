@@ -9,12 +9,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class BookUnchantmentListener implements Listener
-{
+public class BookUnchantmentListener implements Listener {
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event)
-    {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         if(event.isCancelled())
             return;
 

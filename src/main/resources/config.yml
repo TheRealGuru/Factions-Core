@@ -27,6 +27,7 @@ classes:
     enabled: true
   bard:
     enabled: true
+    nearby-check-distance: 15.0
   miner:
     enabled: true
   active-cooldowns:

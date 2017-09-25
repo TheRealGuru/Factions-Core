@@ -10,12 +10,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class EnderpearlCDListener implements Listener
-{
+public class EnderpearlCDListener implements Listener {
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event)
-    {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 

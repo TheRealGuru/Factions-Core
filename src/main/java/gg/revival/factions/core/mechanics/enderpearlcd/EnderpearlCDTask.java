@@ -11,8 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class EnderpearlCDTask
-{
+public class EnderpearlCDTask {
 
     /**
      * Attempts to throw an enderpearl. Returns true if possible
@@ -20,18 +19,16 @@ public class EnderpearlCDTask
      * @param dur The duration the enderpearl should be locked for
      * @return Enderpearl throw was successful
      */
-    public static boolean attemptEnderpearl(UUID uuid, int dur)
-    {
+    public static boolean attemptEnderpearl(UUID uuid, int dur) {
         if(Bukkit.getPlayer(uuid) == null)
-        {
             return false;
-        }
 
         Player player = Bukkit.getPlayer(uuid);
         FPlayer facPlayer = PlayerManager.getPlayer(uuid);
 
-        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL))
-        {
+        if(facPlayer == null) return false;
+
+        if(facPlayer.isBeingTimed(TimerType.ENDERPEARL)) {
             long expireDur = facPlayer.getTimer(TimerType.ENDERPEARL).getExpire() - System.currentTimeMillis();
             player.sendMessage(ChatColor.RED + "Your enderpearl is locked for another " + ChatColor.RED + "" + ChatColor.BOLD + TimeTools.getFormattedCooldown(true, expireDur) + ChatColor.RED + " seconds");
             return false;

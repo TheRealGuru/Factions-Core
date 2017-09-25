@@ -82,8 +82,8 @@ public class Mechanics {
         }
 
         if(Configuration.settingsRemoveGApples) {
-            ItemStack gApple = new ItemStack(Material.GOLDEN_APPLE, 1, (short)1);
-            ItemTools.deleteRecipe(gApple);
+            ItemStack gapple = new ItemStack(Material.GOLDEN_APPLE, 1, (short)1);
+            ItemTools.deleteRecipe(gapple);
         }
     }
 

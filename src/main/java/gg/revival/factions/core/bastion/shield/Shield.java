@@ -1,12 +1,11 @@
 package gg.revival.factions.core.bastion.shield;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Shield {
 
@@ -21,11 +20,10 @@ public class Shield {
      * @return
      */
     static ShieldPlayer getShieldPlayer(UUID uuid) {
-        List<ShieldPlayer> playerCache = new CopyOnWriteArrayList<>(shieldPlayers);
+        ImmutableList<ShieldPlayer> cache = ImmutableList.copyOf(shieldPlayers);
 
-        for(ShieldPlayer players : playerCache) {
+        for(ShieldPlayer players : cache)
             if(players.getUuid().equals(uuid)) return players;
-        }
 
         ShieldPlayer newPlayer = new ShieldPlayer(uuid);
         shieldPlayers.add(newPlayer);

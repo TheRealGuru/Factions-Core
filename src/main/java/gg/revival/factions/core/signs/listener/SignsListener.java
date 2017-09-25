@@ -1,6 +1,5 @@
 package gg.revival.factions.core.signs.listener;
 
-import gg.revival.core.tools.Logger;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.signs.Signs;
@@ -20,25 +19,20 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SignsListener implements Listener
-{
+public class SignsListener implements Listener {
 
     @EventHandler
-    public void onSignFormatting(SignChangeEvent event)
-    {
+    public void onSignFormatting(SignChangeEvent event) {
         Player player = event.getPlayer();
 
         if(!player.hasPermission(Permissions.CORE_ADMIN)) return;
 
         for(int i = 0; i < 3; i++)
-        {
             event.setLine(i, ChatColor.translateAlternateColorCodes('&', event.getLine(i)));
-        }
     }
 
     @EventHandler
-    public void onSignChange(SignChangeEvent event)
-    {
+    public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
 
         String lineOne = event.getLine(0);
@@ -48,10 +42,8 @@ public class SignsListener implements Listener
 
         if(!player.hasPermission(Permissions.CORE_ADMIN)) return;
 
-        if(lineOne.equalsIgnoreCase("buysign"))
-        {
-            if(!Signs.isValidSign(lineTwo, lineThree, lineFour))
-            {
+        if(lineOne.equalsIgnoreCase("buysign")) {
+            if(!Signs.isValidSign(lineTwo, lineThree, lineFour)) {
                 player.sendMessage(ChatColor.RED + "Invalid sign");
                 return;
             }
@@ -60,12 +52,9 @@ public class SignsListener implements Listener
             String itemName = item.getType().toString().replace("_", " ");
 
             if(item.getItemMeta() != null)
-            {
                 itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName());
-            }
 
-            if(itemName == null)
-            {
+            if(itemName == null) {
                 player.sendMessage(ChatColor.RED + "Invalid sign");
                 return;
             }
@@ -79,10 +68,8 @@ public class SignsListener implements Listener
             return;
         }
 
-        if(lineOne.equalsIgnoreCase("sellsign"))
-        {
-            if(!Signs.isValidSign(lineTwo, lineThree, lineFour))
-            {
+        if(lineOne.equalsIgnoreCase("sellsign")) {
+            if(!Signs.isValidSign(lineTwo, lineThree, lineFour)) {
                 player.sendMessage(ChatColor.RED + "Invalid sign");
                 return;
             }
@@ -91,12 +78,9 @@ public class SignsListener implements Listener
             String itemName = item.getType().toString();
 
             if(item.getItemMeta() != null)
-            {
                 itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName());
-            }
 
-            if(itemName == null)
-            {
+            if(itemName == null) {
                 player.sendMessage(ChatColor.RED + "Invalid sign");
                 return;
             }
@@ -112,8 +96,7 @@ public class SignsListener implements Listener
     }
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event)
-    {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
         if(!event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
@@ -131,16 +114,14 @@ public class SignsListener implements Listener
         String lineThree = sign.getLine(2);
         String lineFour = sign.getLine(3);
 
-        if(Signs.isBuySign(lineOne, lineTwo, lineThree, lineFour))
-        {
+        if(Signs.isBuySign(lineOne, lineTwo, lineThree, lineFour)) {
             int amount = Integer.valueOf(lineTwo.replace("Amt: ", ""));
             ItemStack item = Signs.getItemStackFromString(lineThree);
             int price = Integer.valueOf(lineFour.replace("$", ""));
 
             FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
-            if(facPlayer.getBalance() < price)
-            {
+            if(facPlayer.getBalance() < price) {
                 player.sendMessage(ChatColor.RED + "You can not afford this item");
                 return;
             }
@@ -164,20 +145,17 @@ public class SignsListener implements Listener
             }.runTaskLater(FC.getFactionsCore(), 5L);
         }
 
-        if(Signs.isSellSign(lineOne, lineTwo, lineThree, lineFour))
-        {
+        if(Signs.isSellSign(lineOne, lineTwo, lineThree, lineFour)) {
             int amount = Integer.valueOf(lineTwo.replace("Amt: ", ""));
             ItemStack item = Signs.getItemStackFromString(lineThree);
             int price = Integer.valueOf(lineFour.replace("$", ""));
 
-            if(!player.getInventory().getItemInHand().getType().equals(item.getType()))
-            {
+            if(!player.getInventory().getItemInHand().getType().equals(item.getType())) {
                 player.sendMessage(ChatColor.RED + "You must be holding the item you are trying to sell");
                 return;
             }
 
-            if(player.getInventory().getItemInHand().getDurability() != item.getDurability())
-            {
+            if(player.getInventory().getItemInHand().getDurability() != item.getDurability()) {
                 player.sendMessage(ChatColor.RED + "You must be holding the item you are trying to sell");
                 return;
             }
@@ -187,19 +165,16 @@ public class SignsListener implements Listener
 
             facPlayer.setBalance(facPlayer.getBalance() + price);
 
-            if(amtInHand < amount)
-            {
+            if(amtInHand < amount) {
                 player.sendMessage(ChatColor.RED + "You need " + amount + " of this item in order to sell it");
                 return;
             }
 
-            if((amtInHand - amount) == 0)
-            {
+            if((amtInHand - amount) == 0) {
                 player.getInventory().setItemInHand(null);
             }
 
-            else
-            {
+            else {
                 ItemStack newHand = player.getInventory().getItemInHand();
                 newHand.setAmount(amtInHand - amount);
                 player.getInventory().setItemInHand(newHand);

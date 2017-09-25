@@ -7,19 +7,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.UUID;
 
 public class StatsListener implements Listener {
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+    public void onPlayerLoginAttempt(AsyncPlayerPreLoginEvent event) {
+        UUID uuid = event.getUniqueId();
 
         if(!Configuration.statsEnabled) return;
+        if(Stats.getActiveStats().contains(uuid)) return;
 
-        if(Stats.getActiveStats().contains(player.getUniqueId())) return;
-        Stats.loadStats(player.getUniqueId());
+        Stats.loadStats(uuid, true);
     }
 
     @EventHandler
@@ -31,7 +33,8 @@ public class StatsListener implements Listener {
         PlayerStats stats = Stats.getStats(player.getUniqueId());
         stats.setPlaytime(stats.getNewPlaytime());
 
-        Stats.saveStats(Stats.getStats(player.getUniqueId()), false);
+        Stats.saveStats(stats, false);
+        Stats.getActiveStats().remove(stats);
     }
 
     @EventHandler

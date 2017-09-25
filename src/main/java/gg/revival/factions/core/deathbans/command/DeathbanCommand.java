@@ -27,7 +27,7 @@ public class DeathbanCommand implements CommandExecutor {
         }
 
         if(args.length != 2) {
-            sender.sendMessage(ChatColor.RED + "/deathban <player> <time>");
+            sender.sendMessage(ChatColor.RED + "/deathban <player> <seconds>");
             return false;
         }
 
@@ -37,7 +37,7 @@ public class DeathbanCommand implements CommandExecutor {
         int duration = NumberUtils.toInt(namedDuration);
 
         if(!NumberUtils.isNumber(namedDuration)) {
-            sender.sendMessage(ChatColor.RED + "/deathban <player> <time>");
+            sender.sendMessage(ChatColor.RED + "/deathban <player> <seconds>");
             return false;
         }
 
@@ -49,7 +49,7 @@ public class DeathbanCommand implements CommandExecutor {
 
             String creator = sender.getName();
 
-            Deathbans.getActiveDeathban(uuid, death -> {
+            Deathbans.getActiveDeathban(uuid, false, death -> {
                 if(death != null) {
                     death.setExpiresTime(System.currentTimeMillis());
                     Deathbans.saveDeathban(death);

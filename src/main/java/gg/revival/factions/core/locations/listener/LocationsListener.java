@@ -45,13 +45,11 @@ public class LocationsListener implements Listener {
             event.setTo(Locations.getSpawnLocation());
         }
 
-        if(to.getWorld().getEnvironment().equals(World.Environment.THE_END)) {
+        if(to.getWorld().getEnvironment().equals(World.Environment.THE_END))
             event.setTo(Locations.getEndSpawnLocation());
-        }
 
-        if(from.getWorld().getEnvironment().equals(World.Environment.THE_END)) {
+        if(from.getWorld().getEnvironment().equals(World.Environment.THE_END))
             event.setTo(Locations.getEndExitLocation());
-        }
     }
 
 }

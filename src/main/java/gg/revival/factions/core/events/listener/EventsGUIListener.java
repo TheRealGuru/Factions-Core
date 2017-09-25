@@ -10,7 +10,7 @@ public class EventsGUIListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Inventory inventory = event.getClickedInventory();
+        Inventory inventory = event.getInventory();
 
         if(inventory == null || !EventsGUI.isGUI(inventory)) return;
 

@@ -1,5 +1,6 @@
 package gg.revival.factions.core.classes;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
@@ -53,7 +54,9 @@ public class Classes {
      * @return
      */
     public static ClassProfile getClassProfile(UUID uuid) {
-        for(ClassProfile loadedClasses : activeClasses)
+        ImmutableList<ClassProfile> cache = ImmutableList.copyOf(activeClasses);
+
+        for(ClassProfile loadedClasses : cache)
             if(loadedClasses.getUuid().equals(uuid)) return loadedClasses;
 
         return null;
@@ -123,6 +126,9 @@ public class Classes {
      */
     public static void removeFromClass(UUID uuid) {
         ClassProfile profile = getClassProfile(uuid);
+
+        if(profile == null) return;
+
         RClass classToRemove = getClassByClassType(profile.getSelectedClass());
 
         for(PotionEffect effectsToRemove : classToRemove.getPassives()) {
@@ -151,34 +157,38 @@ public class Classes {
                 helmet.getType().equals(Material.LEATHER_HELMET) &&
                 chestplate.getType().equals(Material.LEATHER_CHESTPLATE) &&
                 leggings.getType().equals(Material.LEATHER_LEGGINGS) &&
-                boots.getType().equals(Material.LEATHER_BOOTS)) {
+                boots.getType().equals(Material.LEATHER_BOOTS) &&
+                Configuration.archerEnabled) {
 
             return ClassType.ARCHER;
         }
 
         if(
                 helmet.getType().equals(Material.CHAINMAIL_HELMET) &&
-                        chestplate.getType().equals(Material.CHAINMAIL_CHESTPLATE) &&
-                        leggings.getType().equals(Material.CHAINMAIL_LEGGINGS) &&
-                        boots.getType().equals(Material.CHAINMAIL_BOOTS)) {
+                chestplate.getType().equals(Material.CHAINMAIL_CHESTPLATE) &&
+                leggings.getType().equals(Material.CHAINMAIL_LEGGINGS) &&
+                boots.getType().equals(Material.CHAINMAIL_BOOTS) &&
+                Configuration.scoutEnabled) {
 
             return ClassType.SCOUT;
         }
 
         if(
                 helmet.getType().equals(Material.IRON_HELMET) &&
-                        chestplate.getType().equals(Material.IRON_CHESTPLATE) &&
-                        leggings.getType().equals(Material.IRON_LEGGINGS) &&
-                        boots.getType().equals(Material.IRON_BOOTS)) {
+                chestplate.getType().equals(Material.IRON_CHESTPLATE) &&
+                leggings.getType().equals(Material.IRON_LEGGINGS) &&
+                boots.getType().equals(Material.IRON_BOOTS) &&
+                Configuration.minerEnabled) {
 
             return ClassType.MINER;
         }
 
         if(
                 helmet.getType().equals(Material.GOLD_HELMET) &&
-                        chestplate.getType().equals(Material.GOLD_CHESTPLATE) &&
-                        leggings.getType().equals(Material.GOLD_LEGGINGS) &&
-                        boots.getType().equals(Material.GOLD_BOOTS)) {
+                chestplate.getType().equals(Material.GOLD_CHESTPLATE) &&
+                leggings.getType().equals(Material.GOLD_LEGGINGS) &&
+                boots.getType().equals(Material.GOLD_BOOTS) &&
+                Configuration.bardEnabled) {
 
             return ClassType.BARD;
         }

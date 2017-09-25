@@ -6,6 +6,7 @@ import gg.revival.factions.claims.ServerClaimType;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.bastion.logout.tasks.LogoutTask;
+import gg.revival.factions.core.deathbans.DeathMessages;
 import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.PlayerTools;
@@ -169,7 +170,7 @@ public class CombatListener implements Listener {
             }
         }
 
-        Deathbans.getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation(), duration -> Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logged", duration));
+        Deathbans.getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation(), duration -> Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logger Slain", duration));
 
         Faction faction = FactionManager.getFactionByPlayer(logger.getUuid());
 
@@ -183,9 +184,9 @@ public class CombatListener implements Listener {
         }
 
         if(event.getEntity().getKiller() != null)
-            Bukkit.broadcastMessage(ChatColor.DARK_RED + "RIP: " + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain by " + ChatColor.GOLD + event.getEntity().getKiller().getName());
+            Bukkit.broadcastMessage(DeathMessages.getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain by " + ChatColor.GOLD + event.getEntity().getKiller().getName());
         else
-            Bukkit.broadcastMessage(ChatColor.DARK_RED + "RIP: " + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain");
+            Bukkit.broadcastMessage(DeathMessages.getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain");
     }
 
 }

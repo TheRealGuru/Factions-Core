@@ -9,12 +9,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class SpawnerBreakingListener implements Listener
-{
+public class SpawnerBreakingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBlockBreak(BlockBreakEvent event)
-    {
+    public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
 
         if(event.isCancelled())

@@ -24,7 +24,6 @@ public class CombatProtectionListener implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-
         CombatProtection.giveProtection(player, Configuration.pvpProtDuration);
     }
 

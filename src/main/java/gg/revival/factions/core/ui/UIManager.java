@@ -1,6 +1,6 @@
 package gg.revival.factions.core.ui;
 
-import gg.revival.core.scoreboards.RScoreboard;
+import com.google.common.collect.ImmutableList;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
@@ -26,10 +26,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class UIManager {
 
@@ -201,7 +199,7 @@ public class UIManager {
                 }
 
                 if(!EventManager.getActiveEvents().isEmpty()) {
-                    List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
+                    ImmutableList<Event> cache = ImmutableList.copyOf(EventManager.getActiveEvents());
 
                     for(Event activeEvents : cache) {
                         if(activeEvents instanceof KOTHEvent) {
@@ -227,7 +225,7 @@ public class UIManager {
                         if(activeEvents instanceof DTCEvent) {
                             DTCEvent dtc = (DTCEvent)activeEvents;
 
-                            if(dtc.getCappingFaction() != null) {
+                            if(dtc.getCappingFaction() != null && dtc.getTickets().containsKey(dtc.getCappingFaction())) {
                                 builder.append(" " + dtc.getDisplayName() + ChatColor.WHITE + ": " +
                                         ChatColor.YELLOW + dtc.getCappingFaction().getDisplayName() + ChatColor.GOLD + "(" + ChatColor.BLUE + (dtc.getWinCond() - dtc.getTickets().get(dtc.getCappingFaction())) + ChatColor.GOLD + ")" + ChatColor.RESET + " ");
                                 continue;

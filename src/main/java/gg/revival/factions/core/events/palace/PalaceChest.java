@@ -1,4 +1,4 @@
-package gg.revival.factions.core.events.loot;
+package gg.revival.factions.core.events.palace;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,18 +6,20 @@ import org.bukkit.Location;
 
 import java.util.UUID;
 
-public class EventChest {
+public class PalaceChest {
 
     @Getter UUID uuid;
-    @Getter EventChestType type;
+    @Getter @Setter int level;
     @Getter @Setter Location location;
     @Getter String lootTable;
+    @Getter @Setter boolean looted;
 
-    public EventChest(UUID uuid, EventChestType type, Location location, String lootTable) {
+    public PalaceChest(UUID uuid, int level, Location location, String lootTable) {
         this.uuid = uuid;
-        this.type = type;
+        this.level = level;
         this.location = location;
         this.lootTable = lootTable;
+        this.looted = false;
     }
 
 }

@@ -34,48 +34,86 @@ public class Deathbans {
      * @param uuid
      * @return
      */
-    public static void getActiveDeathban(UUID uuid, ActiveDeathbanCallback callback) {
-        new BukkitRunnable() {
-            public void run() {
-                if(DBManager.getDeathbans() == null)
-                    DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
+    public static void getActiveDeathban(UUID uuid, boolean unsafe, ActiveDeathbanCallback callback) {
+        if(unsafe) {
+            if(DBManager.getDeathbans() == null)
+                DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
 
-                MongoCollection collection = DBManager.getDeathbans();
-                FindIterable<Document> query = null;
+            MongoCollection collection = DBManager.getDeathbans();
+            FindIterable<Document> query = null;
 
-                try {
-                    query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
-                } catch (LinkageError err) {
-                    getActiveDeathban(uuid, callback);
+            try {
+                query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
+            } catch (LinkageError err) {
+                getActiveDeathban(uuid, unsafe, callback);
+                return;
+            }
+
+            for (Document current : query) {
+                if (current.getLong("expires") > System.currentTimeMillis()) {
+                    UUID deathId = UUID.fromString(current.getString("uuid"));
+                    String reason = current.getString("reason");
+                    long created = current.getLong("created");
+                    long expires = current.getLong("expires");
+
+                    Death death = new Death(deathId, uuid, reason, created, expires);
+
+                    new BukkitRunnable() {
+                        public void run() {
+                            callback.onQueryDone(death);
+                        }
+                    }.runTask(FC.getFactionsCore());
+
                     return;
                 }
+            }
 
-                for (Document current : query) {
-                    if (current.getLong("expires") > System.currentTimeMillis()) {
-                        UUID deathId = UUID.fromString(current.getString("uuid"));
-                        String reason = current.getString("reason");
-                        long created = current.getLong("created");
-                        long expires = current.getLong("expires");
+            callback.onQueryDone(null);
+        }
 
-                        Death death = new Death(deathId, uuid, reason, created, expires);
+        else {
+            new BukkitRunnable() {
+                public void run() {
+                    if(DBManager.getDeathbans() == null)
+                        DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
 
-                        new BukkitRunnable() {
-                            public void run() {
-                                callback.onQueryDone(death);
-                            }
-                        }.runTask(FC.getFactionsCore());
+                    MongoCollection collection = DBManager.getDeathbans();
+                    FindIterable<Document> query = null;
 
+                    try {
+                        query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
+                    } catch (LinkageError err) {
+                        getActiveDeathban(uuid, unsafe, callback);
                         return;
                     }
-                }
 
-                new BukkitRunnable() {
-                    public void run() {
-                        callback.onQueryDone(null);
+                    for (Document current : query) {
+                        if (current.getLong("expires") > System.currentTimeMillis()) {
+                            UUID deathId = UUID.fromString(current.getString("uuid"));
+                            String reason = current.getString("reason");
+                            long created = current.getLong("created");
+                            long expires = current.getLong("expires");
+
+                            Death death = new Death(deathId, uuid, reason, created, expires);
+
+                            new BukkitRunnable() {
+                                public void run() {
+                                    callback.onQueryDone(death);
+                                }
+                            }.runTask(FC.getFactionsCore());
+
+                            return;
+                        }
                     }
-                }.runTask(FC.getFactionsCore());
-            }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+
+                    new BukkitRunnable() {
+                        public void run() {
+                            callback.onQueryDone(null);
+                        }
+                    }.runTask(FC.getFactionsCore());
+                }
+            }.runTaskAsynchronously(FC.getFactionsCore());
+        }
     }
 
     /**
