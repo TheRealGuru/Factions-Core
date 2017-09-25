@@ -25,6 +25,7 @@ public class EventsCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[]) {
         if(!command.getName().equalsIgnoreCase("events")) return false;
+
         if(!(sender instanceof Player)) return false;
 
         Player player = (Player)sender;

@@ -21,7 +21,10 @@ commands:
     description: View a players previous deathbans
   events:
     description: Events command
-    aliases: [e, event, koth, dtc, beacon, palace, citadel, conquest]
+    aliases: [e, event]
+  palace:
+    description: Palace command
+    aliases: [citadel, conquest]
   eventchest:
     description: Event Chest command
     aliases: [ec]
