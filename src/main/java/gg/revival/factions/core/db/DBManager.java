@@ -7,6 +7,7 @@ import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.db.listener.DatabaseListener;
 import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.Timer;
 import gg.revival.factions.timers.TimerManager;
@@ -132,6 +133,15 @@ public class DBManager {
 
                 if(progressionDuration > 0)
                     facPlayer.addTimer(TimerManager.createTimer(TimerType.PROGRESSION, progressionDuration));
+
+                new BukkitRunnable() {
+                    public void run() {
+                        if(Bukkit.getPlayer(uuid) != null && facPlayer.isBeingTimed(TimerType.PROGRESSION)) {
+                            if(Bukkit.getPlayer(uuid).hasPermission(Permissions.BYPASS_PROGRESSION))
+                                facPlayer.removeTimer(TimerType.PROGRESSION);
+                        }
+                    }
+                }.runTask(FC.getFactionsCore());
             }
         }.runTaskAsynchronously(FC.getFactionsCore());
     }

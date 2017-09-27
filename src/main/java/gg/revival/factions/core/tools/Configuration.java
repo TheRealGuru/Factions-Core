@@ -59,8 +59,8 @@ public class Configuration
     public static boolean minerEnabled = true;
 
     public static boolean deathbansEnabled = true;
-    public static int normalDeathban = 86400;
-    public static int eventDeathban = 3600;
+    public static long normalDeathban = 10000L;
+    public static long eventDeathban = 10000L;
 
     public static boolean livesEnabled = true;
 
@@ -80,10 +80,10 @@ public class Configuration
     public static int highSpawnersHeight = 125;
 
     public static boolean miningEnabled = true;
-    public static float miningGoldChance = 0.009f;
-    public static float miningDiamondChance = 0.006f;
-    public static float miningEmeraldChance = 0.003f;
-    public static float miningGlowstoneChance = 0.003f;
+    public static float miningGoldChance = 0.006f;
+    public static float miningDiamondChance = 0.004f;
+    public static float miningEmeraldChance = 0.001f;
+    public static float miningGlowstoneChance = 0.002f;
     public static boolean announceFoundGold = false;
     public static boolean announceFoundDiamond = true;
     public static boolean announceFoundEmerald = true;
@@ -194,8 +194,8 @@ public class Configuration
         }
 
         deathbansEnabled = config.getBoolean("deathbans.enabled");
-        normalDeathban = config.getInt("deathbans.durations.normal");
-        eventDeathban = config.getInt("deathbans.durations.event");
+        normalDeathban = config.getInt("deathbans.durations.normal") * 1000L;
+        eventDeathban = config.getInt("deathbans.durations.event") * 1000L;
 
         livesEnabled = config.getBoolean("lives.enabled");
 

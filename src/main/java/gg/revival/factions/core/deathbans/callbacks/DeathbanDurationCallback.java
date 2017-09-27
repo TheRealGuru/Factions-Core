@@ -2,6 +2,6 @@ package gg.revival.factions.core.deathbans.callbacks;
 
 public interface DeathbanDurationCallback {
 
-    void onLookupComplete(int duration);
+    void onLookupComplete(long duration);
 
 }

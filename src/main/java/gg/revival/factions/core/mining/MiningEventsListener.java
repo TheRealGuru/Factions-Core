@@ -1,5 +1,6 @@
 package gg.revival.factions.core.mining;
 
+import gg.revival.factions.core.tools.Configuration;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -17,6 +18,8 @@ public class MiningEventsListener implements Listener {
     public void onPistonRetract(BlockPistonRetractEvent event) {
         if(event.isCancelled()) return;
 
+        if(!Configuration.miningEnabled) return;
+
         if(event.getBlocks().isEmpty()) return;
 
         for(Block blocks : event.getBlocks()) {
@@ -31,6 +34,8 @@ public class MiningEventsListener implements Listener {
     @EventHandler
     public void onPistonExtend(BlockPistonExtendEvent event) {
         if(event.isCancelled()) return;
+
+        if(!Configuration.miningEnabled) return;
 
         if(event.getBlocks().isEmpty()) return;
 
@@ -47,6 +52,8 @@ public class MiningEventsListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         if(event.isCancelled()) return;
 
+        if(!Configuration.miningEnabled) return;
+
         Block block = event.getBlock();
 
         if(!block.getType().equals(Material.STONE) && !block.getType().equals(Material.NETHERRACK)) return;
@@ -58,6 +65,8 @@ public class MiningEventsListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         if(event.isCancelled()) return;
+
+        if(!Configuration.miningEnabled) return;
 
         Player player = event.getPlayer();
         Block block = event.getBlock();

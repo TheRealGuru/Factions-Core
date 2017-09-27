@@ -73,10 +73,10 @@ mechanics:
 mining:
   enabled: true
   odds:
-    gold: 0.009
-    diamond: 0.006
-    emerald: 0.003
-    glowstone: 0.003
+    gold: 0.006
+    diamond: 0.004
+    emerald: 0.001
+    glowstone: 0.002
   announce:
     gold: false
     diamond: true

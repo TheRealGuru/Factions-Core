@@ -22,7 +22,15 @@ public class StatsCommand implements CommandExecutor {
         Player player = (Player)sender;
 
         if(args.length == 0) {
-            player.sendMessage(Stats.getFormattedStats(Stats.getStats(player.getUniqueId()), player.getName()));
+            Stats.getStats(player.getUniqueId(), stats -> {
+                if(stats == null) {
+                    player.sendMessage(ChatColor.RED + "Player not found");
+                    return;
+                }
+
+                player.sendMessage(Stats.getFormattedStats(stats, player.getName()));
+            });
+
             return false;
         }
 
@@ -35,7 +43,12 @@ public class StatsCommand implements CommandExecutor {
                     return;
                 }
 
-                Stats.loadAndReceiveStats(uuid, stats -> {
+                Stats.getStats(uuid, stats -> {
+                    if(stats == null) {
+                        player.sendMessage(ChatColor.RED + "Player not found");
+                        return;
+                    }
+
                     player.sendMessage(Stats.getFormattedStats(stats, username));
                 });
             });

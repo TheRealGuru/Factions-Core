@@ -49,7 +49,7 @@ public class DeathbanCommand implements CommandExecutor {
 
             String creator = sender.getName();
 
-            Deathbans.getActiveDeathban(uuid, false, death -> {
+            Deathbans.getActiveDeathban(uuid, death -> {
                 if(death != null) {
                     death.setExpiresTime(System.currentTimeMillis());
                     Deathbans.saveDeathban(death);

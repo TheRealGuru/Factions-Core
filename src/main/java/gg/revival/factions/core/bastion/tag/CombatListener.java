@@ -8,13 +8,18 @@ import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.bastion.logout.tasks.LogoutTask;
 import gg.revival.factions.core.deathbans.DeathMessages;
 import gg.revival.factions.core.deathbans.Deathbans;
+import gg.revival.factions.core.stats.PlayerStats;
+import gg.revival.factions.core.stats.Stats;
+import gg.revival.factions.core.stats.StatsCallback;
 import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.tools.Logger;
 import gg.revival.factions.core.tools.PlayerTools;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import gg.revival.factions.obj.ServerFaction;
 import gg.revival.factions.timers.TimerType;
+import gg.revival.factions.tools.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -30,6 +35,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.math.BigDecimal;
 
@@ -89,10 +95,13 @@ public class CombatListener implements Listener {
 
         if(logger == null || logger.isDead) return;
 
+        Logger.log("Combatlogger was found");
+
         player.teleport(logger.getNpc().getLocation());
         player.setHealth(((LivingEntity)logger.getNpc()).getHealth());
         player.setFireTicks(logger.getNpc().getFireTicks());
         player.setFallDistance(logger.getNpc().getFallDistance());
+        player.setRemainingAir(((LivingEntity) logger.getNpc()).getRemainingAir());
 
         logger.destroy();
     }
@@ -116,8 +125,49 @@ public class CombatListener implements Listener {
             return;
         }
 
-        if(player.getFireTicks() > 0 || player.getFallDistance() > 0) {
+        if(player.getFireTicks() > 0 || player.getFallDistance() > 0 || player.getRemainingAir() != player.getMaximumAir()) {
             NPCTools.spawnLogger(player, Configuration.loggerDuration);
+            return;
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onLoggerDamageByEntity(EntityDamageByEntityEvent event) {
+        if(event.isCancelled())
+            return;
+
+        Entity damaged = event.getEntity();
+        Entity damager = event.getDamager();
+
+        if(!NPCTools.isLogger(damaged)) return;
+
+        if(damager instanceof Player) {
+            Player playerDamager = (Player)damager;
+            CombatLogger logger = NPCTools.getLoggerByEntity(damaged);
+
+            if(FactionManager.isFactionMember(playerDamager.getUniqueId(), logger.getUuid())) {
+                event.setCancelled(true);
+                return;
+            }
+
+            CombatManager.tagPlayer(playerDamager, TagReason.ATTACKER);
+        }
+
+        if(damager instanceof Projectile) {
+            Projectile projectile = (Projectile)damager;
+            ProjectileSource source = projectile.getShooter();
+
+            if(source instanceof Player) {
+                Player playerDamager = (Player)source;
+                CombatLogger logger = NPCTools.getLoggerByEntity(damaged);
+
+                if(FactionManager.isFactionMember(playerDamager.getUniqueId(), logger.getUuid())) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                CombatManager.tagPlayer(playerDamager, TagReason.ATTACKER);
+            }
         }
     }
 
@@ -179,14 +229,20 @@ public class CombatListener implements Listener {
 
             playerFaction.setDtr(playerFaction.getDtr().subtract(BigDecimal.valueOf(1.0)));
             playerFaction.setUnfreezeTime(gg.revival.factions.tools.Configuration.DTR_FREEZE_TIME);
-
-            // TODO: Send member death message
+            playerFaction.sendMessage(Messages.memberDeath(logger.getDisplayName())); // This is kinda shitty, find a way to replace this?
         }
 
         if(event.getEntity().getKiller() != null)
             Bukkit.broadcastMessage(DeathMessages.getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain by " + ChatColor.GOLD + event.getEntity().getKiller().getName());
         else
             Bukkit.broadcastMessage(DeathMessages.getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain");
+
+        Stats.getStats(logger.getUuid(), PlayerStats::addDeath);
+
+        if(event.getEntity().getKiller() instanceof Player) {
+            Player killer = event.getEntity().getKiller();
+            Stats.getStats(killer.getUniqueId(), PlayerStats::addKill);
+        }
     }
 
 }

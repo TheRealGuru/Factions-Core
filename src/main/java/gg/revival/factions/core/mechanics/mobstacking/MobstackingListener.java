@@ -2,10 +2,7 @@ package gg.revival.factions.core.mechanics.mobstacking;
 
 import gg.revival.factions.core.FC;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -40,8 +37,8 @@ public class MobstackingListener implements Listener {
         UUID uuid = player.getUniqueId();
         Entity entity = event.getRightClicked();
 
-        if(!(entity instanceof LivingEntity)) return;
-        if(entity instanceof Player) return;
+        if(!(entity instanceof LivingEntity))
+        if(entity instanceof Player || entity instanceof Monster) return;
         if(!Mobstacker.isStack(entity)) return;
         if(Mobstacker.getProtectedEntities().contains(entity.getUniqueId())) return;
 

@@ -1,6 +1,7 @@
 package gg.revival.factions.core.stats;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import gg.revival.driver.MongoAPI;
@@ -9,6 +10,7 @@ import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.stats.command.StatsCommand;
 import gg.revival.factions.core.stats.listener.StatsListener;
 import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.tools.Logger;
 import gg.revival.factions.core.tools.Processor;
 import lombok.Getter;
 import org.bson.Document;
@@ -22,186 +24,73 @@ import java.util.UUID;
 
 public class Stats {
 
-    @Getter static Set<PlayerStats> activeStats = new HashSet<>();
+    @Getter static Set<PlayerStats> activeStats = Sets.newConcurrentHashSet();
 
-    public static PlayerStats getStats(UUID uuid) {
+    public static void loadStats(UUID uuid) {
+        getStats(uuid, stats -> {
+            PlayerStats result = null;
+
+            if(stats == null)
+                result = new PlayerStats(uuid, 0L, System.currentTimeMillis(), 0, 0, 0, 0, 0);
+            else
+                result = stats;
+
+            activeStats.add(result);
+        });
+    }
+
+    public static void getStats(UUID uuid, StatsCallback callback) {
         ImmutableList<PlayerStats> cache = ImmutableList.copyOf(activeStats);
 
         for(PlayerStats stats : cache) {
-            if(!stats.getUuid().equals(uuid)) continue;
-
-            if(Bukkit.getPlayer(uuid) != null)
-                stats.setPlaytime(stats.getNewPlaytime());
-
-            return stats;
-        }
-
-        return null;
-    }
-
-    public static void loadStats(UUID uuid, boolean unsafe) {
-        if(getStats(uuid) != null) return;
-
-        if(unsafe) {
-            if(DBManager.getStats() == null)
-                DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
-
-            MongoCollection collection = DBManager.getStats();
-            FindIterable<Document> query = null;
-
-            try {
-                query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
-            } catch (LinkageError err) {
-                loadStats(uuid, unsafe);
+            if(stats.getUuid().equals(uuid)) {
+                callback.onQueryDone(stats);
                 return;
             }
-
-            Document document = query.first();
-
-            if(document != null) {
-                long playtime = document.getLong("playtime");
-                int kills = document.getInteger("kills");
-                int deaths = document.getInteger("deaths");
-                int foundGold = document.getInteger("foundGold");
-                int foundDiamond = document.getInteger("foundDiamond");
-                int foundEmerald = document.getInteger("foundEmerald");
-
-                long loginTime = -1L;
-
-                if(Bukkit.getPlayer(uuid) != null)
-                    loginTime = System.currentTimeMillis();
-
-                PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
-                activeStats.add(newPlayerStats);
-            }
-
-            else {
-                long loginTime = -1L;
-
-                if(Bukkit.getPlayer(uuid) != null)
-                    loginTime = System.currentTimeMillis();
-
-                PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
-                activeStats.add(newPlayerStats);
-            }
-        }
-
-        else {
-            new BukkitRunnable() {
-                public void run() {
-                    if(DBManager.getStats() == null)
-                        DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
-
-                    MongoCollection collection = DBManager.getStats();
-                    FindIterable<Document> query = null;
-
-                    try {
-                        query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
-                    } catch (LinkageError err) {
-                        loadStats(uuid, unsafe);
-                        return;
-                    }
-
-                    Document document = query.first();
-
-                    if(document != null) {
-                        long playtime = document.getLong("playtime");
-                        int kills = document.getInteger("kills");
-                        int deaths = document.getInteger("deaths");
-                        int foundGold = document.getInteger("foundGold");
-                        int foundDiamond = document.getInteger("foundDiamond");
-                        int foundEmerald = document.getInteger("foundEmerald");
-
-                        new BukkitRunnable() {
-                            public void run() {
-                                long loginTime = -1L;
-
-                                if(Bukkit.getPlayer(uuid) != null)
-                                    loginTime = System.currentTimeMillis();
-
-                                PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
-                                activeStats.add(newPlayerStats);
-                            }
-                        }.runTask(FC.getFactionsCore());
-                    }
-
-                    else {
-                        new BukkitRunnable() {
-                            public void run() {
-                                long loginTime = -1L;
-
-                                if(Bukkit.getPlayer(uuid) != null)
-                                    loginTime = System.currentTimeMillis();
-
-                                PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
-                                activeStats.add(newPlayerStats);
-                            }
-                        }.runTask(FC.getFactionsCore());
-                    }
-                }
-            }.runTaskAsynchronously(FC.getFactionsCore());
-        }
-    }
-
-    public static void loadAndReceiveStats(UUID uuid, StatsCallback callback) {
-        if(getStats(uuid) != null) {
-            callback.onQueryDone(getStats(uuid));
-            return;
         }
 
         new BukkitRunnable() {
             public void run() {
                 if(DBManager.getStats() == null)
-                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
+                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "playerstats"));
 
-                MongoCollection collection = DBManager.getStats();
+                MongoCollection<Document> collection = DBManager.getStats();
                 FindIterable<Document> query = null;
 
                 try {
                     query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
                 } catch (LinkageError err) {
-                    loadAndReceiveStats(uuid, callback);
+                    getStats(uuid, callback);
                     return;
                 }
 
-                Document document = query.first();
+                Document foundDocument = query.first();
 
-                if(document != null) {
-                    long playtime = document.getLong("playtime");
-                    int kills = document.getInteger("kills");
-                    int deaths = document.getInteger("deaths");
-                    int foundGold = document.getInteger("foundGold");
-                    int foundDiamond = document.getInteger("foundDiamond");
-                    int foundEmerald = document.getInteger("foundEmerald");
+                if(foundDocument != null) {
+                    int kills = foundDocument.getInteger("kills");
+                    int deaths = foundDocument.getInteger("deaths");
+                    long playtime = foundDocument.getLong("playtime");
+                    long loginTime = -1L;
+                    int foundGold = foundDocument.getInteger("gold");
+                    int foundDiamond = foundDocument.getInteger("diamond");
+                    int foundEmerald = foundDocument.getInteger("emerald");
+
+                    PlayerStats playerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
 
                     new BukkitRunnable() {
                         public void run() {
-                            long loginTime = -1L;
-
-                            if(Bukkit.getPlayer(uuid) != null)
-                                loginTime = System.currentTimeMillis();
-
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, playtime, loginTime, kills, deaths, foundGold, foundDiamond, foundEmerald);
-                            activeStats.add(newPlayerStats);
-                            callback.onQueryDone(newPlayerStats);
+                            callback.onQueryDone(playerStats);
                         }
                     }.runTask(FC.getFactionsCore());
+
+                    return;
                 }
 
-                else {
-                    new BukkitRunnable() {
-                        public void run() {
-                            long loginTime = -1L;
-
-                            if(Bukkit.getPlayer(uuid) != null)
-                                loginTime = System.currentTimeMillis();
-
-                            PlayerStats newPlayerStats = new PlayerStats(uuid, 0, loginTime, 0, 0, 0, 0, 0);
-                            activeStats.add(newPlayerStats);
-                            callback.onQueryDone(newPlayerStats);
-                        }
-                    }.runTask(FC.getFactionsCore());
-                }
+                new BukkitRunnable() {
+                    public void run() {
+                        callback.onQueryDone(null);
+                    }
+                }.runTask(FC.getFactionsCore());
             }
         }.runTaskAsynchronously(FC.getFactionsCore());
     }
@@ -210,9 +99,9 @@ public class Stats {
         if(unsafe) {
             Runnable saveTask = () -> {
                 if(DBManager.getStats() == null)
-                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
+                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "playerstats"));
 
-                MongoCollection collection = DBManager.getStats();
+                MongoCollection<Document> collection = DBManager.getStats();
                 FindIterable<Document> query = null;
 
                 try {
@@ -222,72 +111,76 @@ public class Stats {
                     return;
                 }
 
-                Document document = query.first();
+                Document foundDocument = query.first();
 
-                Document newDoc = new Document("uuid", stats.getUuid().toString())
-                        .append("playtime", stats.getPlaytime())
+                Document newDocument = new Document("uuid", stats.getUuid().toString())
                         .append("kills", stats.getKills())
                         .append("deaths", stats.getDeaths())
-                        .append("foundGold", stats.getFoundGold())
-                        .append("foundDiamond", stats.getFoundDiamonds())
-                        .append("foundEmerald", stats.getFoundEmeralds());
+                        .append("playtime", stats.getPlaytime())
+                        .append("gold", stats.getFoundGold())
+                        .append("diamond", stats.getFoundDiamonds())
+                        .append("emerald", stats.getFoundEmeralds());
 
-                if(document != null)
-                    collection.replaceOne(document, newDoc);
+                if(foundDocument != null)
+                    collection.replaceOne(foundDocument, newDocument);
                 else
-                    collection.insertOne(newDoc);
+                    collection.insertOne(newDocument);
             };
 
             Processor.getExecutor().submit(saveTask);
-            return;
         }
 
-        new BukkitRunnable() {
-            public void run() {
-                if(DBManager.getStats() == null)
-                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "stats"));
+        else {
+            new BukkitRunnable() {
+                public void run() {
+                    if(DBManager.getStats() == null)
+                        DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "playerstats"));
 
-                MongoCollection collection = DBManager.getStats();
-                FindIterable<Document> query = null;
+                    MongoCollection<Document> collection = DBManager.getStats();
+                    FindIterable<Document> query = null;
 
-                try {
-                    query = MongoAPI.getQueryByFilter(collection, "uuid", stats.getUuid().toString());
-                } catch (LinkageError err) {
-                    saveStats(stats, unsafe);
-                    return;
+                    try {
+                        query = MongoAPI.getQueryByFilter(collection, "uuid", stats.getUuid().toString());
+                    } catch (LinkageError err) {
+                        saveStats(stats, unsafe);
+                        return;
+                    }
+
+                    Document foundDocument = query.first();
+
+                    Document newDocument = new Document("uuid", stats.getUuid().toString())
+                            .append("kills", stats.getKills())
+                            .append("deaths", stats.getDeaths())
+                            .append("playtime", stats.getPlaytime())
+                            .append("gold", stats.getFoundGold())
+                            .append("diamond", stats.getFoundDiamonds())
+                            .append("emerald", stats.getFoundEmeralds());
+
+                    if(foundDocument != null)
+                        collection.replaceOne(foundDocument, newDocument);
+                    else
+                        collection.insertOne(newDocument);
                 }
-
-                Document document = query.first();
-
-                Document newDoc = new Document("uuid", stats.getUuid().toString())
-                        .append("playtime", stats.getPlaytime())
-                        .append("kills", stats.getKills())
-                        .append("deaths", stats.getDeaths())
-                        .append("foundGold", stats.getFoundGold())
-                        .append("foundDiamond", stats.getFoundDiamonds())
-                        .append("foundEmerald", stats.getFoundEmeralds());
-
-                if(document != null)
-                    collection.replaceOne(document, newDoc);
-                else
-                    collection.insertOne(newDoc);
-            }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+            }.runTaskAsynchronously(FC.getFactionsCore());
+        }
     }
+
+    /*
+
+     */
 
     public static String getFormattedStats(PlayerStats stats, String statsUsername) {
         StringBuilder message = new StringBuilder();
 
-        message.append(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------" + "\n");
-        message.append(ChatColor.RESET + "Displaying statistics for " + ChatColor.AQUA + statsUsername + "\n");
-        message.append("     " + "\n");
-        message.append(ChatColor.GREEN + "Kills" + ChatColor.WHITE + ": " + stats.getKills() + "\n");
-        message.append(ChatColor.RED + "Deaths" + ChatColor.WHITE + ": " + stats.getDeaths() + "\n");
-        message.append("     " + "\n");
+        message.append(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------" + "\n");
 
-        int seconds = (int) (stats.getPlaytime() / 1000) % 60;
-        int minutes = (int) (stats.getPlaytime() / (1000 * 60) % 60);
-        int hours   = (int) (stats.getPlaytime() / (1000 * 60 * 60) % 24);
+        message.append(ChatColor.RESET + statsUsername + ChatColor.BOLD + " | " +
+                ChatColor.GREEN + "Kills" + ChatColor.WHITE + ": " + stats.getKills() + ChatColor.RESET + " - " +
+                ChatColor.RED + "Deaths" + ChatColor.WHITE + ": " + stats.getDeaths() + "\n     \n");
+
+        int seconds = (int) (stats.getCurrentPlaytime() / 1000) % 60;
+        int minutes = (int) (stats.getCurrentPlaytime() / (1000 * 60) % 60);
+        int hours   = (int) (stats.getCurrentPlaytime() / (1000 * 60 * 60) % 24);
 
         if(seconds >= 60)
             seconds = 59;
@@ -307,12 +200,13 @@ public class Stats {
                 time.append(seconds + " seconds ");
         }
 
-        message.append(ChatColor.LIGHT_PURPLE + "Playtime" + ChatColor.WHITE + ": " + time.toString().trim() + "\n");
-        message.append("     " + "\n");
-        message.append(ChatColor.YELLOW + "Found " + ChatColor.GOLD + "Gold" + ChatColor.WHITE + ": " + stats.getFoundGold() + "\n");
-        message.append(ChatColor.YELLOW + "Found " + ChatColor.AQUA + "Diamond" + ChatColor.WHITE + ": " + stats.getFoundDiamonds() + "\n");
-        message.append(ChatColor.YELLOW + "Found " + ChatColor.GREEN + "Emerald" + ChatColor.WHITE + ": " + stats.getFoundEmeralds() + "\n");
-        message.append(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------" + "\n");
+        message.append(ChatColor.BLUE + "Time Played" + ChatColor.WHITE + ": " + time.toString().trim() + "\n");
+
+        message.append(ChatColor.GREEN + "Emeralds" + ChatColor.WHITE + ": " + stats.getFoundEmeralds() +
+                " " + ChatColor.AQUA + "Diamonds" + ChatColor.WHITE + ": " + stats.getFoundDiamonds() +
+                " " + ChatColor.GOLD + "Gold" + ChatColor.WHITE + ": " + stats.getFoundGold() + "\n");
+
+        message.append(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------" + "\n");
 
         return message.toString();
     }

@@ -1,5 +1,6 @@
 package gg.revival.factions.core.deathbans.command;
 
+import gg.revival.factions.core.deathbans.Death;
 import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.tools.OfflinePlayerLookup;
 import org.bukkit.ChatColor;
@@ -7,6 +8,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeathsCommand implements CommandExecutor
 {

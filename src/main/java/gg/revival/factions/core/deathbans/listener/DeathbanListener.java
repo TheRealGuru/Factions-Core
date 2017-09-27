@@ -20,9 +20,12 @@ public class DeathbanListener implements Listener {
     public void onPlayerLoginAttempt(AsyncPlayerPreLoginEvent event) {
         UUID uuid = event.getUniqueId();
 
-        Deathbans.getActiveDeathban(uuid, true, death -> {
+        Deathbans.getActiveDeathban(uuid, death -> {
             if(death == null) return;
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Deathbans.getDeathbanMessage(death));
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Deathbans.getDeathbanMessage(death));
+
+            if(Bukkit.getPlayer(uuid) != null || event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED))
+                Bukkit.getPlayer(uuid).kickPlayer(Deathbans.getDeathbanMessage(death));
         });
     }
 
@@ -30,7 +33,7 @@ public class DeathbanListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         if(!(event.getEntity() instanceof Player)) return;
 
-        Player player = (Player)event.getEntity();
+        Player player = event.getEntity();
         final String originalDeathMessage = event.getDeathMessage();
 
         event.setDeathMessage(DeathMessages.getDeathMessage(player));

@@ -28,9 +28,7 @@ public class Bastion {
         Bukkit.getPluginManager().registerEvents(new CombatListener(), FC.getFactionsCore());
         Bukkit.getPluginManager().registerEvents(new LogoutListener(), FC.getFactionsCore());
         Bukkit.getPluginManager().registerEvents(new ShieldListener(), FC.getFactionsCore());
-
-        if(Configuration.pvpSafetyEnabled && Configuration.pvpProtEnabled)
-            Bukkit.getPluginManager().registerEvents(new CombatProtectionListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new CombatProtectionListener(), FC.getFactionsCore());
     }
 
     private static void loadCommands() {

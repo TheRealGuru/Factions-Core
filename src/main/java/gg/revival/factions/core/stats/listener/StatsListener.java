@@ -2,6 +2,7 @@ package gg.revival.factions.core.stats.listener;
 
 import gg.revival.factions.core.stats.PlayerStats;
 import gg.revival.factions.core.stats.Stats;
+import gg.revival.factions.core.stats.StatsCallback;
 import gg.revival.factions.core.tools.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,9 +20,8 @@ public class StatsListener implements Listener {
         UUID uuid = event.getUniqueId();
 
         if(!Configuration.statsEnabled) return;
-        if(Stats.getActiveStats().contains(uuid)) return;
 
-        Stats.loadStats(uuid, true);
+        Stats.loadStats(uuid);
     }
 
     @EventHandler
@@ -30,11 +30,12 @@ public class StatsListener implements Listener {
 
         if(!Configuration.statsEnabled) return;
 
-        PlayerStats stats = Stats.getStats(player.getUniqueId());
-        stats.setPlaytime(stats.getNewPlaytime());
+        Stats.getStats(player.getUniqueId(), stats -> {
+            stats.setPlaytime(stats.getCurrentPlaytime());
 
-        Stats.saveStats(stats, false);
-        Stats.getActiveStats().remove(stats);
+            Stats.saveStats(stats, false);
+            Stats.getActiveStats().remove(stats);
+        });
     }
 
     @EventHandler
@@ -50,11 +51,8 @@ public class StatsListener implements Listener {
 
         Player killer = (Player)killed.getKiller();
 
-        PlayerStats killerStats = Stats.getStats(killer.getUniqueId());
-        PlayerStats killedStats = Stats.getStats(killed.getUniqueId());
-
-        killedStats.addDeath();
-        killerStats.addKill();
+        Stats.getStats(killer.getUniqueId(), PlayerStats::addKill);
+        Stats.getStats(killed.getUniqueId(), PlayerStats::addDeath);
     }
 
 }

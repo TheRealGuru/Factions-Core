@@ -1,7 +1,9 @@
 package gg.revival.factions.core.classes.listener;
 
+import gg.revival.factions.claims.ServerClaimType;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
+import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.classes.ClassProfile;
 import gg.revival.factions.core.classes.ClassType;
 import gg.revival.factions.core.classes.Classes;
@@ -9,8 +11,10 @@ import gg.revival.factions.core.classes.cont.RClass;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.PlayerTools;
 import gg.revival.factions.core.tools.TimeTools;
+import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
+import gg.revival.factions.obj.ServerFaction;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -115,6 +119,18 @@ public class ClassListener implements Listener {
         if(!event.getAction().equals(Action.RIGHT_CLICK_AIR) && !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if(player.getItemInHand() == null) return;
 
+        FPlayer facPlayer = PlayerManager.getPlayer(uuid);
+
+        // Player is in a safezone, don't consume anything
+        if(facPlayer.getLocation().getCurrentClaim() != null && facPlayer.getLocation().getCurrentClaim().getClaimOwner() instanceof ServerFaction) {
+            ServerFaction serverFaction = (ServerFaction)facPlayer.getLocation().getCurrentClaim().getClaimOwner();
+
+            if(serverFaction.getType().equals(ServerClaimType.SAFEZONE)) {
+                player.sendMessage(ChatColor.RED + "You can not consume active abilities in SazeZone claims");
+                return;
+            }
+        }
+
         ItemStack hand = player.getItemInHand();
         ClassProfile classProfile = Classes.getClassProfile(player.getUniqueId());
 
@@ -122,6 +138,7 @@ public class ClassListener implements Listener {
 
         RClass playerClass = Classes.getClassByClassType(classProfile.getSelectedClass());
 
+        // Class doesn't have any active effects to consume
         if(playerClass.getActives().isEmpty()) return;
 
         boolean isConsumeable = false;
@@ -247,7 +264,7 @@ public class ClassListener implements Listener {
         // Scheduler to re-apply passive effects if they were overwritten when using the active
         new BukkitRunnable() {
             public void run() {
-                if(player == null) return;
+                if(player == null || Classes.getClassProfile(uuid) == null) return;
                 if(!Classes.getClassProfile(uuid).getSelectedClass().equals(classProfile.getSelectedClass())) return;
 
                 for(PotionEffect passives : playerClass.getPassives()) {

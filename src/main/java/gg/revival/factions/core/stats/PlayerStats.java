@@ -22,16 +22,11 @@ public class PlayerStats {
         this.foundEmeralds = foundEmeralds;
     }
 
-    public long getNewPlaytime() {
-        final long previousLoginTime = loginTime;
+    public long getCurrentPlaytime() {
+        if(loginTime == -1L)
+            this.loginTime = System.currentTimeMillis();
 
-        this.loginTime = System.currentTimeMillis();
-
-        return playtime + (System.currentTimeMillis() - previousLoginTime);
-    }
-
-    public int getPlaytimeAsInt() {
-        return (int)(playtime / 1000L);
+        return playtime + (System.currentTimeMillis() - loginTime);
     }
 
     public void addKill() {

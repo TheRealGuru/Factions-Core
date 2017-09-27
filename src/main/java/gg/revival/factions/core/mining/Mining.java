@@ -4,7 +4,9 @@ import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
+import gg.revival.factions.core.stats.PlayerStats;
 import gg.revival.factions.core.stats.Stats;
+import gg.revival.factions.core.stats.StatsCallback;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
@@ -30,32 +32,32 @@ public class Mining {
      * @param location The location the drop should be placed at if it does happen
      */
     public static void runLottery(Player player, Location location) {
-        if(placedBlocks.contains(location)) return;
-
         Random random = new Random();
         int size = random.nextInt(8);
-        float chance = random.nextFloat();
+        float runA = random.nextFloat(), runB = random.nextFloat(), runC = random.nextFloat();
 
-        if(size < 2)
-            size = 2;
+        if(size < 2) size = 2;
 
-        if(location.getWorld().getEnvironment().equals(World.Environment.NETHER) && chance <= Configuration.miningGlowstoneChance) {
-            generateVein(player, location, random, size, Material.GLOWSTONE);
+        if(location.getWorld().getEnvironment().equals(World.Environment.NETHER)) {
+            if(runA <= Configuration.miningGlowstoneChance)
+                generateVein(player, location, random, size, Material.GLOWSTONE);
+
             return;
         }
 
-        if(chance <= Configuration.miningGoldChance && chance > Configuration.miningDiamondChance && location.getBlockY() <= 32) {
+        if(runA <= Configuration.miningGoldChance && location.getBlockY() <= 24) {
             generateVein(player, location, random, size, Material.GOLD_ORE);
             return;
         }
 
-        if(chance <= Configuration.miningDiamondChance && chance > Configuration.miningEmeraldChance && location.getBlockY() <= 16) {
+        if(runB <= Configuration.miningDiamondChance && location.getBlockY() <= 16) {
             generateVein(player, location, random, size, Material.DIAMOND_ORE);
             return;
         }
 
-        if(chance <= Configuration.miningEmeraldChance && location.getBlockY() <= 16) {
+        if(runC <= Configuration.miningEmeraldChance && location.getBlockY() <= 16) {
             generateVein(player, location, random, size, Material.EMERALD_ORE);
+            return;
         }
     }
 
@@ -155,6 +157,8 @@ public class Mining {
         }
 
         if(found > 0) {
+            final int foundAmount = found;
+
             if(material.equals(Material.GOLD_ORE)) {
                 if(Configuration.announceFoundGold) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
@@ -162,7 +166,7 @@ public class Mining {
                     player.sendMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
                 }
 
-                Stats.getStats(player.getUniqueId()).addGold(found);
+                Stats.getStats(player.getUniqueId(), stats -> stats.addGold(foundAmount));
             }
 
             if(material.equals(Material.DIAMOND_ORE)) {
@@ -172,7 +176,7 @@ public class Mining {
                     player.sendMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
                 }
 
-                Stats.getStats(player.getUniqueId()).addDiamond(found);
+                Stats.getStats(player.getUniqueId(), stats -> stats.addDiamond(foundAmount));
             }
 
             if(material.equals(Material.EMERALD_ORE)) {
@@ -182,7 +186,7 @@ public class Mining {
                     player.sendMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
                 }
 
-                Stats.getStats(player.getUniqueId()).addEmerald(found);
+                Stats.getStats(player.getUniqueId(), stats -> stats.addEmerald(foundAmount));
             }
 
             if(material.equals(Material.GLOWSTONE)) {
@@ -200,8 +204,7 @@ public class Mining {
     }
 
     public static void loadListeners() {
-        if(Configuration.miningEnabled)
-            Bukkit.getPluginManager().registerEvents(new MiningEventsListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new MiningEventsListener(), FC.getFactionsCore());
     }
 
 }

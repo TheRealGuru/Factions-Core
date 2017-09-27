@@ -24,6 +24,9 @@ public class CombatProtectionListener implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+
+        if(!Configuration.pvpProtEnabled) return;
+
         CombatProtection.giveProtection(player, Configuration.pvpProtDuration);
     }
 
@@ -33,6 +36,8 @@ public class CombatProtectionListener implements Listener {
         World from = event.getFrom();
 
         if(!from.getEnvironment().equals(World.Environment.NORMAL)) return;
+
+        if(!Configuration.pvpSafetyEnabled) return;
 
         CombatProtection.giveSafety(player, Configuration.pvpSafetyDuration);
     }
@@ -57,7 +62,7 @@ public class CombatProtectionListener implements Listener {
 
             Player affectedPlayer = (Player)entities;
 
-            if(CombatProtection.hasProt(affectedPlayer) || CombatProtection.hasSafety(affectedPlayer))
+            if((CombatProtection.hasProt(affectedPlayer) && Configuration.pvpProtEnabled) || (CombatProtection.hasSafety(affectedPlayer) && Configuration.pvpSafetyEnabled))
                 event.getAffectedEntities().remove(entities);
         }
     }
@@ -74,25 +79,25 @@ public class CombatProtectionListener implements Listener {
             Player playerDamaged = (Player)damaged;
             Player playerDamager = (Player)damager;
 
-            if(CombatProtection.hasSafety(playerDamaged)) {
+            if(CombatProtection.hasSafety(playerDamaged) && Configuration.pvpSafetyEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP safety");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasSafety(playerDamager)) {
+            if(CombatProtection.hasSafety(playerDamager) && Configuration.pvpSafetyEnabled) {
                 CombatProtection.takeSafety(playerDamager);
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamaged)) {
+            if(CombatProtection.hasProt(playerDamaged) && Configuration.pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP protection");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamager)) {
+            if(CombatProtection.hasProt(playerDamager) && Configuration.pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You have PvP protection. Type '/pvp enable' to enable combat");
                 event.setCancelled(true);
                 return;
@@ -107,25 +112,25 @@ public class CombatProtectionListener implements Listener {
             Player playerDamager = (Player)projectile.getShooter();
             Player playerDamaged = (Player)damaged;
 
-            if(CombatProtection.hasSafety(playerDamaged)) {
+            if(CombatProtection.hasSafety(playerDamaged) && Configuration.pvpSafetyEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP safety");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasSafety(playerDamager)) {
+            if(CombatProtection.hasSafety(playerDamager) && Configuration.pvpSafetyEnabled) {
                 CombatProtection.takeSafety(playerDamager);
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamaged)) {
+            if(CombatProtection.hasProt(playerDamaged) && Configuration.pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP protection");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamager)) {
+            if(CombatProtection.hasProt(playerDamager) && Configuration.pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You have PvP protection. Type '/pvp enable' to enable combat");
                 event.setCancelled(true);
             }
@@ -136,7 +141,7 @@ public class CombatProtectionListener implements Listener {
     public void onPlayerChangeWorld(PlayerPortalEvent event) {
         Player player = event.getPlayer();
 
-        if(CombatProtection.hasProt(player)) {
+        if(CombatProtection.hasProt(player) && Configuration.pvpProtEnabled) {
             if(!event.getTo().getWorld().getEnvironment().equals(World.Environment.THE_END))
                 player.sendMessage(ChatColor.RED + "You can not change worlds while you have PvP protection");
 

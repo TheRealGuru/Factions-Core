@@ -14,7 +14,9 @@ import gg.revival.factions.core.deathbans.command.DeathsCommand;
 import gg.revival.factions.core.deathbans.listener.DeathbanListener;
 import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
+import gg.revival.factions.core.stats.PlayerStats;
 import gg.revival.factions.core.stats.Stats;
+import gg.revival.factions.core.stats.StatsCallback;
 import gg.revival.factions.core.tools.Configuration;
 import mkremins.fanciful.FancyMessage;
 import org.bson.Document;
@@ -34,86 +36,48 @@ public class Deathbans {
      * @param uuid
      * @return
      */
-    public static void getActiveDeathban(UUID uuid, boolean unsafe, ActiveDeathbanCallback callback) {
-        if(unsafe) {
-            if(DBManager.getDeathbans() == null)
-                DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
+    public static void getActiveDeathban(UUID uuid, ActiveDeathbanCallback callback) {
+        new BukkitRunnable() {
+            public void run() {
+                if(DBManager.getDeathbans() == null)
+                    DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
 
-            MongoCollection collection = DBManager.getDeathbans();
-            FindIterable<Document> query = null;
+                MongoCollection collection = DBManager.getDeathbans();
+                FindIterable<Document> query = null;
 
-            try {
-                query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
-            } catch (LinkageError err) {
-                getActiveDeathban(uuid, unsafe, callback);
-                return;
-            }
-
-            for (Document current : query) {
-                if (current.getLong("expires") > System.currentTimeMillis()) {
-                    UUID deathId = UUID.fromString(current.getString("uuid"));
-                    String reason = current.getString("reason");
-                    long created = current.getLong("created");
-                    long expires = current.getLong("expires");
-
-                    Death death = new Death(deathId, uuid, reason, created, expires);
-
-                    new BukkitRunnable() {
-                        public void run() {
-                            callback.onQueryDone(death);
-                        }
-                    }.runTask(FC.getFactionsCore());
-
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
+                } catch (LinkageError err) {
+                    getActiveDeathban(uuid, callback);
                     return;
                 }
-            }
 
-            callback.onQueryDone(null);
-        }
+                for (Document current : query) {
+                    if (current.getLong("expires") > System.currentTimeMillis()) {
+                        UUID deathId = UUID.fromString(current.getString("uuid"));
+                        String reason = current.getString("reason");
+                        long created = current.getLong("created");
+                        long expires = current.getLong("expires");
 
-        else {
-            new BukkitRunnable() {
-                public void run() {
-                    if(DBManager.getDeathbans() == null)
-                        DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
+                        Death death = new Death(deathId, uuid, reason, created, expires);
 
-                    MongoCollection collection = DBManager.getDeathbans();
-                    FindIterable<Document> query = null;
+                        new BukkitRunnable() {
+                            public void run() {
+                                callback.onQueryDone(death);
+                            }
+                        }.runTask(FC.getFactionsCore());
 
-                    try {
-                        query = MongoAPI.getQueryByFilter(collection, "killed", uuid.toString());
-                    } catch (LinkageError err) {
-                        getActiveDeathban(uuid, unsafe, callback);
                         return;
                     }
-
-                    for (Document current : query) {
-                        if (current.getLong("expires") > System.currentTimeMillis()) {
-                            UUID deathId = UUID.fromString(current.getString("uuid"));
-                            String reason = current.getString("reason");
-                            long created = current.getLong("created");
-                            long expires = current.getLong("expires");
-
-                            Death death = new Death(deathId, uuid, reason, created, expires);
-
-                            new BukkitRunnable() {
-                                public void run() {
-                                    callback.onQueryDone(death);
-                                }
-                            }.runTask(FC.getFactionsCore());
-
-                            return;
-                        }
-                    }
-
-                    new BukkitRunnable() {
-                        public void run() {
-                            callback.onQueryDone(null);
-                        }
-                    }.runTask(FC.getFactionsCore());
                 }
-            }.runTaskAsynchronously(FC.getFactionsCore());
-        }
+
+                new BukkitRunnable() {
+                    public void run() {
+                        callback.onQueryDone(null);
+                    }
+                }.runTask(FC.getFactionsCore());
+            }
+        }.runTaskAsynchronously(FC.getFactionsCore());
     }
 
     /**
@@ -213,20 +177,17 @@ public class Deathbans {
      * @param reason
      * @param duration
      */
-    public static void deathbanPlayer(UUID uuid, String reason, int duration) {
+    public static void deathbanPlayer(UUID uuid, String reason, long duration) {
         UUID dbID = UUID.randomUUID();
         long created = System.currentTimeMillis();
-        long expires = System.currentTimeMillis() + (duration * 1000L);
+        long expires = System.currentTimeMillis() + duration;
 
         Death death = new Death(dbID, uuid, reason, created, expires);
 
         saveDeathban(death);
 
-        if(Bukkit.getPlayer(uuid) != null) {
-            Player player = Bukkit.getPlayer(uuid);
-
-            player.kickPlayer(getDeathbanMessage(death));
-        }
+        if(Bukkit.getPlayer(uuid) != null)
+            Bukkit.getPlayer(uuid).kickPlayer(getDeathbanMessage(death));
     }
 
     /**
@@ -236,29 +197,24 @@ public class Deathbans {
      * @param callback
      */
     public static void getDeathbanDurationByLocation(UUID uuid, Location location, DeathbanDurationCallback callback) {
-        Stats.loadAndReceiveStats(uuid, stats -> {
-            if(stats.getLoginTime() != -1L)
-                stats.setPlaytime(stats.getNewPlaytime());
+        Stats.getStats(uuid, stats -> {
+            long deathbanDuration = stats.getCurrentPlaytime();
 
-            for(Event events : EventManager.getActiveEvents()) {
-                if(events.getHookedFaction() == null || events.getHookedFaction().getClaims().isEmpty()) continue;
+            for(Event event : EventManager.getActiveEvents()) {
+                if(event.getHookedFaction() == null || event.getHookedFaction().getClaims().isEmpty()) continue;
 
-                for(Claim claims : events.getHookedFaction().getClaims()) {
-                    if(!claims.inside(location, true)) continue;
+                for(Claim claim : event.getHookedFaction().getClaims()) {
+                    if(!claim.inside(location, true)) continue;
 
-                    if(stats.getPlaytimeAsInt() >= Configuration.eventDeathban) {
-                        callback.onLookupComplete(Configuration.eventDeathban);
-                        return;
-                    }
+                    if(deathbanDuration > Configuration.eventDeathban)
+                        deathbanDuration = Configuration.eventDeathban;
                 }
             }
 
-            if(stats.getPlaytimeAsInt() >= Configuration.normalDeathban) {
-                callback.onLookupComplete(Configuration.normalDeathban);
-                return;
-            }
+            if(deathbanDuration > Configuration.normalDeathban)
+                deathbanDuration = Configuration.normalDeathban;
 
-            callback.onLookupComplete(stats.getPlaytimeAsInt());
+            callback.onLookupComplete(deathbanDuration);
         });
     }
 
@@ -303,10 +259,10 @@ public class Deathbans {
      * @param deaths
      */
     public static void sendDeathbans(Player player, String username, Set<Death> deaths) {
-        player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------");
-        player.sendMessage("Displaying most recent deathbans for " + ChatColor.RED + username);
-        player.sendMessage(ChatColor.YELLOW + "Hover over each deathban to view more information.");
-        player.sendMessage("     " );
+        player.sendMessage(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------");
+        player.sendMessage(username + ChatColor.BOLD + " | " + ChatColor.GREEN + deaths.size() + " deaths on record");
+        player.sendMessage(ChatColor.YELLOW + "Hover over each death to view more information");
+        player.sendMessage("     ");
 
         SimpleDateFormat formatter = new SimpleDateFormat("M-d-yyyy '@' hh:mm:ss a");
 
@@ -319,15 +275,15 @@ public class Deathbans {
             Date expire = new Date(death.getExpiresTime());
             List<String> info = new ArrayList<>();
 
-            info.add("Died on: " + formatter.format(create));
-            info.add("Expires on: " + formatter.format(expire));
+            info.add(ChatColor.RED + "Died" + ChatColor.WHITE + ": " + formatter.format(create));
+            info.add(ChatColor.DARK_AQUA + "Expires" + ChatColor.WHITE + ": " + formatter.format(expire));
 
-            new FancyMessage(cursor + ". ").then(death.getReason()).color(ChatColor.RED).tooltip(info).send(player);
+            new FancyMessage(" - ").color(ChatColor.GOLD).then(death.getReason()).color(ChatColor.YELLOW).tooltip(info).send(player);
 
             cursor++;
         }
 
-        player.sendMessage(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------");
+        player.sendMessage(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------");
     }
 
     public static void onEnable() {

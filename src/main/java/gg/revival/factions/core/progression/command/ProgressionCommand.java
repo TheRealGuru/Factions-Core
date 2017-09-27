@@ -33,19 +33,19 @@ public class ProgressionCommand implements CommandExecutor {
             FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
             if(facPlayer.isBeingTimed(TimerType.PROGRESSION)) {
-                player.sendMessage(ChatColor.AQUA + "Progression is a system we've developed to discourage cheaters and players using alt-accounts.");
+                player.sendMessage(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------");
+                player.sendMessage(ChatColor.YELLOW + "Your progression has not been completed yet. Check your progress above your hotbar.");
                 player.sendMessage("     ");
-                player.sendMessage(ChatColor.UNDERLINE + "Once you have finished your Progression, you will be allowed to:");
+                player.sendMessage(ChatColor.RED + "You will not be able to perform the following until your progression has been completed" + ChatColor.WHITE + ": ");
                 player.sendMessage("     ");
-                player.sendMessage(ChatColor.YELLOW + " - Enter other factions claims");
-                player.sendMessage(ChatColor.YELLOW + " - Enter event claims");
-                player.sendMessage("     ");
-                player.sendMessage(ChatColor.GREEN + "You can see your current Progression above your hotbar!");
+                player.sendMessage(ChatColor.GOLD + " - " + ChatColor.YELLOW + "Enter enemy faction claims");
+                player.sendMessage(ChatColor.GOLD + " - " + ChatColor.YELLOW + "Enter event claims");
+                player.sendMessage(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------");
 
                 return false;
             }
 
-            player.sendMessage(ChatColor.GREEN + "You have filled your progression!");
+            player.sendMessage(ChatColor.GREEN + "Your progression has been completed");
 
             return false;
         }

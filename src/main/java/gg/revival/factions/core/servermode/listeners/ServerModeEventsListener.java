@@ -19,7 +19,6 @@ public class ServerModeEventsListener implements Listener {
 
         if(ServerMode.getCurrentState().equals(ServerState.EOTW_CLOSED)) {
             if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
-
             player.kickPlayer(ChatColor.RED + "The End of the World is currently underway. See you next map!");
         }
     }
@@ -30,7 +29,6 @@ public class ServerModeEventsListener implements Listener {
 
         if(ServerMode.getCurrentState().equals(ServerState.EOTW_CLOSED) && !player.hasPlayedBefore()) {
             if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
-
             player.kickPlayer(ChatColor.RED + "The End of the World is currently underway. See you next map!");
         }
     }

@@ -1,5 +1,6 @@
 package gg.revival.factions.core.bastion.logout.tasks;
 
+import com.google.common.collect.ImmutableList;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.obj.FPlayer;
@@ -43,9 +44,9 @@ public class LogoutTask
      * Checks to make sure every player performing a /logout has not moved too far
      */
     public static void checkLocations() {
-        List<UUID> userCache = new CopyOnWriteArrayList<>(startingLocations.keySet());
+        ImmutableList<UUID> cache = ImmutableList.copyOf(safeloggers);
 
-        for(UUID uuid : userCache) {
+        for(UUID uuid : cache) {
             if(Bukkit.getPlayer(uuid) == null) {
                 startingLocations.remove(uuid);
                 continue;

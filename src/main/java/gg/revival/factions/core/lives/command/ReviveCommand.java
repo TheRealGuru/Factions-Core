@@ -26,7 +26,7 @@ public class ReviveCommand implements CommandExecutor {
 
             Player revivedPlayer = (Player)sender;
 
-            Deathbans.getActiveDeathban(revivedPlayer.getUniqueId(), false, death -> {
+            Deathbans.getActiveDeathban(revivedPlayer.getUniqueId(), death -> {
                 if(death == null) {
                     revivedPlayer.sendMessage(ChatColor.GREEN + "You are not deathbanned");
                     return;
@@ -62,7 +62,7 @@ public class ReviveCommand implements CommandExecutor {
                     return;
                 }
 
-                Deathbans.getActiveDeathban(uuid, false, death -> {
+                Deathbans.getActiveDeathban(uuid, death -> {
                     if(death == null) {
                         sender.sendMessage(ChatColor.GREEN + "This player is not deathbanned");
                         return;

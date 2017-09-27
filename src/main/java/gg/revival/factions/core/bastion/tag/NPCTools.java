@@ -1,5 +1,6 @@
 package gg.revival.factions.core.bastion.tag;
 
+import com.google.common.collect.ImmutableList;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.Permissions;
 import org.bukkit.Bukkit;
@@ -45,6 +46,7 @@ public class NPCTools {
 
         logger.getNpc().setFireTicks(player.getFireTicks());
         logger.getNpc().setFallDistance(player.getFallDistance());
+        ((LivingEntity)logger.getNpc()).setRemainingAir(player.getRemainingAir());
         ((LivingEntity)logger.getNpc()).setHealth(player.getHealth());
 
         Bukkit.broadcastMessage(ChatColor.YELLOW + "Combat-Logger: " + ChatColor.RED + player.getName());
@@ -74,7 +76,9 @@ public class NPCTools {
      * @return
      */
     public static boolean isLogger(Entity entity) {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+
+        for(CombatLogger loggers : cache) {
             if(loggers.getNpc() != entity) continue;
 
             return true;
@@ -89,7 +93,9 @@ public class NPCTools {
      * @return
      */
     public static CombatLogger getLoggerByEntity(Entity entity) {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+
+        for(CombatLogger loggers : cache) {
             if(loggers.getNpc() != entity) continue;
 
             return loggers;
@@ -104,7 +110,9 @@ public class NPCTools {
      * @return
      */
     public static CombatLogger getLoggerByUUID(UUID uuid) {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+
+        for(CombatLogger loggers : cache) {
             if(!loggers.getUuid().equals(uuid)) continue;
 
             return loggers;
@@ -119,7 +127,9 @@ public class NPCTools {
      * @return
      */
     public static CombatLogger getLoggerByName(String name) {
-        for(CombatLogger loggers : CombatManager.getCombatLoggers().values()) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+
+        for(CombatLogger loggers : cache) {
             if(!loggers.getDisplayName().equals(name)) continue;
 
             return loggers;

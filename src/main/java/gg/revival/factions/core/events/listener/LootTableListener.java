@@ -45,12 +45,12 @@ public class LootTableListener implements Listener {
         Inventory inventory = event.getInventory();
         Inventory clickedInventory = event.getClickedInventory();
 
-        if(inventory.getName() != null && inventory.getName().equals(ChatColor.BLACK + "Loot Table")) {
+        if(inventory != null && inventory.getName() != null && inventory.getName().equals(ChatColor.BLACK + "Loot Table")) {
             event.setResult(Event.Result.DENY);
             event.setCancelled(true);
         }
 
-        if(clickedInventory.getName() != null && clickedInventory.getName().equals(ChatColor.BLACK + "Loot Table")) {
+        if(clickedInventory != null && clickedInventory.getName() != null && clickedInventory.getName().equals(ChatColor.BLACK + "Loot Table")) {
             event.setResult(Event.Result.DENY);
             event.setCancelled(true);
         }

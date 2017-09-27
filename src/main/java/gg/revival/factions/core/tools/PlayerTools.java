@@ -50,12 +50,24 @@ public class PlayerTools {
 
             if(!player.getWorld().equals(location.getWorld())) continue;
 
-            if(player.getLocation().distanceSquared(location) > 15.0) continue; // TODO: Update this with var from config
+            if(player.getLocation().distanceSquared(location) > Configuration.loggerEnemyDistance) continue;
 
             result.add(player.getUniqueId());
         }
 
         return result;
+    }
+
+    /**
+     * Send players with given permission a message
+     * @param permission
+     * @param message
+     */
+    public static void sendPermissionMessage(String permission, String message) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(!player.hasPermission(permission)) continue;
+            player.sendMessage(message);
+        }
     }
 
 }

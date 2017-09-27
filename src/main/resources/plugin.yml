@@ -48,3 +48,6 @@ commands:
   statistics:
     description: Stats command
     aliases: [stats, ores, playtime, kd]
+  servermode:
+    description: Server mode command
+    aliases: [sm, mode]
