@@ -119,18 +119,6 @@ public class ClassListener implements Listener {
         if(!event.getAction().equals(Action.RIGHT_CLICK_AIR) && !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if(player.getItemInHand() == null) return;
 
-        FPlayer facPlayer = PlayerManager.getPlayer(uuid);
-
-        // Player is in a safezone, don't consume anything
-        if(facPlayer.getLocation().getCurrentClaim() != null && facPlayer.getLocation().getCurrentClaim().getClaimOwner() instanceof ServerFaction) {
-            ServerFaction serverFaction = (ServerFaction)facPlayer.getLocation().getCurrentClaim().getClaimOwner();
-
-            if(serverFaction.getType().equals(ServerClaimType.SAFEZONE)) {
-                player.sendMessage(ChatColor.RED + "You can not consume active abilities in SazeZone claims");
-                return;
-            }
-        }
-
         ItemStack hand = player.getItemInHand();
         ClassProfile classProfile = Classes.getClassProfile(player.getUniqueId());
 
@@ -150,6 +138,18 @@ public class ClassListener implements Listener {
 
         // No item to consume, no reason to go further
         if(!isConsumeable) return;
+
+        FPlayer facPlayer = PlayerManager.getPlayer(uuid);
+
+        // Player is in a safezone, don't consume anything
+        if(facPlayer.getLocation().getCurrentClaim() != null && facPlayer.getLocation().getCurrentClaim().getClaimOwner() instanceof ServerFaction) {
+            ServerFaction serverFaction = (ServerFaction)facPlayer.getLocation().getCurrentClaim().getClaimOwner();
+
+            if(serverFaction.getType().equals(ServerClaimType.SAFEZONE)) {
+                player.sendMessage(ChatColor.RED + "You can not consume active abilities in SazeZone claims");
+                return;
+            }
+        }
 
         Material consumeable = hand.getType();
         int cooldown = 0;

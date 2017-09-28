@@ -10,17 +10,16 @@ import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.stats.command.StatsCommand;
 import gg.revival.factions.core.stats.listener.StatsListener;
 import gg.revival.factions.core.tools.Configuration;
-import gg.revival.factions.core.tools.Logger;
-import gg.revival.factions.core.tools.Processor;
 import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Stats {
 
@@ -97,6 +96,8 @@ public class Stats {
 
     public static void saveStats(PlayerStats stats, boolean unsafe) {
         if(unsafe) {
+            ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
             Runnable saveTask = () -> {
                 if(DBManager.getStats() == null)
                     DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "playerstats"));
@@ -127,7 +128,7 @@ public class Stats {
                     collection.insertOne(newDocument);
             };
 
-            Processor.getExecutor().submit(saveTask);
+            executorService.execute(saveTask);
         }
 
         else {

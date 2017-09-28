@@ -21,7 +21,7 @@ public class DatabaseListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
-        DBManager.saveTimerData(facPlayer);
+        DBManager.saveTimerData(facPlayer, false);
     }
 
 }

@@ -4,21 +4,32 @@ import com.google.common.base.Joiner;
 import gg.revival.factions.core.events.builder.DTCBuilder;
 import gg.revival.factions.core.events.builder.EventBuilder;
 import gg.revival.factions.core.events.builder.KOTHBuilder;
+import gg.revival.factions.core.events.chests.ChestManager;
+import gg.revival.factions.core.events.chests.ClaimChest;
+import gg.revival.factions.core.events.chests.ClaimChestType;
+import gg.revival.factions.core.events.chests.LootTables;
 import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.events.gui.EventsGUI;
 import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.Event;
-import gg.revival.factions.core.events.obj.EventsGUI;
+import gg.revival.factions.core.tools.BlockTools;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Permissions;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class EventsCommand implements CommandExecutor {
 
@@ -182,6 +193,118 @@ public class EventsCommand implements CommandExecutor {
 
                 return false;
             }
+
+            if(args[0].equalsIgnoreCase("chest") && args[1].equalsIgnoreCase("delete")) {
+                if(!player.hasPermission(Permissions.CORE_ADMIN)) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+                    return false;
+                }
+
+                Block targetBlock = BlockTools.getTargetBlock(player, 4);
+
+                if(targetBlock == null || ChestManager.getClaimChestByLocation(targetBlock.getLocation()) == null) {
+                    player.sendMessage(ChatColor.RED + "You are not looking at a Claim Chest");
+                    return false;
+                }
+
+                ClaimChest claimChest = ChestManager.getClaimChestByLocation(targetBlock.getLocation());
+
+                if(claimChest != null && claimChest.getAboveArmorStand() != null)
+                    claimChest.getAboveArmorStand().remove();
+
+                ChestManager.deleteChest(claimChest);
+
+                player.sendMessage(ChatColor.GREEN + "Claim chest deleted");
+
+                return false;
+            }
+        }
+
+        if(args.length == 3) {
+            if(args[0].equalsIgnoreCase("loot")) {
+                if(!player.hasPermission(Permissions.CORE_ADMIN)) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+                    return false;
+                }
+
+                if(args[1].equalsIgnoreCase("create") || args[1].equalsIgnoreCase("update") || args[1].equalsIgnoreCase("edit")) {
+                    String namedTable = args[2];
+
+                    LootTables.openEditor(player, namedTable);
+
+                    return false;
+                }
+
+                if(args[1].equalsIgnoreCase("delete")) {
+                    String namedTable = args[2];
+
+                    if(LootTables.getLootTableByName(namedTable) == null) {
+                        player.sendMessage(ChatColor.RED + "Invalid loot table. Valid loot tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(LootTables.getLootTables().keySet()));
+                        return false;
+                    }
+
+                    LootTables.deleteLootTable(namedTable);
+                    player.sendMessage(ChatColor.RED + "Loot table deleted." + ChatColor.DARK_RED + " Warning: All event chests connected to this table are now fucked and you need to remove them.");
+                    return false;
+                }
+            }
+        }
+
+        if(args.length == 4) {
+            if(args[0].equalsIgnoreCase("chest") && args[1].equalsIgnoreCase("create")) {
+                if(!player.hasPermission(Permissions.CORE_ADMIN)) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+                    return false;
+                }
+
+                String namedType = args[2];
+                String namedTable = args[3];
+                ClaimChestType type = null;
+                Block targetBlock = BlockTools.getTargetBlock(player, 4);
+
+                for(ClaimChestType claimChestTypes : ClaimChestType.values())
+                    if(claimChestTypes.toString().equalsIgnoreCase(namedType)) type = claimChestTypes;
+
+                if(type == null) {
+                    player.sendMessage(ChatColor.RED + "Invalid claim chest type. Valid types" + ChatColor.WHITE + ": " + Joiner.on(", ").join(ClaimChestType.values()));
+                    return false;
+                }
+
+                if(LootTables.getLootTableByName(namedTable) == null) {
+                    player.sendMessage(ChatColor.RED + "Invalid loot table. Valid tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(LootTables.getLootTables().keySet()));
+                    return false;
+                }
+
+                if(targetBlock == null || !targetBlock.getType().equals(Material.CHEST)) {
+                    player.sendMessage(ChatColor.RED + "You are not looking at a chest");
+                    return false;
+                }
+
+                type = ClaimChestType.valueOf(namedType.toUpperCase());
+
+                ClaimChest claimChest = new ClaimChest(UUID.randomUUID(), targetBlock.getLocation(), namedTable, type);
+                ChestManager.createChest(claimChest);
+
+                ArmorStand nameplate = (ArmorStand)targetBlock.getLocation().getWorld().spawnEntity(
+                        new Location(targetBlock.getWorld(), targetBlock.getX() + 0.5, targetBlock.getY() - 1, targetBlock.getZ() + 0.5), EntityType.ARMOR_STAND);
+
+                switch(type) {
+                    case RARE: nameplate.setCustomName(ChatColor.GRAY + "[ " + ChatColor.DARK_GREEN + "Claim Rare Loot" + ChatColor.GRAY + " ]");
+                        break;
+                    case COMBAT: nameplate.setCustomName(ChatColor.GRAY + "[ " + ChatColor.DARK_RED + "Claim Combat Loot" + ChatColor.GRAY + " ]");
+                        break;
+                    case BREWING: nameplate.setCustomName(ChatColor.GRAY + "[ " + ChatColor.AQUA + "Claim Brewing Loot" + ChatColor.GRAY + " ]");
+                        break;
+                    default: nameplate.setCustomName(ChatColor.RED + "Error");
+                }
+
+                nameplate.setVisible(false);
+                nameplate.setCustomNameVisible(true);
+
+                player.sendMessage(ChatColor.GREEN + "Claim Chest created");
+
+                return false;
+            }
         }
 
         player.sendMessage(ChatColor.RED + "/event");
@@ -193,6 +316,8 @@ public class EventsCommand implements CommandExecutor {
             player.sendMessage(ChatColor.RED + "/event stop <event>");
             player.sendMessage(ChatColor.RED + "/event delete <event>");
             player.sendMessage(ChatColor.RED + "/event create <koth/dtc>");
+            player.sendMessage(ChatColor.RED + "/event chest delete");
+            player.sendMessage(ChatColor.RED + "/event chest create <type> <table>");
         }
 
         return false;

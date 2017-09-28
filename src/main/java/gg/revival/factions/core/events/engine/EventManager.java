@@ -2,13 +2,11 @@ package gg.revival.factions.core.events.engine;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.events.loot.EventKey;
 import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
-import gg.revival.factions.core.events.palace.PalaceManager;
 import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Logger;
@@ -97,9 +95,7 @@ public class EventManager {
         }
 
         if(event.isPalace()) {
-            PalaceManager.setPublicChestLevel(0);
-            PalaceManager.setCappingFaction(null);
-            PalaceManager.setCaptured(false);
+            // TODO: Set palace uncapped
         }
     }
 
@@ -148,9 +144,7 @@ public class EventManager {
             if(event.isPalace()) {
                 Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
 
-                PalaceManager.setCappingFaction(koth.getCappingFaction());
-                PalaceManager.setCaptured(true);
-                PalaceManager.setPublicChestLevel(0);
+                // TODO: Cap palace here
             } else {
                 Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.captured(event)));
             }
@@ -168,9 +162,7 @@ public class EventManager {
             if(event.isPalace()) {
                 Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
 
-                PalaceManager.setCappingFaction(dtc.getCappingFaction());
-                PalaceManager.setCaptured(true);
-                PalaceManager.setPublicChestLevel(0);
+                // TODO: Cap Palace here
             } else {
                 Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.captured(event)));
             }
@@ -280,7 +272,8 @@ public class EventManager {
 
         new BukkitRunnable() {
             public void run() {
-                inventory.addItem(EventKey.getKey(amount));
+                // TODO: Spawn key here
+                //inventory.addItem(EventKey.getKey(amount));
             }
         }.runTaskLater(FC.getFactionsCore(), 5L);
 

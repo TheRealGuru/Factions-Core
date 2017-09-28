@@ -59,7 +59,7 @@ public class SignsListener implements Listener {
                 return;
             }
 
-            event.setLine(0, ChatColor.DARK_GREEN + "[Buy]");
+            event.setLine(0, ChatColor.DARK_GREEN + "- Buy -");
             event.setLine(1, "Amt: " + lineTwo);
             event.setLine(2, StringUtils.capitalize(itemName.toLowerCase()));
             event.setLine(3, "$" + lineFour);
@@ -85,7 +85,7 @@ public class SignsListener implements Listener {
                 return;
             }
 
-            event.setLine(0, ChatColor.DARK_RED + "[Sell]");
+            event.setLine(0, ChatColor.DARK_RED + "- Sell -");
             event.setLine(1, "Amt: " + lineTwo);
             event.setLine(2, StringUtils.capitalize(itemName.toLowerCase()));
             event.setLine(3, "$" + lineFour);

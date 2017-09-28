@@ -1,72 +1,73 @@
 package gg.revival.factions.core.events.listener;
 
-import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.events.loot.EventChest;
-import gg.revival.factions.core.events.loot.EventChestManager;
-import gg.revival.factions.core.events.loot.EventKey;
-import gg.revival.factions.core.events.loot.LootTableManager;
-import gg.revival.factions.core.events.messages.EventsMessages;
-import gg.revival.factions.obj.PlayerFaction;
-import org.bukkit.ChatColor;
+import gg.revival.factions.core.events.chests.*;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public class EventChestListener implements Listener {
 
     @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+
+        if(event.isCancelled())
+            return;
+
+        if(block.getType() == null || !block.getType().equals(Material.CHEST))
+            return;
+
+        if(ChestManager.getEventChestByLocation(block.getLocation()) != null)
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
         Action action = event.getAction();
 
-        if(!action.equals(Action.RIGHT_CLICK_BLOCK) || event.getClickedBlock() == null || event.getClickedBlock().getType().equals(Material.AIR)) return;
+        if(!action.equals(Action.RIGHT_CLICK_BLOCK))
+            return;
 
-        Block clickedBlock = event.getClickedBlock();
+        if(block.getType() == null || !block.getType().equals(Material.CHEST))
+            return;
 
-        EventChest eventChest = EventChestManager.getEventChestAtLocation(clickedBlock.getLocation());
+        if(ChestManager.getEventChestByLocation(block.getLocation()) == null)
+            return;
 
-        if(eventChest == null) return;
+        EventChest eventChest = ChestManager.getEventChestByLocation(block.getLocation());
 
-        event.setCancelled(true);
+        if(eventChest instanceof ClaimChest) {
+            ClaimChest claimChest = (ClaimChest)eventChest;
 
-        if(player.getItemInHand() != null && EventKey.isKey(player.getItemInHand())) {
-            List<ItemStack> receivedLoot = EventChestManager.getRandomItems(eventChest, 3); // TODO: Get this value from config
-            ItemStack hand = player.getItemInHand();
+            event.setCancelled(true);
 
-            if(hand.getAmount() <= 1)
-                player.setItemInHand(null);
-            else
-                hand.setAmount(hand.getAmount() - 1);
+            if(player.getItemInHand() != null && EventKey.isKey(player.getItemInHand())) {
+                // TODO: Claim loot here
 
-            for(ItemStack loot : receivedLoot) {
-                if(player.getInventory().firstEmpty() == -1) {
-                    player.getLocation().getWorld().dropItem(player.getLocation(), loot);
-                    player.sendMessage(ChatColor.DARK_RED + "Loot has been dropped at your feet because your inventory is full!");
-                    continue;
-                }
-
-                player.getInventory().addItem(loot);
+                return;
             }
 
-            if(FactionManager.getFactionByPlayer(player.getUniqueId()) != null) {
-                PlayerFaction playerFaction = (PlayerFaction)FactionManager.getFactionByPlayer(player.getUniqueId());
-
-                playerFaction.sendMessage(EventsMessages.asGeneral(EventsMessages.receivedLoot(player.getName(), receivedLoot)));
-            } else {
-                player.sendMessage(EventsMessages.asGeneral(EventsMessages.receivedLoot(player.getName(), receivedLoot)));
-            }
+            LootTables.viewTable(player, claimChest.getLootTable());
 
             return;
         }
 
-        LootTableManager.openLootTable(player, LootTableManager.getLootTableByName(eventChest.getLootTable()));
+        if(eventChest instanceof PalaceChest) {
+            PalaceChest palaceChest = (PalaceChest)eventChest;
+
+            if(event.isCancelled())
+                return;
+
+            palaceChest.setRecentlyLooted(true);
+        }
     }
 
 }

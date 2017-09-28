@@ -1,6 +1,6 @@
 package gg.revival.factions.core.events.listener;
 
-import gg.revival.factions.core.events.obj.EventsGUI;
+import gg.revival.factions.core.events.gui.EventsGUI;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;

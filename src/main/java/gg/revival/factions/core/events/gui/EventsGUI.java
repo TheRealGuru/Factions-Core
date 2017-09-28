@@ -1,6 +1,9 @@
-package gg.revival.factions.core.events.obj;
+package gg.revival.factions.core.events.gui;
 
 import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.events.obj.DTCEvent;
+import gg.revival.factions.core.events.obj.Event;
+import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.PlayerFaction;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +22,7 @@ import java.util.List;
 public class EventsGUI {
 
     public static boolean isGUI(Inventory inventory) {
-        return inventory != null && inventory.getName().equals(ChatColor.BLACK + "Events");
+        return inventory != null && inventory.getName() != null && inventory.getName().equals(ChatColor.BLACK + "Events");
     }
 
     public static void update(Inventory inventory) {

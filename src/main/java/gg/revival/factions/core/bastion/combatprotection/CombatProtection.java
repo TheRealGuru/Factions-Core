@@ -51,7 +51,7 @@ public class CombatProtection {
 
         player.sendMessage(ChatColor.YELLOW + "Your PvP protection has been removed");
 
-        DBManager.saveTimerData(facPlayer);
+        DBManager.saveTimerData(facPlayer, false);
     }
 
     /**

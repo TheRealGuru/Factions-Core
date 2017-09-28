@@ -1,8 +1,7 @@
 package gg.revival.factions.core.events.task;
 
 import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.events.obj.EventsGUI;
-import gg.revival.factions.core.tools.Logger;
+import gg.revival.factions.core.events.gui.EventsGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;

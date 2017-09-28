@@ -6,8 +6,6 @@ import gg.revival.factions.core.classes.cont.Bard;
 import gg.revival.factions.core.classes.cont.Miner;
 import gg.revival.factions.core.classes.cont.Scout;
 import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.events.loot.EventChestManager;
-import gg.revival.factions.core.events.loot.LootTableManager;
 import gg.revival.factions.core.locations.Locations;
 import gg.revival.factions.core.servermode.ServerMode;
 import gg.revival.factions.core.servermode.ServerState;
@@ -21,8 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class Configuration
-{
+public class Configuration {
 
     public static String databaseName = "factions";
 
@@ -111,8 +108,6 @@ public class Configuration
 
         Classes.getEnabledClasses().clear();
         EventManager.getEvents().clear();
-        EventChestManager.getEventChests().clear();
-        LootTableManager.getLootTables().clear();
         enchantmentLimits.clear();
         potionLimits.clear();
 

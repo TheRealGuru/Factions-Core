@@ -98,7 +98,7 @@ public class Signs {
      * @return Is a valid sign or not
      */
     public static boolean isBuySign(String lineOne, String lineTwo, String lineThree, String lineFour) {
-        if(!lineOne.equals(ChatColor.DARK_GREEN + "[Buy]"))
+        if(!lineOne.equals(ChatColor.DARK_GREEN + "- Buy -"))
             return false;
 
         if(!NumberUtils.isNumber(lineTwo.replace("Amt: ", ""))) return false;
@@ -121,7 +121,7 @@ public class Signs {
      * @return Is a valid sell sign
      */
     public static boolean isSellSign(String lineOne, String lineTwo, String lineThree, String lineFour) {
-        if(!lineOne.equals(ChatColor.DARK_RED + "[Sell]"))
+        if(!lineOne.equals(ChatColor.DARK_RED + "- Sell -"))
             return false;
 
         if(!NumberUtils.isNumber(lineTwo.replace("Amt: ", ""))) return false;
