@@ -1,6 +1,7 @@
 configuration:
   automated: true
   play-chest-effects: true
+  pulls-per-key: 3
   koth:
     default-duration: 60
     default-wincond: 15
@@ -12,6 +13,8 @@ configuration:
   palace:
     default-keys: 10
     captured: false
+    loot-spawn-interval: 3600
     capping-faction: []
+    capping-players:
 event-chests:
 loot-tables:

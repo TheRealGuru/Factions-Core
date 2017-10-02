@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class DTCBuilder {
 
@@ -53,13 +54,12 @@ public class DTCBuilder {
 
         String displayName = ChatColor.translateAlternateColorCodes('&', getDisplayName());
         Faction faction = FactionManager.getFactionByName(hookedFactionName);
-        ServerFaction hookedFaction = null;
+        UUID hookedFactionId = null;
 
-        if(faction != null && faction instanceof ServerFaction) {
-            hookedFaction = (ServerFaction)faction;
-        }
+        if(faction != null && faction instanceof ServerFaction)
+            hookedFactionId = faction.getFactionID();
 
-        DTCEvent dtc = new DTCEvent(eventName, displayName, hookedFaction, lootChest, schedule, core, winCond, regenTimer, palace);
+        DTCEvent dtc = new DTCEvent(eventName, displayName, hookedFactionId, lootChest, schedule, core, winCond, regenTimer, palace);
 
         return dtc;
     }

@@ -31,62 +31,57 @@ public class Signs {
      * @return ItemStack based on name
      */
     public static ItemStack getItemStackFromString(String itemName) {
-        Material material;
-        int data = 0;
+        if(itemName.equalsIgnoreCase(CustomMaterial.CROWBAR.toString()))
+            return Crowbar.getCrowbar();
+
+        if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_HELMET.toString().replace("_", " ")))
+            return new ItemStack(Material.CHAINMAIL_HELMET);
+
+        if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_CHESTPLATE.toString().replace("_", " ")))
+            return new ItemStack(Material.CHAINMAIL_CHESTPLATE);
+
+        if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_LEGGINGS.toString().replace("_", " ")))
+            return new ItemStack(Material.CHAINMAIL_LEGGINGS);
+
+        if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_BOOTS.toString().replace("_", " ")))
+            return new ItemStack(Material.CHAINMAIL_BOOTS);
+
+        if(itemName.equalsIgnoreCase(CustomMaterial.COW_EGG.toString().replace("_", " "))) {
+            SpawnEgg spawnEgg = new SpawnEgg();
+            spawnEgg.setSpawnedType(EntityType.COW);
+            return spawnEgg.toItemStack();
+        }
+
+        if(itemName.equalsIgnoreCase(CustomMaterial.END_PORTAL_FRAME.toString().replace("_", " ")))
+            return new ItemStack(Material.ENDER_PORTAL_FRAME);
+
+        if(itemName.equalsIgnoreCase(CustomMaterial.LAPIS.toString().replace("_", " "))) {
+            Dye dye = new Dye();
+            dye.setColor(DyeColor.BLUE);
+            return dye.toItemStack();
+        }
+
+        Material material = null;
+        short data;
 
         String[] obj = itemName.split(":");
 
-        if(obj.length == 2) {
-            material = Material.matchMaterial(obj[0]);
+        if(obj.length == 2 && NumberUtils.isNumber(obj[1])) {
+            material = Material.getMaterial(obj[0].toUpperCase());
+            data = (short)NumberUtils.toInt(obj[1]);
 
-            try {
-                data = Integer.valueOf(obj[1]);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
+            if(material != null) return new ItemStack(material, 1, data);
         }
 
-        else {
-            material = Material.matchMaterial(itemName);
+        for(Material materials : Material.values()) {
+            if(materials.name().replace("_", "").equalsIgnoreCase(itemName.toUpperCase()))
+                material = materials;
         }
 
-        if(material == null) {
-            if(itemName.equalsIgnoreCase(CustomMaterial.CROWBAR.toString()))
-                return Crowbar.getCrowbar();
+        if(material != null)
+            return new ItemStack(material);
 
-            if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_HELMET.toString().replace("_", " ")))
-                return new ItemStack(Material.CHAINMAIL_HELMET);
-
-            if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_CHESTPLATE.toString().replace("_", " ")))
-                return new ItemStack(Material.CHAINMAIL_CHESTPLATE);
-
-            if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_LEGGINGS.toString().replace("_", " ")))
-                return new ItemStack(Material.CHAINMAIL_LEGGINGS);
-
-            if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_BOOTS.toString().replace("_", " ")))
-                return new ItemStack(Material.CHAINMAIL_BOOTS);
-
-            if(itemName.equalsIgnoreCase(CustomMaterial.COW_EGG.toString().replace("_", " "))) {
-                SpawnEgg spawnEgg = new SpawnEgg();
-                spawnEgg.setSpawnedType(EntityType.COW);
-                return spawnEgg.toItemStack();
-            }
-
-            if(itemName.equalsIgnoreCase(CustomMaterial.END_PORTAL_FRAME.toString().replace("_", " ")))
-                return new ItemStack(Material.ENDER_PORTAL_FRAME);
-
-            if(itemName.equalsIgnoreCase(CustomMaterial.LAPIS.toString().replace("_", " "))) {
-                Dye dye = new Dye();
-                dye.setColor(DyeColor.BLUE);
-                return dye.toItemStack();
-            }
-        }
-
-        if(material == null) return null;
-
-        ItemStack item = new ItemStack(material, 1);
-        item.setDurability((short)data);
-        return item;
+        return null;
     }
 
     /**
@@ -98,16 +93,19 @@ public class Signs {
      * @return Is a valid sign or not
      */
     public static boolean isBuySign(String lineOne, String lineTwo, String lineThree, String lineFour) {
-        if(!lineOne.equals(ChatColor.DARK_GREEN + "- Buy -"))
+        if(!lineOne.equals(ChatColor.GREEN + "" + ChatColor.BOLD + "- Buy -"))
             return false;
 
-        if(!NumberUtils.isNumber(lineTwo.replace("Amt: ", ""))) return false;
+        if(!NumberUtils.isNumber(lineTwo.replace("Amt: ", "")))
+            return false;
 
         ItemStack item = getItemStackFromString(lineThree);
 
-        if(item == null) return false;
+        if(item == null)
+            return false;
 
-        if(!NumberUtils.isNumber(lineFour)) return false;
+        if(!NumberUtils.isNumber(lineFour.replace("$", "")))
+            return false;
 
         return true;
     }
@@ -121,7 +119,7 @@ public class Signs {
      * @return Is a valid sell sign
      */
     public static boolean isSellSign(String lineOne, String lineTwo, String lineThree, String lineFour) {
-        if(!lineOne.equals(ChatColor.DARK_RED + "- Sell -"))
+        if(!lineOne.equals(ChatColor.RED + "" + ChatColor.BOLD + "- Sell -"))
             return false;
 
         if(!NumberUtils.isNumber(lineTwo.replace("Amt: ", ""))) return false;
@@ -130,7 +128,7 @@ public class Signs {
 
         if(item == null) return false;
 
-        if(!NumberUtils.isNumber(lineFour)) return false;
+        if(!NumberUtils.isNumber(lineFour.replace("$", ""))) return false;
 
         return true;
     }

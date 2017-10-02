@@ -2,7 +2,9 @@ package gg.revival.factions.core.events;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.events.command.EventsCommand;
+import gg.revival.factions.core.events.command.PalaceCommand;
 import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.events.engine.PalaceManager;
 import gg.revival.factions.core.events.listener.*;
 import gg.revival.factions.core.events.task.*;
 import org.bukkit.Bukkit;
@@ -15,6 +17,7 @@ public class Events {
         loadThreads();
 
         EventManager.loadEvents();
+        PalaceManager.loadPalace();
     }
 
     public static void loadListeners() {
@@ -23,10 +26,12 @@ public class Events {
         Bukkit.getPluginManager().registerEvents(new DTCEventListener(), FC.getFactionsCore());
         Bukkit.getPluginManager().registerEvents(new EventChestListener(), FC.getFactionsCore());
         Bukkit.getPluginManager().registerEvents(new LootTablesListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new EventsListener(), FC.getFactionsCore());
     }
 
     private static void loadCommands() {
         FC.getFactionsCore().getCommand("events").setExecutor(new EventsCommand());
+        FC.getFactionsCore().getCommand("palace").setExecutor(new PalaceCommand());
     }
 
     @SuppressWarnings("deprecation")

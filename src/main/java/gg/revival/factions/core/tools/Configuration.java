@@ -5,6 +5,7 @@ import gg.revival.factions.core.classes.cont.Archer;
 import gg.revival.factions.core.classes.cont.Bard;
 import gg.revival.factions.core.classes.cont.Miner;
 import gg.revival.factions.core.classes.cont.Scout;
+import gg.revival.factions.core.events.chests.*;
 import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.locations.Locations;
 import gg.revival.factions.core.servermode.ServerMode;
@@ -13,10 +14,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.potion.PotionEffectType;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class Configuration {
@@ -25,6 +29,7 @@ public class Configuration {
 
     public static boolean automateEvents = true;
     public static boolean playChestEffects = true;
+    public static int pullsPerKey = 3;
     public static int defaultKothDuration = 60;
     public static int defaultKothWinCondition = 15;
     public static int defaultKothKeys = 3;
@@ -108,6 +113,7 @@ public class Configuration {
 
         Classes.getEnabledClasses().clear();
         EventManager.getEvents().clear();
+        ChestManager.getLoadedChests().clear();
         enchantmentLimits.clear();
         potionLimits.clear();
 
@@ -138,6 +144,7 @@ public class Configuration {
 
         automateEvents = events.getBoolean("configuration.automated");
         playChestEffects = events.getBoolean("configuration.play-chest-effects");
+        pullsPerKey = events.getInt("configuration.pulls-per-key");
         defaultKothDuration = events.getInt("configuration.koth.default-duration");
         defaultKothWinCondition = events.getInt("configuration.koth.default-wincond");
         defaultKothKeys = events.getInt("configuration.koth.default-keys");
@@ -242,6 +249,56 @@ public class Configuration {
         statsEnabled = config.getBoolean("stats.enabled");
         trackStats = config.getBoolean("stats.track-stats");
 
+        if(events.get("claim-chests") != null) {
+            for(String claimChestKeys : events.getConfigurationSection("claim-chests").getKeys(false)) {
+                UUID uuid = UUID.fromString(claimChestKeys);
+                int x = events.getInt("claim-chests." + claimChestKeys + ".location.x");
+                int y = events.getInt("claim-chests." + claimChestKeys + ".location.y");
+                int z = events.getInt("claim-chests." + claimChestKeys + ".location.z");
+                String worldName = events.getString("claim-chests." + claimChestKeys + ".location.world");
+
+                Location chestLocation = new Location(Bukkit.getWorld(worldName), x, y, z);
+
+                String lootTable = events.getString("claim-chests." + claimChestKeys + ".table");
+                ClaimChestType type = ClaimChestType.valueOf(events.getString("claim-chests." + claimChestKeys + ".type"));
+
+                ClaimChest claimChest = new ClaimChest(uuid, chestLocation, lootTable, type);
+
+                ChestManager.getLoadedChests().add(claimChest);
+            }
+        }
+
+        if(events.get("palace-chests") != null) {
+            for(String palaceChestKeys : events.getConfigurationSection("palace-chests").getKeys(false)) {
+                UUID uuid = UUID.fromString(palaceChestKeys);
+                int x = events.getInt("palace-chests." + palaceChestKeys + ".location.x");
+                int y = events.getInt("palace-chests." + palaceChestKeys + ".location.y");
+                int z = events.getInt("palace-chests." + palaceChestKeys + ".location.z");
+                String worldName = events.getString("palace-chests." + palaceChestKeys + ".location.world");
+
+                Location chestLocation = new Location(Bukkit.getWorld(worldName), x, y, z);
+
+                String lootTable = events.getString("palace-chests." + palaceChestKeys + ".table");
+                int tier = events.getInt("palace-chests." + palaceChestKeys + ".tier");
+
+                PalaceChest palaceChest = new PalaceChest(uuid, chestLocation, lootTable, tier);
+
+                ChestManager.getLoadedChests().add(palaceChest);
+            }
+        }
+
+        if(events.get("loot-tables") != null) {
+            for(String lootTableKeys : events.getConfigurationSection("loot-tables").getKeys(false)) {
+                try {
+                    Inventory inventory = InvTools.inventoryFromBase64(events.getString("loot-tables." + lootTableKeys + ".contents"));
+
+                    LootTables.getLootTables().put(lootTableKeys, inventory);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         Location overworldSpawn = new Location(Bukkit.getWorlds().get(0), 0, 100, 0), endSpawn = new Location(Bukkit.getWorlds().get(2), 0, 100, 0), endExit = new Location(Bukkit.getWorlds().get(0), 0, 100, 0);
 
         if(config.getString("locations.overworld-spawn.world") != null) {
@@ -277,6 +334,8 @@ public class Configuration {
 
         Logger.log("Loaded " + enchantmentLimits.size() + " Enchantment limits");
         Logger.log("Loaded " + potionLimits.size() + " Potion limits");
+        Logger.log("Loaded " + ChestManager.getLoadedChests().size() + " Event chests");
+        Logger.log("Loaded " + LootTables.getLootTables().size() + " Loot tables");
     }
 
 }

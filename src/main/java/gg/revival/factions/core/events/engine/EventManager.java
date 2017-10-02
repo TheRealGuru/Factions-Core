@@ -1,7 +1,7 @@
 package gg.revival.factions.core.events.engine;
 
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.FactionManager;
+import gg.revival.factions.core.events.chests.EventKey;
 import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
@@ -11,7 +11,6 @@ import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Logger;
 import gg.revival.factions.obj.PlayerFaction;
-import gg.revival.factions.obj.ServerFaction;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -94,9 +93,8 @@ public class EventManager {
                 Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.started(event)));
         }
 
-        if(event.isPalace()) {
-            // TODO: Set palace uncapped
-        }
+        if(event.isPalace())
+            PalaceManager.resetPalace();
     }
 
     public static void stopEvent(Event event) {
@@ -143,8 +141,7 @@ public class EventManager {
 
             if(event.isPalace()) {
                 Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
-
-                // TODO: Cap palace here
+                PalaceManager.setCappers(koth.getCappingFaction());
             } else {
                 Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.captured(event)));
             }
@@ -161,8 +158,7 @@ public class EventManager {
 
             if(event.isPalace()) {
                 Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
-
-                // TODO: Cap Palace here
+                PalaceManager.setCappers(dtc.getCappingFaction());
             } else {
                 Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.captured(event)));
             }
@@ -272,8 +268,7 @@ public class EventManager {
 
         new BukkitRunnable() {
             public void run() {
-                // TODO: Spawn key here
-                //inventory.addItem(EventKey.getKey(amount));
+                inventory.addItem(EventKey.getKeys(amount));
             }
         }.runTaskLater(FC.getFactionsCore(), 5L);
 
@@ -301,14 +296,14 @@ public class EventManager {
             return;
 
         for(String eventNames : FileManager.getEvents().getConfigurationSection("events").getKeys(false)) {
-            Location lootChest = null;
+            Location lootChest;
 
             if(EventManager.getEventByName(eventNames) != null) continue;
 
             String displayName = ChatColor.translateAlternateColorCodes('&', FileManager.getEvents().getString("events." + eventNames + ".display-name"));
             boolean palace = FileManager.getEvents().getBoolean("events." + eventNames + ".palace");
             int winCond = FileManager.getEvents().getInt("events." + eventNames + ".win-cond");
-            ServerFaction serverFaction = (ServerFaction) FactionManager.getFactionByUUID(UUID.fromString(FileManager.getEvents().getString("events." + eventNames + ".hooked-claim")));
+            UUID hookedFactionId = UUID.fromString(FileManager.getEvents().getString("events." + eventNames + ".hooked-claim"));
 
             int lootChestX = FileManager.getEvents().getInt("events." + eventNames + ".loot-chest.x");
             int lootChestY = FileManager.getEvents().getInt("events." + eventNames + ".loot-chest.y");
@@ -345,7 +340,7 @@ public class EventManager {
 
                 int duration = FileManager.getEvents().getInt("events." + eventNames + ".duration");
 
-                KOTHEvent kothEvent = new KOTHEvent(eventNames, displayName, serverFaction, lootChest, schedule, new CapZone(cornerOne, cornerTwo, worldName), duration, winCond, palace);
+                KOTHEvent kothEvent = new KOTHEvent(eventNames, displayName, hookedFactionId, lootChest, schedule, new CapZone(cornerOne, cornerTwo, worldName), duration, winCond, palace);
                 EventManager.getEvents().add(kothEvent);
 
                 continue;
@@ -362,7 +357,7 @@ public class EventManager {
 
                 int regenTimer = FileManager.getEvents().getInt("events." + eventNames + ".regen-timer");
 
-                DTCEvent dtcEvent = new DTCEvent(eventNames, displayName, serverFaction, lootChest, schedule, core, winCond, regenTimer, palace);
+                DTCEvent dtcEvent = new DTCEvent(eventNames, displayName, hookedFactionId, lootChest, schedule, core, winCond, regenTimer, palace);
                 EventManager.getEvents().add(dtcEvent);
             }
         }

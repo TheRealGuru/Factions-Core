@@ -2,14 +2,13 @@ package gg.revival.factions.core.events.obj;
 
 import com.google.common.collect.Maps;
 import gg.revival.factions.obj.PlayerFaction;
-import gg.revival.factions.obj.ServerFaction;
 import gg.revival.factions.tools.ToolBox;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class KOTHEvent extends Event {
 
@@ -21,8 +20,8 @@ public class KOTHEvent extends Event {
     @Getter @Setter boolean isContested;
     @Getter @Setter long pauseDuration;
 
-    public KOTHEvent(String eventName, String displayName, ServerFaction hookedFaction, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, CapZone capzone, int duration, int winCond, boolean palace) {
-        super(eventName, displayName, hookedFaction, lootChest, schedule, palace);
+    public KOTHEvent(String eventName, String displayName, UUID hookedFactionId, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, CapZone capzone, int duration, int winCond, boolean palace) {
+        super(eventName, displayName, hookedFactionId, lootChest, schedule, palace);
         this.capZone = capzone;
         this.duration = duration;
         this.winCond = winCond;

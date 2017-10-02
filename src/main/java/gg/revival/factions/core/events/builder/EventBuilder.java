@@ -7,7 +7,6 @@ import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Logger;
-import gg.revival.factions.obj.ServerFaction;
 import lombok.Getter;
 import org.bukkit.Location;
 
@@ -66,7 +65,6 @@ public class EventBuilder {
      */
     public static void saveEvent(Event event) {
         Location lootChest = event.getLootChest();
-        ServerFaction hookedFaction = event.getHookedFaction();
 
         FileManager.getEvents().set("events." + event.getEventName() + ".display-name", event.getDisplayName());
 
@@ -75,7 +73,8 @@ public class EventBuilder {
         FileManager.getEvents().set("events." + event.getEventName() + ".loot-chest.z", lootChest.getBlockZ());
         FileManager.getEvents().set("events." + event.getEventName() + ".loot-chest.world", lootChest.getWorld().getName());
 
-        FileManager.getEvents().set("events." + event.getEventName() + ".hooked-claim", hookedFaction.getFactionID().toString());
+        FileManager.getEvents().set("events." + event.getEventName() + ".hooked-claim", event.getHookedFactionId().toString());
+        FileManager.getEvents().set("events." + event.getEventName() + ".palace", event.isPalace());
 
         for(Integer days : event.getSchedule().keySet()) {
             int hr = event.getSchedule().get(days).keySet().iterator().next();

@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class KOTHBuilder {
 
@@ -57,13 +58,12 @@ public class KOTHBuilder {
 
         String displayName = ChatColor.translateAlternateColorCodes('&', getDisplayName());
         Faction faction = FactionManager.getFactionByName(hookedFactionName);
-        ServerFaction hookedFaction = null;
+        UUID hookedFactionId = null;
 
-        if(faction != null && faction instanceof ServerFaction) {
-            hookedFaction = (ServerFaction)faction;
-        }
+        if(faction != null && faction instanceof ServerFaction)
+            hookedFactionId = faction.getFactionID();
 
-        KOTHEvent koth = new KOTHEvent(eventName, displayName, hookedFaction, lootChest, schedule, capzone, duration, winCond, palace);
+        KOTHEvent koth = new KOTHEvent(eventName, displayName, hookedFactionId, lootChest, schedule, capzone, duration, winCond, palace);
 
         return koth;
     }

@@ -78,6 +78,11 @@ public class EventBuilderListener implements Listener {
                     builder.setPalace(true);
                     builder.setBuildPhase(8);
                     player.sendMessage(builder.getPhaseResponse());
+
+                    KOTHEvent kothEvent = builder.convertToKOTH();
+                    EventManager.getEvents().add(kothEvent);
+                    EventBuilder.saveEvent(kothEvent);
+
                     event.setCancelled(true);
 
                     return;
@@ -152,6 +157,11 @@ public class EventBuilderListener implements Listener {
                     builder.setPalace(true);
                     builder.setBuildPhase(7);
                     player.sendMessage(builder.getPhaseResponse());
+
+                    DTCEvent dtcEvent = builder.convertToDTC();
+                    EventManager.getEvents().add(dtcEvent);
+                    EventBuilder.saveEvent(dtcEvent);
+
                     event.setCancelled(true);
 
                     return;

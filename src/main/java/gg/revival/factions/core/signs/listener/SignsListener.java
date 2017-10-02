@@ -51,7 +51,7 @@ public class SignsListener implements Listener {
             ItemStack item = Signs.getItemStackFromString(lineThree);
             String itemName = item.getType().toString().replace("_", " ");
 
-            if(item.getItemMeta() != null)
+            if(item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null)
                 itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName());
 
             if(itemName == null) {
@@ -59,7 +59,10 @@ public class SignsListener implements Listener {
                 return;
             }
 
-            event.setLine(0, ChatColor.DARK_GREEN + "- Buy -");
+            if(item.getDurability() != 0)
+                itemName = itemName + ":" + item.getDurability();
+
+            event.setLine(0, ChatColor.GREEN + "" + ChatColor.BOLD + "- Buy -");
             event.setLine(1, "Amt: " + lineTwo);
             event.setLine(2, StringUtils.capitalize(itemName.toLowerCase()));
             event.setLine(3, "$" + lineFour);
@@ -77,7 +80,7 @@ public class SignsListener implements Listener {
             ItemStack item = Signs.getItemStackFromString(lineThree);
             String itemName = item.getType().toString();
 
-            if(item.getItemMeta() != null)
+            if(item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null)
                 itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName());
 
             if(itemName == null) {
@@ -85,13 +88,15 @@ public class SignsListener implements Listener {
                 return;
             }
 
-            event.setLine(0, ChatColor.DARK_RED + "- Sell -");
+            if(item.getDurability() != 0)
+                itemName = itemName + ":" + item.getDurability();
+
+            event.setLine(0, ChatColor.RED + "" + ChatColor.BOLD + "- Sell -");
             event.setLine(1, "Amt: " + lineTwo);
             event.setLine(2, StringUtils.capitalize(itemName.toLowerCase()));
             event.setLine(3, "$" + lineFour);
 
             player.sendMessage(ChatColor.GREEN + "Sign created");
-            return;
         }
     }
 

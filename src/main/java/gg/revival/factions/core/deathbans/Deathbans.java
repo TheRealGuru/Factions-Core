@@ -5,6 +5,7 @@ import com.mongodb.client.MongoCollection;
 import gg.revival.driver.MongoAPI;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.core.FC;
+import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.deathbans.callbacks.ActiveDeathbanCallback;
 import gg.revival.factions.core.deathbans.callbacks.DeathbanCallback;
@@ -14,10 +15,9 @@ import gg.revival.factions.core.deathbans.command.DeathsCommand;
 import gg.revival.factions.core.deathbans.listener.DeathbanListener;
 import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
-import gg.revival.factions.core.stats.PlayerStats;
 import gg.revival.factions.core.stats.Stats;
-import gg.revival.factions.core.stats.StatsCallback;
 import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.obj.ServerFaction;
 import mkremins.fanciful.FancyMessage;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -201,9 +201,13 @@ public class Deathbans {
             long deathbanDuration = stats.getCurrentPlaytime();
 
             for(Event event : EventManager.getActiveEvents()) {
-                if(event.getHookedFaction() == null || event.getHookedFaction().getClaims().isEmpty()) continue;
+                if(event.getHookedFactionId() == null || FactionManager.getFactionByUUID(event.getHookedFactionId()) == null) continue;
 
-                for(Claim claim : event.getHookedFaction().getClaims()) {
+                ServerFaction serverFaction = (ServerFaction)FactionManager.getFactionByUUID(event.getHookedFactionId());
+
+                if(serverFaction== null || serverFaction.getClaims().isEmpty()) continue;
+
+                for(Claim claim : serverFaction.getClaims()) {
                     if(!claim.inside(location, true)) continue;
 
                     if(deathbanDuration > Configuration.eventDeathban)

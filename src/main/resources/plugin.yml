@@ -22,6 +22,9 @@ commands:
   events:
     description: Events command
     aliases: [e, event]
+  palace:
+    description: Palace command
+    aliases: [citadel, conquest]
   tables:
     description: Table command
     aliases: [table, loottables, loot]
