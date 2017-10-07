@@ -30,40 +30,19 @@ public class Mechanics {
     }
 
     public static void loadListeners() {
-        if(Configuration.emeraldXpEnabled)
-            Bukkit.getPluginManager().registerEvents(new EmeraldEXPListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new CrowbarListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new EmeraldEXPListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new EnderpearlCDListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new MobstackingListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new NetherPortalListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new BookUnchantmentListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new HighSpawnerListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new InvalidPearlListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new SpawnerBreakingListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new EndermiteListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new HardmodeListener(), FC.getFactionsCore());
 
-        if(Configuration.enderpearlCooldownsEnabled)
-            Bukkit.getPluginManager().registerEvents(new EnderpearlCDListener(), FC.getFactionsCore());
-
-        if(Configuration.mobstackingEnabled) {
-            Bukkit.getPluginManager().registerEvents(new MobstackingListener(), FC.getFactionsCore());
-            Mobstacker.run();
-        }
-
-        if(Configuration.crowbarsEnabled)
-            Bukkit.getPluginManager().registerEvents(new CrowbarListener(), FC.getFactionsCore());
-
-        if(Configuration.protectNetherPortals)
-            Bukkit.getPluginManager().registerEvents(new NetherPortalListener(), FC.getFactionsCore());
-
-        if(Configuration.bookUnenchantingEnabled)
-            Bukkit.getPluginManager().registerEvents(new BookUnchantmentListener(), FC.getFactionsCore());
-
-        if(Configuration.highSpawnersDisabled)
-            Bukkit.getPluginManager().registerEvents(new HighSpawnerListener(), FC.getFactionsCore());
-
-        if(Configuration.invalidPearlBlocksEnabled)
-            Bukkit.getPluginManager().registerEvents(new InvalidPearlListener(), FC.getFactionsCore());
-
-        if(Configuration.settingsDisableBreakingSpawners)
-            Bukkit.getPluginManager().registerEvents(new SpawnerBreakingListener(), FC.getFactionsCore());
-
-        if(Configuration.settingsDisableEndermites)
-            Bukkit.getPluginManager().registerEvents(new EndermiteListener(), FC.getFactionsCore());
-
-        if(Configuration.hardmodeEnabled)
-            Bukkit.getPluginManager().registerEvents(new HardmodeListener(), FC.getFactionsCore());
+        Mobstacker.run();
     }
 
     public static void loadCommands()

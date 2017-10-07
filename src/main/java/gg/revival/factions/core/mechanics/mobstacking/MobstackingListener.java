@@ -1,6 +1,7 @@
 package gg.revival.factions.core.mechanics.mobstacking;
 
 import gg.revival.factions.core.FC;
+import gg.revival.factions.core.tools.Configuration;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -17,15 +18,14 @@ public class MobstackingListener implements Listener {
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
-        Entity entity = event.getEntity();
+        if(!Configuration.mobstackingEnabled) return;
 
-        if(!(entity instanceof LivingEntity)) return;
+        LivingEntity entity = event.getEntity();
 
-        LivingEntity livingEntity = (LivingEntity)entity;
+        if(entity instanceof Player) return;
 
-        if(livingEntity instanceof Player) return;
-
-        Mobstacker.subtractFromStack(entity);
+        if(Mobstacker.isStack(entity))
+            Mobstacker.subtractFromStack(entity);
 
         if(Mobstacker.getProtectedEntities().contains(entity.getUniqueId()))
             Mobstacker.getProtectedEntities().remove(entity.getUniqueId());
@@ -33,12 +33,13 @@ public class MobstackingListener implements Listener {
 
     @EventHandler
     public void onEntityInteract(PlayerInteractEntityEvent event) {
+        if(!Configuration.mobstackingEnabled) return;
+
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         Entity entity = event.getRightClicked();
 
-        if(!(entity instanceof LivingEntity))
-        if(entity instanceof Player || entity instanceof Monster) return;
+        if(!(entity instanceof LivingEntity) || entity instanceof Player || entity instanceof Monster) return;
         if(!Mobstacker.isStack(entity)) return;
         if(Mobstacker.getProtectedEntities().contains(entity.getUniqueId())) return;
 

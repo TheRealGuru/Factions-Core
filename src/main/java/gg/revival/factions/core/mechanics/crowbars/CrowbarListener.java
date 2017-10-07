@@ -1,5 +1,6 @@
 package gg.revival.factions.core.mechanics.crowbars;
 
+import gg.revival.factions.core.tools.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,6 +20,7 @@ public class CrowbarListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if(!Configuration.crowbarsEnabled) return;
         if(event.isCancelled()) return;
         if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if(event.getClickedBlock() == null || event.getClickedBlock().getType().equals(Material.AIR)) return;

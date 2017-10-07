@@ -1,5 +1,6 @@
 package gg.revival.factions.core.mechanics.spawnerbreaking;
 
+import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.Permissions;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,6 +14,9 @@ public class SpawnerBreakingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
+        if(!Configuration.settingsDisableBreakingSpawners)
+            return;
+
         Block block = event.getBlock();
 
         if(event.isCancelled())

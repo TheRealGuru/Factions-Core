@@ -1,5 +1,6 @@
 package gg.revival.factions.core.mechanics.hardmode;
 
+import gg.revival.factions.core.tools.Configuration;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,9 @@ public class HardmodeListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(!Configuration.hardmodeEnabled)
+            return;
+
         Entity damager = event.getDamager();
 
         if(damager instanceof Player) return;
@@ -29,6 +33,9 @@ public class HardmodeListener implements Listener {
 
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
+        if(!Configuration.hardmodeEnabled)
+            return;
+
         Entity entity = event.getEntity();
         LivingEntity livingEntity = (LivingEntity)entity;
 

@@ -124,6 +124,11 @@ public class SignsListener implements Listener {
             ItemStack item = Signs.getItemStackFromString(lineThree);
             int price = Integer.valueOf(lineFour.replace("$", ""));
 
+            if(player.getInventory().firstEmpty() == -1) {
+                player.sendMessage(ChatColor.RED + "You need to have an empty space in your inventory to purchase this item");
+                return;
+            }
+
             FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
             if(facPlayer.getBalance() < price) {

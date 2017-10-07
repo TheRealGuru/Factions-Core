@@ -19,11 +19,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class PotionLimitListener implements Listener
-{
+public class PotionLimitListener implements Listener {
 
     @EventHandler
     public void onPlayerConsume(PlayerItemConsumeEvent event) {
+        if(!Configuration.limitPotions)
+            return;
+
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
 
@@ -45,6 +47,9 @@ public class PotionLimitListener implements Listener
 
     @EventHandler
     public void onPotionSplash(PotionSplashEvent event) {
+        if(!Configuration.limitPotions)
+            return;
+
         ThrownPotion potion = event.getPotion();
 
         for(PotionEffect effects : potion.getEffects()) {
@@ -65,6 +70,9 @@ public class PotionLimitListener implements Listener
 
     @EventHandler
     public void onBrew(BrewEvent event) {
+        if(!Configuration.limitPotions)
+            return;
+
         new BukkitRunnable() {
             public void run() {
                 List<ItemStack> results = new CopyOnWriteArrayList<>(event.getContents().getContents());

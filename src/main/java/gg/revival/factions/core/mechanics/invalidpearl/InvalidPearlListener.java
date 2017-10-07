@@ -3,6 +3,7 @@ package gg.revival.factions.core.mechanics.invalidpearl;
 import com.google.common.collect.ImmutableSet;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.tools.BlockTools;
+import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerType;
 import org.bukkit.ChatColor;
@@ -37,6 +38,9 @@ public class InvalidPearlListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if(!Configuration.invalidPearlBlocksEnabled)
+            return;
+
         if(event.isCancelled())
             return;
 
@@ -57,6 +61,9 @@ public class InvalidPearlListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onTeleport(PlayerTeleportEvent event) {
+        if(!Configuration.invalidPearlBlocksEnabled)
+            return;
+
         if(event.isCancelled())
             return;
 

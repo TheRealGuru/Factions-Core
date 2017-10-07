@@ -4,6 +4,7 @@ import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.claims.ServerClaimType;
 import gg.revival.factions.core.locations.Locations;
+import gg.revival.factions.core.tools.PlayerTools;
 import gg.revival.factions.obj.ServerFaction;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,13 +21,16 @@ public class LocationsListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if(!player.hasPlayedBefore())
+        if(!player.hasPlayedBefore()) {
             player.teleport(Locations.getSpawnLocation());
+            PlayerTools.cleanupPlayer(player);
+        }
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         event.setRespawnLocation(Locations.getSpawnLocation());
+        PlayerTools.cleanupPlayer(event.getPlayer());
     }
 
     @EventHandler

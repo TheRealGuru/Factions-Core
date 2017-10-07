@@ -1,21 +1,18 @@
 package gg.revival.factions.core.ui;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RScoreboard {
 
-    private static Map<String, OfflinePlayer> cache = new HashMap<>();
+    private static Map<String, String> cache = new HashMap<>();
 
     private Scoreboard scoreboard;
     private String title;
@@ -75,13 +72,13 @@ public class RScoreboard {
         return str;
     }
 
-    private Map.Entry<Team, OfflinePlayer> createTeam(String text, int pos) {
+    private Map.Entry<Team, String> createTeam(String text, int pos) {
         Team team;
         ChatColor color = ChatColor.values()[pos];
-        OfflinePlayer result;
+        String result;
 
         if (!cache.containsKey(color.toString()))
-            cache.put(color.toString(), getOfflinePlayerSkipLookup(color.toString()));
+            cache.put(color.toString(), color.toString());
 
         result = cache.get(color.toString());
 
@@ -94,17 +91,18 @@ public class RScoreboard {
         applyText(team, text, result);
 
         teams.add(team);
+
         return new AbstractMap.SimpleEntry<>(team, result);
     }
 
-    private void applyText(Team team, String text, OfflinePlayer result) {
+    private void applyText(Team team, String text, String result) {
         Iterator<String> iterator = Splitter.fixedLength(16).split(text).iterator();
         String prefix = iterator.next();
 
         team.setPrefix(prefix);
 
-        if(!team.hasPlayer(result))
-            team.addPlayer(result);
+        if(!team.hasEntry(result))
+            team.addEntry(result);
 
         if (text.length() > 16) {
             String prefixColor = ChatColor.getLastColors(prefix);
@@ -159,7 +157,7 @@ public class RScoreboard {
 
         for (Map.Entry<String, Integer> text : scores.entrySet()) {
             Team t = scoreboard.getTeam(ChatColor.values()[text.getValue()].toString());
-            Map.Entry<Team, OfflinePlayer> team;
+            Map.Entry<Team, String> team;
 
             if(!updated.contains(text.getKey())) {
                 continue;
@@ -169,7 +167,7 @@ public class RScoreboard {
                 String color = ChatColor.values()[text.getValue()].toString();
 
                 if (!cache.containsKey(color)) {
-                    cache.put(color, getOfflinePlayerSkipLookup(color));
+                    cache.put(color, color);
                 }
 
                 team = new AbstractMap.SimpleEntry<>(t, cache.get(color));
@@ -213,41 +211,4 @@ public class RScoreboard {
             p.setScoreboard(scoreboard);
     }
 
-    private final UUID invalidUserUUID = UUID.nameUUIDFromBytes("InvalidUsername".getBytes(Charsets.UTF_8));
-    private Class<?> gameProfileClass;
-    private Constructor<?> gameProfileConstructor;
-    private Constructor<?> craftOfflinePlayerConstructor;
-
-    @SuppressWarnings("deprecation")
-    private OfflinePlayer getOfflinePlayerSkipLookup(String name) {
-        try {
-            if (gameProfileConstructor == null) {
-                try { // 1.7
-                    gameProfileClass = Class.forName("net.minecraft.util.com.mojang.authlib.GameProfile");
-                } catch (ClassNotFoundException e) { // 1.8
-                    gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
-                }
-
-                gameProfileConstructor = gameProfileClass.getDeclaredConstructor(UUID.class, String.class);
-                gameProfileConstructor.setAccessible(true);
-            }
-
-            if (craftOfflinePlayerConstructor == null) {
-                Class<?> serverClass = Bukkit.getServer().getClass();
-                Class<?> craftOfflinePlayerClass = Class.forName(serverClass.getName()
-                        .replace("CraftServer", "CraftOfflinePlayer"));
-                craftOfflinePlayerConstructor = craftOfflinePlayerClass.getDeclaredConstructor(
-                        serverClass, gameProfileClass
-                );
-
-                craftOfflinePlayerConstructor.setAccessible(true);
-            }
-            Object gameProfile = gameProfileConstructor.newInstance(invalidUserUUID, name);
-            Object craftOfflinePlayer = craftOfflinePlayerConstructor.newInstance(Bukkit.getServer(), gameProfile);
-
-            return (OfflinePlayer) craftOfflinePlayer;
-        } catch (Throwable t) { // Fallback if fail
-            return Bukkit.getOfflinePlayer(name);
-        }
-    }
 }

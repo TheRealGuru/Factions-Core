@@ -14,6 +14,8 @@ public class HighSpawnerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if(!Configuration.highSpawnersDisabled) return;
+
         Player player = event.getPlayer();
         Block block = event.getBlock();
         int yLevel = block.getLocation().getBlockY();

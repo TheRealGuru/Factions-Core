@@ -2,6 +2,7 @@ package gg.revival.factions.core.deathbans.listener;
 
 import gg.revival.factions.core.deathbans.DeathMessages;
 import gg.revival.factions.core.deathbans.Deathbans;
+import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,9 @@ public class DeathbanListener implements Listener {
 
     @EventHandler
     public void onPlayerLoginAttempt(AsyncPlayerPreLoginEvent event) {
+        if(!Configuration.deathbansEnabled)
+            return;
+
         UUID uuid = event.getUniqueId();
 
         Deathbans.getActiveDeathban(uuid, death -> {
@@ -31,8 +35,6 @@ public class DeathbanListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if(!(event.getEntity() instanceof Player)) return;
-
         Player player = event.getEntity();
         final String originalDeathMessage = event.getDeathMessage();
 
@@ -40,7 +42,8 @@ public class DeathbanListener implements Listener {
 
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
-        Deathbans.getDeathbanDurationByLocation(player.getUniqueId(), player.getLocation(), duration -> Deathbans.deathbanPlayer(player.getUniqueId(), originalDeathMessage, duration));
+        if(Configuration.deathbansEnabled)
+            Deathbans.getDeathbanDurationByLocation(player.getUniqueId(), player.getLocation(), duration -> Deathbans.deathbanPlayer(player.getUniqueId(), originalDeathMessage, duration));
     }
 
     @EventHandler

@@ -12,8 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class Mobstacker
-{
+public class Mobstacker {
 
     /**
      * Multimap that contains players split cooldowns for each entity type
@@ -79,9 +78,7 @@ public class Mobstacker
      * @return
      */
     public static boolean isStack(Entity entity) {
-        if(getStackSize(entity) > 0) return true;
-
-        return false;
+        return getStackSize(entity) > 0;
     }
 
     /**
@@ -216,8 +213,9 @@ public class Mobstacker
     /**
      * Timer that constantly checks for new mobs to merge
      */
-    public static void run()
-    {
+    public static void run() {
+        if(!Configuration.mobstackingEnabled) return;
+
         new BukkitRunnable()
         {
             public void run()

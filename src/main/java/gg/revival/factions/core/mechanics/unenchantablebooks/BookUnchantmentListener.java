@@ -1,5 +1,6 @@
 package gg.revival.factions.core.mechanics.unenchantablebooks;
 
+import gg.revival.factions.core.tools.Configuration;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -13,6 +14,8 @@ public class BookUnchantmentListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if(!Configuration.bookUnenchantingEnabled) return;
+
         if(event.isCancelled())
             return;
 

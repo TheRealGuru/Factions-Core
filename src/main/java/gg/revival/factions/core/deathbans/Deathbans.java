@@ -302,8 +302,7 @@ public class Deathbans {
     }
 
     public static void loadListeners() {
-        if(Configuration.deathbansEnabled)
-            Bukkit.getPluginManager().registerEvents(new DeathbanListener(), FC.getFactionsCore());
+        Bukkit.getPluginManager().registerEvents(new DeathbanListener(), FC.getFactionsCore());
     }
 
 }

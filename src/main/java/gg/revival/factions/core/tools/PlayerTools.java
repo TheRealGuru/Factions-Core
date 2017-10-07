@@ -13,6 +13,18 @@ import java.util.UUID;
 
 public class PlayerTools {
 
+    public static void cleanupPlayer(Player player) {
+        player.setHealth(20.0);
+        player.setFoodLevel(20);
+        player.setSaturation(20);
+        player.setExhaustion(0);
+        player.setFallDistance(0);
+        player.setFireTicks(0);
+
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+    }
+
     /**
      * Returns true if there is a nearby enemy player
      * @param player The player to check

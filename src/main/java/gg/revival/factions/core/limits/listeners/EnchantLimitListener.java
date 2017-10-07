@@ -18,6 +18,9 @@ public class EnchantLimitListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(!Configuration.limitEnchants)
+            return;
+
         if(event.isCancelled())
             return;
 
@@ -81,6 +84,9 @@ public class EnchantLimitListener implements Listener {
 
     @EventHandler
     public void onEnchantItem(EnchantItemEvent event) {
+        if(!Configuration.limitEnchants)
+            return;
+
         Player player = event.getEnchanter();
         Map<Enchantment, Integer> toAdd = new HashMap<>(event.getEnchantsToAdd());
 
