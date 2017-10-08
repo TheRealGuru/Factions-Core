@@ -1,6 +1,7 @@
 package gg.revival.factions.core.mechanics.crowbars;
 
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,9 +19,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CrowbarListener implements Listener {
 
+    @Getter private FC core;
+
+    public CrowbarListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if(!Configuration.crowbarsEnabled) return;
+        if(!core.getConfiguration().crowbarsEnabled) return;
         if(event.isCancelled()) return;
         if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if(event.getClickedBlock() == null || event.getClickedBlock().getType().equals(Material.AIR)) return;
@@ -28,9 +35,9 @@ public class CrowbarListener implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInHand();
 
-        if(!Crowbar.isCrowbar(item)) return;
+        if(!core.getMechanics().getCrowbars().isCrowbar(item)) return;
 
-        Crowbar.attemptCrowbar(player, item, event.getClickedBlock());
+        core.getMechanics().getCrowbars().attemptCrowbar(player, item, event.getClickedBlock());
     }
 
     @EventHandler
@@ -47,8 +54,6 @@ public class CrowbarListener implements Listener {
             if(meta.getDisplayName().contains(ChatColor.DARK_RED + StringUtils.capitalize(creatureSpawner.getSpawnedType().toString().toLowerCase()))) return;
 
             EntityType entityType = EntityType.valueOf(ChatColor.stripColor(meta.getDisplayName().toUpperCase().replace(" ", "_")));
-
-            if(entityType == null) return;
 
             creatureSpawner.setSpawnedType(entityType);
             block.getState().update();

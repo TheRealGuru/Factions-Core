@@ -1,6 +1,7 @@
 package gg.revival.factions.core.mechanics.unenchantablebooks;
 
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -10,11 +11,17 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class BookUnchantmentListener implements Listener {
+public class BookUnenchantmentListener implements Listener {
+
+    @Getter private FC core;
+
+    public BookUnenchantmentListener(FC core) {
+        this.core = core;
+    }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if(!Configuration.bookUnenchantingEnabled) return;
+        if(!core.getConfiguration().bookUnenchantingEnabled) return;
 
         if(event.isCancelled())
             return;

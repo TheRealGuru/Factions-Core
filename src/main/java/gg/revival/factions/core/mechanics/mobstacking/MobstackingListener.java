@@ -1,7 +1,7 @@
 package gg.revival.factions.core.mechanics.mobstacking;
 
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.tools.Configuration;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -16,43 +16,49 @@ import java.util.UUID;
 
 public class MobstackingListener implements Listener {
 
+    @Getter private FC core;
+
+    public MobstackingListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
-        if(!Configuration.mobstackingEnabled) return;
+        if(!core.getConfiguration().mobstackingEnabled) return;
 
         LivingEntity entity = event.getEntity();
 
         if(entity instanceof Player) return;
 
-        if(Mobstacker.isStack(entity))
-            Mobstacker.subtractFromStack(entity);
+        if(core.getMechanics().getMobstacker().isStack(entity))
+            core.getMechanics().getMobstacker().subtractFromStack(entity);
 
-        if(Mobstacker.getProtectedEntities().contains(entity.getUniqueId()))
-            Mobstacker.getProtectedEntities().remove(entity.getUniqueId());
+        if(core.getMechanics().getMobstacker().getProtectedEntities().contains(entity.getUniqueId()))
+            core.getMechanics().getMobstacker().getProtectedEntities().remove(entity.getUniqueId());
     }
 
     @EventHandler
     public void onEntityInteract(PlayerInteractEntityEvent event) {
-        if(!Configuration.mobstackingEnabled) return;
+        if(!core.getConfiguration().mobstackingEnabled) return;
 
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         Entity entity = event.getRightClicked();
 
         if(!(entity instanceof LivingEntity) || entity instanceof Player || entity instanceof Monster) return;
-        if(!Mobstacker.isStack(entity)) return;
-        if(Mobstacker.getProtectedEntities().contains(entity.getUniqueId())) return;
+        if(!core.getMechanics().getMobstacker().isStack(entity)) return;
+        if(core.getMechanics().getMobstacker().getProtectedEntities().contains(entity.getUniqueId())) return;
 
         List<EntityType> types;
 
-        if(Mobstacker.getSplitCooldowns().containsKey(player.getUniqueId())) {
-            if(Mobstacker.getSplitCooldowns().get(player.getUniqueId()).contains(entity.getType())) {
+        if(core.getMechanics().getMobstacker().getSplitCooldowns().containsKey(player.getUniqueId())) {
+            if(core.getMechanics().getMobstacker().getSplitCooldowns().get(player.getUniqueId()).contains(entity.getType())) {
                 player.sendMessage(ChatColor.RED + "Try again in a few minutes");
                 event.setCancelled(true);
                 return;
             }
 
-            types = Mobstacker.getSplitCooldowns().get(player.getUniqueId());
+            types = core.getMechanics().getMobstacker().getSplitCooldowns().get(player.getUniqueId());
         }
 
         else {
@@ -61,15 +67,15 @@ public class MobstackingListener implements Listener {
 
         types.add(entity.getType());
 
-        Mobstacker.getSplitCooldowns().put(player.getUniqueId(), types);
-        Mobstacker.splitStack(entity);
+        core.getMechanics().getMobstacker().getSplitCooldowns().put(player.getUniqueId(), types);
+        core.getMechanics().getMobstacker().splitStack(entity);
 
         new BukkitRunnable() {
             public void run() {
-                if(Mobstacker.getSplitCooldowns().containsKey(uuid))
-                    Mobstacker.getSplitCooldowns().get(uuid).remove(entity.getType());
+                if(core.getMechanics().getMobstacker().getSplitCooldowns().containsKey(uuid))
+                    core.getMechanics().getMobstacker().getSplitCooldowns().get(uuid).remove(entity.getType());
             }
-        }.runTaskLater(FC.getFactionsCore(), 300 * 20L);
+        }.runTaskLater(core, 300 * 20L);
     }
 
 }

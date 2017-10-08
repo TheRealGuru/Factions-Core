@@ -1,7 +1,8 @@
 package gg.revival.factions.core.locations.command;
 
-import gg.revival.factions.core.locations.Locations;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SpawnCommand implements CommandExecutor {
+
+    @Getter private FC core;
+
+    public SpawnCommand(FC core) {
+        this.core = core;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -27,7 +34,7 @@ public class SpawnCommand implements CommandExecutor {
                 return false;
             }
 
-            player.teleport(Locations.getSpawnLocation());
+            player.teleport(core.getLocations().getSpawnLocation());
             player.sendMessage(ChatColor.GREEN + "Returned to spawn");
             return false;
         }
@@ -39,7 +46,7 @@ public class SpawnCommand implements CommandExecutor {
                     return false;
                 }
 
-                Locations.saveSpawnLocation(player.getLocation());
+                core.getLocations().saveSpawnLocation(player.getLocation());
                 player.sendMessage(ChatColor.GREEN + "Spawn location has been updated");
                 return false;
             }

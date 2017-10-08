@@ -7,6 +7,7 @@ import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerType;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,6 +24,12 @@ import java.util.UUID;
 
 public class ShieldListener implements Listener {
 
+    @Getter private FC core;
+
+    public ShieldListener(FC core) {
+        this.core = core;
+    }
+
     /**
      * Contains all players who currently have data being processed for their shields
      */
@@ -32,14 +39,14 @@ public class ShieldListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         ShieldPlayer shieldPlayer = new ShieldPlayer(player.getUniqueId());
-        Shield.getShieldPlayers().add(shieldPlayer);
+        core.getBastion().getShield().getShieldPlayers().add(shieldPlayer);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        ShieldPlayer shieldPlayer = Shield.getShieldPlayer(player.getUniqueId());
-        Shield.getShieldPlayers().remove(shieldPlayer);
+        ShieldPlayer shieldPlayer = core.getBastion().getShield().getShieldPlayer(player.getUniqueId());
+        core.getBastion().getShield().getShieldPlayers().remove(shieldPlayer);
     }
 
     @EventHandler
@@ -52,7 +59,7 @@ public class ShieldListener implements Listener {
                 from.getBlockZ() == to.getBlockZ()) return;
 
         if(currentlyProcessing.contains(player.getUniqueId())) return;
-        final ShieldPlayer shieldPlayer = Shield.getShieldPlayer(player.getUniqueId());
+        final ShieldPlayer shieldPlayer = core.getBastion().getShield().getShieldPlayer(player.getUniqueId());
         final FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
         if(
@@ -74,7 +81,7 @@ public class ShieldListener implements Listener {
                         shieldPlayer.setLastShownBlocks(null);
                         currentlyProcessing.remove(shieldPlayer.getUuid());
                     }
-                }.runTaskAsynchronously(FC.getFactionsCore());
+                }.runTaskAsynchronously(core);
             }
 
             return;
@@ -88,9 +95,9 @@ public class ShieldListener implements Listener {
                 player.getLocation().getWorld().getName());
 
         ShieldUpdateRequest request = new ShieldUpdateRequest(currentPos, shieldPlayer);
-        final ShieldUpdateTask task = new ShieldUpdateTask(request);
+        final ShieldUpdateTask task = new ShieldUpdateTask(core, request);
 
-        Bukkit.getScheduler().runTaskAsynchronously(FC.getFactionsCore(), task);
+        Bukkit.getScheduler().runTaskAsynchronously(core, task);
         task.addListener(() -> currentlyProcessing.remove(shieldPlayer.getUuid()), MoreExecutors.sameThreadExecutor());
     }
 

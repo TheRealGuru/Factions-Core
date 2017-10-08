@@ -1,7 +1,9 @@
 package gg.revival.factions.core.tools;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.obj.PlayerFaction;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -13,7 +15,13 @@ import java.util.UUID;
 
 public class PlayerTools {
 
-    public static void cleanupPlayer(Player player) {
+    @Getter private FC core;
+
+    public PlayerTools(FC core) {
+        this.core = core;
+    }
+
+    public void cleanupPlayer(Player player) {
         player.setHealth(20.0);
         player.setFoodLevel(20);
         player.setSaturation(20);
@@ -31,7 +39,7 @@ public class PlayerTools {
      * @param distance Distance to check
      * @return Player is nearby
      */
-    public static boolean isNearbyEnemy(Player player, int distance) {
+    public boolean isNearbyEnemy(Player player, int distance) {
         for(Entity nearbyEntities : player.getNearbyEntities(distance, distance, distance)) {
             if(!(nearbyEntities instanceof Player)) continue;
 
@@ -54,7 +62,7 @@ public class PlayerTools {
      * @param location
      * @return
      */
-    public static Set<UUID> getNearbyFactionMembers(PlayerFaction playerFaction, Location location) {
+    public Set<UUID> getNearbyFactionMembers(PlayerFaction playerFaction, Location location) {
         Set<UUID> result = new HashSet<>();
 
         for(UUID onlineRoster : playerFaction.getRoster(true)) {
@@ -62,7 +70,7 @@ public class PlayerTools {
 
             if(!player.getWorld().equals(location.getWorld())) continue;
 
-            if(player.getLocation().distanceSquared(location) > Configuration.loggerEnemyDistance) continue;
+            if(player.getLocation().distanceSquared(location) > core.getConfiguration().loggerEnemyDistance) continue;
 
             result.add(player.getUniqueId());
         }
@@ -75,7 +83,7 @@ public class PlayerTools {
      * @param permission
      * @param message
      */
-    public static void sendPermissionMessage(String permission, String message) {
+    public void sendPermissionMessage(String permission, String message) {
         for(Player player : Bukkit.getOnlinePlayers()) {
             if(!player.hasPermission(permission)) continue;
             player.sendMessage(message);

@@ -3,8 +3,8 @@ package gg.revival.factions.core.classes.listener;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.classes.ClassProfile;
 import gg.revival.factions.core.classes.ClassType;
-import gg.revival.factions.core.classes.Classes;
 import gg.revival.factions.core.tools.armorevents.ArmorEquipEvent;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,29 +12,35 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ArmorEventsListener implements Listener {
 
+    @Getter private FC core;
+
+    public ArmorEventsListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onArmorEquip(ArmorEquipEvent event) {
         Player player = event.getPlayer();
-        ClassProfile classProfile = Classes.getClassProfile(player.getUniqueId());
+        ClassProfile classProfile = core.getClasses().getClassProfile(player.getUniqueId());
 
         new BukkitRunnable() {
             public void run() {
-                if(player == null) return;
+                if(!player.isOnline()) return;
 
-                ClassType foundClassType = Classes.getClassByArmor(
+                ClassType foundClassType = core.getClasses().getClassByArmor(
                         player.getInventory().getHelmet(), player.getInventory().getChestplate(),
                         player.getInventory().getLeggings(), player.getInventory().getBoots());
 
                 if(classProfile == null && foundClassType != null) {
-                    Classes.createClassProfile(player.getUniqueId(), foundClassType);
+                    core.getClasses().createClassProfile(player.getUniqueId(), foundClassType);
                     return;
                 }
 
                 if(classProfile != null && foundClassType == null) {
-                    Classes.removeFromClass(player.getUniqueId());
+                    core.getClasses().removeFromClass(player.getUniqueId());
                 }
             }
-        }.runTaskLater(FC.getFactionsCore(), 1L);
+        }.runTaskLater(core, 1L);
     }
 
 }

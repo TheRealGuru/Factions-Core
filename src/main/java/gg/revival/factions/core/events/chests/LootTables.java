@@ -2,7 +2,7 @@ package gg.revival.factions.core.events.chests;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gg.revival.factions.core.tools.FileManager;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.InvTools;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -19,33 +19,38 @@ import java.util.UUID;
 
 public class LootTables {
 
-    @Getter static Map<String, Inventory> lootTables = Maps.newHashMap();
-    @Getter static Map<UUID, String> lootTableCreators = Maps.newHashMap();
+    @Getter private FC core;
+    @Getter Map<String, Inventory> lootTables = Maps.newHashMap();
+    @Getter Map<UUID, String> lootTableCreators = Maps.newHashMap();
 
-    public static Inventory getLootTableByName(String name) {
+    public LootTables(FC core) {
+        this.core = core;
+    }
+
+    public Inventory getLootTableByName(String name) {
         for(String tableNames : lootTables.keySet())
             if(tableNames.equalsIgnoreCase(name)) return lootTables.get(tableNames);
 
         return null;
     }
 
-    public static void createLootTable(String name, Inventory inventory) {
+    public void createLootTable(String name, Inventory inventory) {
         String asString = InvTools.toBase64(inventory);
 
-        FileManager.getEvents().set("loot-tables." + name + ".contents", asString);
-        FileManager.saveEvents();
+        core.getFileManager().getEvents().set("loot-tables." + name + ".contents", asString);
+        core.getFileManager().saveEvents();
 
         lootTables.put(name, inventory);
     }
 
-    public static void deleteLootTable(String name) {
-        FileManager.getEvents().set("loot-tables." + name, null);
-        FileManager.saveEvents();
+    public void deleteLootTable(String name) {
+        core.getFileManager().getEvents().set("loot-tables." + name, null);
+        core.getFileManager().saveEvents();
 
         lootTables.remove(name);
     }
 
-    public static List<ItemStack> getLoot(Inventory inventory, int pulls) {
+    public List<ItemStack> getLoot(Inventory inventory, int pulls) {
         List<ItemStack> result = Lists.newArrayList();
         List<ItemStack> contents = Lists.newArrayList();
         Random random = new Random();
@@ -61,7 +66,7 @@ public class LootTables {
         return result;
     }
 
-    public static void viewTable(Player player, String tableName) {
+    public void viewTable(Player player, String tableName) {
         Inventory gui = Bukkit.createInventory(null, 27, "Viewing Loot Table: " + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + tableName);
 
         if(getLootTableByName(tableName) != null) {
@@ -74,7 +79,7 @@ public class LootTables {
         player.openInventory(gui);
     }
 
-    public static void openEditor(Player player, String tableName) {
+    public void openEditor(Player player, String tableName) {
         lootTableCreators.put(player.getUniqueId(), tableName);
 
         Inventory gui = Bukkit.createInventory(null, 27, "Creating Loot Table: " + ChatColor.DARK_RED + "" + ChatColor.BOLD + tableName);

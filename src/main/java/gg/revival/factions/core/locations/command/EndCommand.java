@@ -1,7 +1,8 @@
 package gg.revival.factions.core.locations.command;
 
-import gg.revival.factions.core.locations.Locations;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class EndCommand implements CommandExecutor {
+
+    @Getter private FC core;
+
+    public EndCommand(FC core) {
+        this.core = core;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -27,7 +34,7 @@ public class EndCommand implements CommandExecutor {
                 return false;
             }
 
-            player.teleport(Locations.getEndSpawnLocation());
+            player.teleport(core.getLocations().getEndSpawnLocation());
             player.sendMessage(ChatColor.GREEN + "Teleported to The End");
             return false;
         }
@@ -39,7 +46,7 @@ public class EndCommand implements CommandExecutor {
                     return false;
                 }
 
-                Locations.saveEndSpawnLocation(player.getLocation());
+                core.getLocations().saveEndSpawnLocation(player.getLocation());
                 player.sendMessage(ChatColor.GREEN + "End Spawn location has been updated");
                 return false;
             }

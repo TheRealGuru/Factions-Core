@@ -1,17 +1,28 @@
 package gg.revival.factions.core.events.task;
 
-import gg.revival.factions.core.events.chests.*;
+import gg.revival.factions.core.FC;
+import gg.revival.factions.core.events.chests.ClaimChest;
+import gg.revival.factions.core.events.chests.ClaimChestType;
+import gg.revival.factions.core.events.chests.EventChest;
+import gg.revival.factions.core.events.chests.PalaceChest;
+import lombok.Getter;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class ChestTask extends BukkitRunnable implements Runnable {
 
+    @Getter private FC core;
+
+    public ChestTask(FC core) {
+        this.core = core;
+    }
+
     @Override
     public void run() {
-        if(ChestManager.getLoadedChests().isEmpty()) return;
+        if(core.getEvents().getChestManager() == null || core.getEvents().getChestManager().getLoadedChests().isEmpty()) return;
 
-        for(EventChest eventChest : ChestManager.getLoadedChests()) {
+        for(EventChest eventChest : core.getEvents().getChestManager().getLoadedChests()) {
             Location fixedLocation = new Location(
                     eventChest.getLocation().getWorld(), eventChest.getLocation().getBlockX() + 0.5, eventChest.getLocation().getBlockY() + 0.5, eventChest.getLocation().getBlockZ() + 0.5);
 

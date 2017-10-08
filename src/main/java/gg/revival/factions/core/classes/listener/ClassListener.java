@@ -6,15 +6,13 @@ import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.classes.ClassProfile;
 import gg.revival.factions.core.classes.ClassType;
-import gg.revival.factions.core.classes.Classes;
 import gg.revival.factions.core.classes.cont.RClass;
-import gg.revival.factions.core.tools.Configuration;
-import gg.revival.factions.core.tools.PlayerTools;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import gg.revival.factions.obj.ServerFaction;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,37 +38,43 @@ import java.util.UUID;
 
 public class ClassListener implements Listener {
 
+    @Getter private FC core;
+
+    public ClassListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
         new BukkitRunnable() {
             public void run() {
-                ClassType foundClassType = Classes.getClassByArmor(player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots());
+                ClassType foundClassType = core.getClasses().getClassByArmor(player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots());
 
                 if(foundClassType == null) return;
 
-                RClass playerClass = Classes.getClassByClassType(foundClassType);
+                RClass playerClass = core.getClasses().getClassByClassType(foundClassType);
 
                 for(PotionEffect passives : playerClass.getPassives()) {
                     if(player.hasPotionEffect(passives.getType()))
                         player.removePotionEffect(passives.getType());
                 }
 
-                Classes.createClassProfile(player.getUniqueId(), foundClassType);
+                core.getClasses().createClassProfile(player.getUniqueId(), foundClassType);
 
             }
-        }.runTaskLater(FC.getFactionsCore(), 1L);
+        }.runTaskLater(core, 1L);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        ClassProfile classProfile = Classes.getClassProfile(player.getUniqueId());
+        ClassProfile classProfile = core.getClasses().getClassProfile(player.getUniqueId());
 
         if(classProfile == null || !classProfile.getConsumeCooldowns().isEmpty()) return;
 
-        Classes.removeClassProfile(player.getUniqueId());
+        core.getClasses().removeClassProfile(player.getUniqueId());
     }
 
     @EventHandler
@@ -86,7 +90,7 @@ public class ClassListener implements Listener {
         if(!(source instanceof Player)) return;
 
         Player shooter = (Player)source;
-        ClassProfile classProfile = Classes.getClassProfile(shooter.getUniqueId());
+        ClassProfile classProfile = core.getClasses().getClassProfile(shooter.getUniqueId());
 
         if(classProfile == null || !classProfile.getSelectedClass().equals(ClassType.ARCHER) || !classProfile.isActive()) return;
 
@@ -99,8 +103,8 @@ public class ClassListener implements Listener {
         for(int i = 0; i < distance; i++)
             multiplier += 0.05;
 
-        if(multiplier> Configuration.maxArcherDamage)
-            multiplier = Configuration.maxArcherDamage;
+        if(multiplier> core.getConfiguration().maxArcherDamage)
+            multiplier = core.getConfiguration().maxArcherDamage;
 
         DecimalFormat format = new DecimalFormat("#.00");
 
@@ -120,11 +124,11 @@ public class ClassListener implements Listener {
         if(player.getItemInHand() == null) return;
 
         ItemStack hand = player.getItemInHand();
-        ClassProfile classProfile = Classes.getClassProfile(player.getUniqueId());
+        ClassProfile classProfile = core.getClasses().getClassProfile(player.getUniqueId());
 
         if(classProfile == null || classProfile.getSelectedClass() == null || !classProfile.isActive()) return;
 
-        RClass playerClass = Classes.getClassByClassType(classProfile.getSelectedClass());
+        RClass playerClass = core.getClasses().getClassByClassType(classProfile.getSelectedClass());
 
         // Class doesn't have any active effects to consume
         if(playerClass.getActives().isEmpty()) return;
@@ -156,13 +160,13 @@ public class ClassListener implements Listener {
 
         // Set the cooldown based on the item in hand
         if(consumeable.equals(Material.SUGAR))
-            cooldown = Configuration.activeSpeedCooldown;
+            cooldown = core.getConfiguration().activeSpeedCooldown;
         else if(consumeable.equals(Material.FEATHER))
-            cooldown = Configuration.activeJumpCooldown;
+            cooldown = core.getConfiguration().activeJumpCooldown;
         else if(consumeable.equals(Material.GHAST_TEAR))
-            cooldown = Configuration.activeRegenCooldown;
+            cooldown = core.getConfiguration().activeRegenCooldown;
         else if(consumeable.equals(Material.BLAZE_POWDER))
-            cooldown = Configuration.activeStrengthCooldown;
+            cooldown = core.getConfiguration().activeStrengthCooldown;
 
         // Check to make sure the player hasn't recently used this active effect, if they have cancel it and notify them
         if(classProfile.getConsumeCooldowns().containsKey(consumeable)) {
@@ -200,14 +204,14 @@ public class ClassListener implements Listener {
                         } else {
                             // The player is not online, if they don't have cooldowns remove their class profile
                             if(classProfile.getConsumeCooldowns().isEmpty())
-                                Classes.removeClassProfile(classProfile.getUuid());
+                                core.getClasses().removeClassProfile(classProfile.getUuid());
                         }
                     }
-                }.runTaskLater(FC.getFactionsCore(), cooldown * 20L);
+                }.runTaskLater(core, cooldown * 20L);
 
-                for(UUID nearby : PlayerTools.getNearbyFactionMembers(playerFaction, player.getLocation())) {
+                for(UUID nearby : core.getPlayerTools().getNearbyFactionMembers(playerFaction, player.getLocation())) {
                     Player nearbyPlayer = Bukkit.getPlayer(nearby);
-                    ClassProfile nearbyClass = Classes.getClassProfile(nearbyPlayer.getUniqueId());
+                    ClassProfile nearbyClass = core.getClasses().getClassProfile(nearbyPlayer.getUniqueId());
 
                     // Here we'll store the affected players effect that was overwritten, and we'll give it back when the active effect expires
                     PotionEffect foundPotionEffect = null;
@@ -230,8 +234,8 @@ public class ClassListener implements Listener {
                         public void run() {
                             if(nearbyPlayer == null) return;
 
-                            if(Classes.getClassProfile(nearbyPlayer.getUniqueId()) != null && Classes.getClassProfile(nearbyPlayer.getUniqueId()).getSelectedClass() != null) {
-                                for(PotionEffect passives : Classes.getClassByClassType(Classes.getClassProfile(nearby).getSelectedClass()).getPassives()) {
+                            if(core.getClasses().getClassProfile(nearbyPlayer.getUniqueId()) != null && core.getClasses().getClassProfile(nearbyPlayer.getUniqueId()).getSelectedClass() != null) {
+                                for(PotionEffect passives : core.getClasses().getClassByClassType(core.getClasses().getClassProfile(nearby).getSelectedClass()).getPassives()) {
                                     if(passives.getType().equals(playerClass.getActives().get(consumeable).getType())) {
                                         nearbyPlayer.removePotionEffect(passives.getType());
                                         nearbyPlayer.addPotionEffect(passives);
@@ -239,12 +243,12 @@ public class ClassListener implements Listener {
                                 }
                             }
 
-                            if(savedPotionEffect != null && !Classes.getClassProfile(nearbyPlayer.getUniqueId()).isActive()) {
+                            if(savedPotionEffect != null && !core.getClasses().getClassProfile(nearbyPlayer.getUniqueId()).isActive()) {
                                 player.removePotionEffect(savedPotionEffect.getType());
                                 player.addPotionEffect(savedPotionEffect);
                             }
                         }
-                    }.runTaskLater(FC.getFactionsCore(), (playerClass.getActives().get(consumeable).getDuration() + 5L));
+                    }.runTaskLater(core, (playerClass.getActives().get(consumeable).getDuration() + 5L));
 
                     // Notify all nearby players they have been given the effect
                     nearbyPlayer.sendMessage(ChatColor.YELLOW + "You now have " + ChatColor.BLUE +
@@ -264,8 +268,8 @@ public class ClassListener implements Listener {
         // Scheduler to re-apply passive effects if they were overwritten when using the active
         new BukkitRunnable() {
             public void run() {
-                if(player == null || Classes.getClassProfile(uuid) == null) return;
-                if(!Classes.getClassProfile(uuid).getSelectedClass().equals(classProfile.getSelectedClass())) return;
+                if(player == null || core.getClasses().getClassProfile(uuid) == null) return;
+                if(!core.getClasses().getClassProfile(uuid).getSelectedClass().equals(classProfile.getSelectedClass())) return;
 
                 for(PotionEffect passives : playerClass.getPassives()) {
                     if(passives.getType().equals(playerClass.getActives().get(consumeable).getType()))
@@ -273,7 +277,7 @@ public class ClassListener implements Listener {
                         player.addPotionEffect(passives);
                 }
             }
-        }.runTaskLater(FC.getFactionsCore(), (playerClass.getActives().get(consumeable).getDuration() + 5L));
+        }.runTaskLater(core, (playerClass.getActives().get(consumeable).getDuration() + 5L));
 
         // Notify the player that they have consumed the active
         player.sendMessage(ChatColor.YELLOW + "You now have " + ChatColor.BLUE +
@@ -295,10 +299,10 @@ public class ClassListener implements Listener {
                 } else {
                     // Otherwise, if they aren't online check to see if they have timers and if not, remove their class profile
                     if(classProfile.getConsumeCooldowns().isEmpty())
-                        Classes.removeClassProfile(classProfile.getUuid());
+                        core.getClasses().removeClassProfile(classProfile.getUuid());
                 }
             }
-        }.runTaskLater(FC.getFactionsCore(), cooldown * 20L);
+        }.runTaskLater(core, cooldown * 20L);
     }
 
 }

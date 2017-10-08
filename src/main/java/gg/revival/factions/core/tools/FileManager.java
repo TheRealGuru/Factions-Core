@@ -1,6 +1,7 @@
 package gg.revival.factions.core.tools;
 
 import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -9,29 +10,33 @@ import java.io.IOException;
 
 public class FileManager {
 
-    public static File configFile;
-    public static FileConfiguration configConfig;
+    @Getter private FC core;
+    private File configFile;
+    private FileConfiguration configConfig;
+    private File eventsFile;
+    private FileConfiguration eventsConfig;
 
-    public static File eventsFile;
-    public static FileConfiguration eventsConfig;
+    public FileManager(FC core) {
+        this.core = core;
+    }
 
-    public static void createFiles() {
+    void createFiles() {
         try {
-            if (!FC.getFactionsCore().getDataFolder().exists()) {
-                FC.getFactionsCore().getDataFolder().mkdirs();
+            if (!core.getDataFolder().exists()) {
+                core.getDataFolder().mkdirs();
             }
 
-            configFile = new File(FC.getFactionsCore().getDataFolder(), "config.yml");
-            eventsFile = new File(FC.getFactionsCore().getDataFolder(), "events.yml");
+            configFile = new File(core.getDataFolder(), "config.yml");
+            eventsFile = new File(core.getDataFolder(), "events.yml");
 
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
-                FC.getFactionsCore().saveResource("config.yml", true);
+                core.saveResource("config.yml", true);
             }
 
             if(!eventsFile.exists()) {
                 eventsFile.getParentFile().mkdirs();
-                FC.getFactionsCore().saveResource("events.yml", true);
+                core.saveResource("events.yml", true);
             }
 
             configConfig = new YamlConfiguration();
@@ -48,12 +53,12 @@ public class FileManager {
         }
     }
 
-    public static FileConfiguration getConfig() {
+    public FileConfiguration getConfig() {
         return configConfig;
     }
-    public static FileConfiguration getEvents() { return eventsConfig; }
+    public FileConfiguration getEvents() { return eventsConfig; }
 
-    public static void saveConfig() {
+    public void saveConfig() {
         try {
             configConfig.save(configFile);
         } catch (IOException e) {
@@ -61,7 +66,7 @@ public class FileManager {
         }
     }
 
-    public static void saveEvents() {
+    public void saveEvents() {
         try {
             eventsConfig.save(eventsFile);
         } catch (IOException e) {
@@ -69,23 +74,23 @@ public class FileManager {
         }
     }
 
-    public static void reloadFiles() {
+    public void reloadFiles() {
         try {
-            if (!FC.getFactionsCore().getDataFolder().exists()) {
-                FC.getFactionsCore().getDataFolder().mkdirs();
+            if (!core.getDataFolder().exists()) {
+                core.getDataFolder().mkdirs();
             }
 
-            configFile = new File(FC.getFactionsCore().getDataFolder(), "config.yml");
-            eventsFile = new File(FC.getFactionsCore().getDataFolder(), "events.yml");
+            configFile = new File(core.getDataFolder(), "config.yml");
+            eventsFile = new File(core.getDataFolder(), "events.yml");
 
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
-                FC.getFactionsCore().saveResource("config.yml", true);
+                core.saveResource("config.yml", true);
             }
 
             if(!eventsFile.exists()) {
                 eventsFile.getParentFile().mkdirs();
-                FC.getFactionsCore().saveResource("events.yml", true);
+                core.saveResource("events.yml", true);
             }
 
             configConfig = new YamlConfiguration();

@@ -7,7 +7,6 @@ import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.classes.cont.RClass;
 import gg.revival.factions.core.classes.listener.ArmorEventsListener;
 import gg.revival.factions.core.classes.listener.ClassListener;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.armorevents.ArmorListener;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerManager;
@@ -26,22 +25,30 @@ import java.util.UUID;
 
 public class Classes {
 
+    @Getter private FC core;
+
+    public Classes(FC core) {
+        this.core = core;
+
+        onEnable();
+    }
+
     /**
      * Contains all active classes currently running on the server
      */
-    @Getter static Set<ClassProfile> activeClasses = Sets.newHashSet();
+    @Getter Set<ClassProfile> activeClasses = Sets.newHashSet();
 
     /**
      * Contains all enabled class modules for the server
      */
-    @Getter static Set<RClass> enabledClasses = Sets.newHashSet();
+    @Getter Set<RClass> enabledClasses = Sets.newHashSet();
 
     /**
      * Returns a RClass object based on the given ClassType
      * @param type
      * @return
      */
-    public static RClass getClassByClassType(ClassType type) {
+    public RClass getClassByClassType(ClassType type) {
         for(RClass classes : enabledClasses)
             if(classes.getType().equals(type)) return classes;
 
@@ -53,7 +60,7 @@ public class Classes {
      * @param uuid
      * @return
      */
-    public static ClassProfile getClassProfile(UUID uuid) {
+    public ClassProfile getClassProfile(UUID uuid) {
         ImmutableList<ClassProfile> cache = ImmutableList.copyOf(activeClasses);
 
         for(ClassProfile loadedClasses : cache)
@@ -67,14 +74,14 @@ public class Classes {
      * @param uuid
      * @param classType
      */
-    public static void createClassProfile(UUID uuid, ClassType classType) {
+    public void createClassProfile(UUID uuid, ClassType classType) {
         ClassProfile profile = getClassProfile(uuid);
         FPlayer facPlayer = PlayerManager.getPlayer(uuid);
 
         if(profile == null)
             profile = new ClassProfile(uuid);
 
-        facPlayer.addTimer(TimerManager.createTimer(TimerType.CLASS, Configuration.classWarmupDelay));
+        facPlayer.addTimer(TimerManager.createTimer(TimerType.CLASS, core.getConfiguration().classWarmupDelay));
         profile.setSelectedClass(classType);
         profile.setActive(false);
 
@@ -88,7 +95,7 @@ public class Classes {
      * Removes a given UUIDs ClassProfile
      * @param uuid
      */
-    public static void removeClassProfile(UUID uuid) {
+    public void removeClassProfile(UUID uuid) {
         ClassProfile profile = getClassProfile(uuid);
         FPlayer facPlayer = PlayerManager.getPlayer(uuid);
 
@@ -106,7 +113,7 @@ public class Classes {
      * @param player
      * @param type
      */
-    public static void addToClass(Player player, ClassType type) {
+    public void addToClass(Player player, ClassType type) {
         RClass classToGive = getClassByClassType(type);
         ClassProfile classProfile = getClassProfile(player.getUniqueId());
 
@@ -124,7 +131,7 @@ public class Classes {
      * Removes the player from their current class and removes and passive effects
      * @param uuid
      */
-    public static void removeFromClass(UUID uuid) {
+    public void removeFromClass(UUID uuid) {
         ClassProfile profile = getClassProfile(uuid);
 
         if(profile == null) return;
@@ -150,7 +157,7 @@ public class Classes {
      * @param boots
      * @return
      */
-    public static ClassType getClassByArmor(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
+    public ClassType getClassByArmor(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
         if(helmet == null || chestplate == null || leggings == null || boots == null) return null;
 
         if(
@@ -158,7 +165,7 @@ public class Classes {
                 chestplate.getType().equals(Material.LEATHER_CHESTPLATE) &&
                 leggings.getType().equals(Material.LEATHER_LEGGINGS) &&
                 boots.getType().equals(Material.LEATHER_BOOTS) &&
-                Configuration.archerEnabled) {
+                core.getConfiguration().archerEnabled) {
 
             return ClassType.ARCHER;
         }
@@ -168,7 +175,7 @@ public class Classes {
                 chestplate.getType().equals(Material.CHAINMAIL_CHESTPLATE) &&
                 leggings.getType().equals(Material.CHAINMAIL_LEGGINGS) &&
                 boots.getType().equals(Material.CHAINMAIL_BOOTS) &&
-                Configuration.scoutEnabled) {
+                core.getConfiguration().scoutEnabled) {
 
             return ClassType.SCOUT;
         }
@@ -178,7 +185,7 @@ public class Classes {
                 chestplate.getType().equals(Material.IRON_CHESTPLATE) &&
                 leggings.getType().equals(Material.IRON_LEGGINGS) &&
                 boots.getType().equals(Material.IRON_BOOTS) &&
-                Configuration.minerEnabled) {
+                core.getConfiguration().minerEnabled) {
 
             return ClassType.MINER;
         }
@@ -188,7 +195,7 @@ public class Classes {
                 chestplate.getType().equals(Material.GOLD_CHESTPLATE) &&
                 leggings.getType().equals(Material.GOLD_LEGGINGS) &&
                 boots.getType().equals(Material.GOLD_BOOTS) &&
-                Configuration.bardEnabled) {
+                core.getConfiguration().bardEnabled) {
 
             return ClassType.BARD;
         }
@@ -196,14 +203,14 @@ public class Classes {
         return null;
     }
 
-    public static void onEnable() {
+    public void onEnable() {
         loadListeners();
     }
 
-    public static void loadListeners() {
-        Bukkit.getPluginManager().registerEvents(new ArmorListener(), FC.getFactionsCore());
-        Bukkit.getPluginManager().registerEvents(new ArmorEventsListener(), FC.getFactionsCore());
-        Bukkit.getPluginManager().registerEvents(new ClassListener(), FC.getFactionsCore());
+    public void loadListeners() {
+        Bukkit.getPluginManager().registerEvents(new ArmorListener(), core);
+        Bukkit.getPluginManager().registerEvents(new ArmorEventsListener(core), core);
+        Bukkit.getPluginManager().registerEvents(new ClassListener(core), core);
     }
 
 }

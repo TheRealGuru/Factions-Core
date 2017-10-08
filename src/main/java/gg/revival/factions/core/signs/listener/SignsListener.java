@@ -2,9 +2,9 @@ package gg.revival.factions.core.signs.listener;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.signs.Signs;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.obj.FPlayer;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,6 +20,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SignsListener implements Listener {
+
+    @Getter private FC core;
+
+    public SignsListener(FC core) {
+        this.core = core;
+    }
 
     @EventHandler
     public void onSignFormatting(SignChangeEvent event) {
@@ -43,12 +49,12 @@ public class SignsListener implements Listener {
         if(!player.hasPermission(Permissions.CORE_ADMIN)) return;
 
         if(lineOne.equalsIgnoreCase("buysign")) {
-            if(!Signs.isValidSign(lineTwo, lineThree, lineFour)) {
+            if(!core.getSigns().isValidSign(lineTwo, lineThree, lineFour)) {
                 player.sendMessage(ChatColor.RED + "Invalid sign");
                 return;
             }
 
-            ItemStack item = Signs.getItemStackFromString(lineThree);
+            ItemStack item = core.getSigns().getItemStackFromString(lineThree);
             String itemName = item.getType().toString().replace("_", " ");
 
             if(item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null)
@@ -72,12 +78,12 @@ public class SignsListener implements Listener {
         }
 
         if(lineOne.equalsIgnoreCase("sellsign")) {
-            if(!Signs.isValidSign(lineTwo, lineThree, lineFour)) {
+            if(!core.getSigns().isValidSign(lineTwo, lineThree, lineFour)) {
                 player.sendMessage(ChatColor.RED + "Invalid sign");
                 return;
             }
 
-            ItemStack item = Signs.getItemStackFromString(lineThree);
+            ItemStack item = core.getSigns().getItemStackFromString(lineThree);
             String itemName = item.getType().toString();
 
             if(item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null)
@@ -110,7 +116,7 @@ public class SignsListener implements Listener {
 
         if(!block.getType().equals(Material.SIGN) && !block.getType().equals(Material.WALL_SIGN) && !block.getType().equals(Material.SIGN_POST)) return;
 
-        if(Signs.getInteractLock().contains(player.getUniqueId())) return;
+        if(core.getSigns().getInteractLock().contains(player.getUniqueId())) return;
 
         Sign sign = (Sign)block.getState();
 
@@ -119,9 +125,9 @@ public class SignsListener implements Listener {
         String lineThree = sign.getLine(2);
         String lineFour = sign.getLine(3);
 
-        if(Signs.isBuySign(lineOne, lineTwo, lineThree, lineFour)) {
+        if(core.getSigns().isBuySign(lineOne, lineTwo, lineThree, lineFour)) {
             int amount = Integer.valueOf(lineTwo.replace("Amt: ", ""));
-            ItemStack item = Signs.getItemStackFromString(lineThree);
+            ItemStack item = core.getSigns().getItemStackFromString(lineThree);
             int price = Integer.valueOf(lineFour.replace("$", ""));
 
             if(player.getInventory().firstEmpty() == -1) {
@@ -144,20 +150,20 @@ public class SignsListener implements Listener {
             player.sendMessage(ChatColor.GREEN + "Purchased " + amount + " " + lineThree + " for $" + price);
             player.sendMessage(ChatColor.GREEN + "Your new balance: " + ChatColor.WHITE + "$" + facPlayer.getBalance());
 
-            Signs.getInteractLock().add(player.getUniqueId());
+            core.getSigns().getInteractLock().add(player.getUniqueId());
 
             new BukkitRunnable()
             {
                 public void run()
                 {
-                    Signs.getInteractLock().remove(player.getUniqueId());
+                    core.getSigns().getInteractLock().remove(player.getUniqueId());
                 }
-            }.runTaskLater(FC.getFactionsCore(), 5L);
+            }.runTaskLater(core, 5L);
         }
 
-        if(Signs.isSellSign(lineOne, lineTwo, lineThree, lineFour)) {
+        if(core.getSigns().isSellSign(lineOne, lineTwo, lineThree, lineFour)) {
             int amount = Integer.valueOf(lineTwo.replace("Amt: ", ""));
-            ItemStack item = Signs.getItemStackFromString(lineThree);
+            ItemStack item = core.getSigns().getItemStackFromString(lineThree);
             int price = Integer.valueOf(lineFour.replace("$", ""));
 
             if(!player.getInventory().getItemInHand().getType().equals(item.getType())) {
@@ -193,15 +199,15 @@ public class SignsListener implements Listener {
             player.sendMessage(ChatColor.GREEN + "Sold " + amount + " " + lineThree + " for $" + price);
             player.sendMessage(ChatColor.GREEN + "Your new balance: " + ChatColor.WHITE + "$" + facPlayer.getBalance());
 
-            Signs.getInteractLock().add(player.getUniqueId());
+            core.getSigns().getInteractLock().add(player.getUniqueId());
 
             new BukkitRunnable()
             {
                 public void run()
                 {
-                    Signs.getInteractLock().remove(player.getUniqueId());
+                    core.getSigns().getInteractLock().remove(player.getUniqueId());
                 }
-            }.runTaskLater(FC.getFactionsCore(), 5L);
+            }.runTaskLater(core, 5L);
         }
     }
 }

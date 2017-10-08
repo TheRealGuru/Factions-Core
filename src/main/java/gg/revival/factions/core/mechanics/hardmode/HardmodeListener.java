@@ -1,6 +1,7 @@
 package gg.revival.factions.core.mechanics.hardmode;
 
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -13,9 +14,15 @@ import org.bukkit.projectiles.ProjectileSource;
 
 public class HardmodeListener implements Listener {
 
+    @Getter private FC core;
+
+    public HardmodeListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(!Configuration.hardmodeEnabled)
+        if(!core.getConfiguration().hardmodeEnabled)
             return;
 
         Entity damager = event.getDamager();
@@ -33,7 +40,7 @@ public class HardmodeListener implements Listener {
 
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if(!Configuration.hardmodeEnabled)
+        if(!core.getConfiguration().hardmodeEnabled)
             return;
 
         Entity entity = event.getEntity();

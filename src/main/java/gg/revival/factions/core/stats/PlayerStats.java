@@ -11,7 +11,7 @@ public class PlayerStats {
     @Getter @Setter long playtime, loginTime;
     @Getter @Setter int kills, deaths, foundGold, foundDiamonds, foundEmeralds;
 
-    public PlayerStats(UUID uuid, long playtime, long loginTime, int kills, int deaths, int foundGold, int foundDiamonds, int foundEmeralds) {
+    PlayerStats(UUID uuid, long playtime, long loginTime, int kills, int deaths, int foundGold, int foundDiamonds, int foundEmeralds) {
         this.uuid = uuid;
         this.playtime = playtime;
         this.loginTime = loginTime;

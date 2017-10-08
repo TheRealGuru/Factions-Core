@@ -1,7 +1,8 @@
 package gg.revival.factions.core.command;
 
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class FactionsCoreCommand implements CommandExecutor {
+
+    @Getter private FC core;
+
+    public FactionsCoreCommand(FC core) {
+        this.core = core;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -31,7 +38,7 @@ public class FactionsCoreCommand implements CommandExecutor {
         if(args.length == 1) {
             if(args[0].equalsIgnoreCase("reload")) {
                 sender.sendMessage(ChatColor.GREEN + "Reload request has been submitted for the plug-in 'FactionsCore'");
-                Configuration.reload();
+                core.getConfiguration().reload();
                 return false;
             }
 

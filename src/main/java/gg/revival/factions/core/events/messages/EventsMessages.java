@@ -19,31 +19,31 @@ import java.util.List;
 
 public class EventsMessages {
 
-    public static String asKOTH(String message) {
+    public String asKOTH(String message) {
         return ChatColor.GOLD + "[King of the Hill] " + ChatColor.RESET + message;
     }
 
-    public static String asDTC(String message) {
+    public String asDTC(String message) {
         return ChatColor.GOLD + "[Destroy the Core] " + ChatColor.RESET + message;
     }
 
-    public static String asPalace(String message) {
+    public String asPalace(String message) {
         return ChatColor.GOLD + "[Palace] " + ChatColor.RESET + message;
     }
 
-    public static String asEOTW(String message) {
+    public String asEOTW(String message) {
         return ChatColor.GOLD + "[End of the World] " + ChatColor.RESET + message;
     }
 
-    public static String asGeneral(String message) {
+    public String asGeneral(String message) {
         return ChatColor.GOLD + "[Events] " + ChatColor.RESET + message;
     }
 
-    public static String nowControlling(Event event) {
+    public String nowControlling(Event event) {
         return ChatColor.GOLD + "You" + ChatColor.YELLOW + " are now controlling " + event.getDisplayName();
     }
 
-    public static String controlLost(PlayerFaction controller, Event event) {
+    public String controlLost(PlayerFaction controller, Event event) {
         return ChatColor.GOLD + controller.getDisplayName() + ChatColor.YELLOW + " lost control of " + event.getDisplayName();
     }
 
@@ -51,11 +51,11 @@ public class EventsMessages {
         return event.getDisplayName() + ChatColor.YELLOW + " is being controlled by " + ChatColor.GOLD + controller.getDisplayName();
     }
 
-    public static String beingContested(Event event) {
+    public String beingContested(Event event) {
         return event.getDisplayName() + ChatColor.YELLOW + " is being " + ChatColor.RED + "contested";
     }
 
-    public static String receivedLoot(String claimer, List<ItemStack> loot) {
+    public String receivedLoot(String claimer, List<ItemStack> loot) {
         StringBuilder response = new StringBuilder();
 
         response.append(ChatColor.DARK_GREEN + claimer + ChatColor.YELLOW + " has claimed an " + ChatColor.GOLD + "Event Key" + ChatColor.YELLOW + " and received:" + "\n");
@@ -78,7 +78,7 @@ public class EventsMessages {
         return response.toString();
     }
 
-    public static String ticked(Event event) {
+    public String ticked(Event event) {
         if(event instanceof KOTHEvent) {
             KOTHEvent koth = (KOTHEvent)event;
 
@@ -96,15 +96,15 @@ public class EventsMessages {
         return null;
     }
 
-    public static String started(Event event) {
+    public String started(Event event) {
         return event.getDisplayName() + ChatColor.YELLOW + " has started";
     }
 
-    public static String stopped(Event event) {
+    public String stopped(Event event) {
         return event.getDisplayName() + ChatColor.YELLOW + " has stopped";
     }
 
-    public static String captured(Event event) {
+    public String captured(Event event) {
         if(event instanceof KOTHEvent) {
             KOTHEvent koth = (KOTHEvent)event;
 
@@ -120,7 +120,7 @@ public class EventsMessages {
         return null;
     }
 
-    public static String eventInfo(Event event) {
+    public String eventInfo(Event event) {
         StringBuilder result = new StringBuilder();
 
         Date date = new Date();

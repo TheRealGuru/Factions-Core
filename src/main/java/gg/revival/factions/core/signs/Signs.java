@@ -1,7 +1,6 @@
 package gg.revival.factions.core.signs;
 
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.mechanics.crowbars.Crowbar;
 import gg.revival.factions.core.signs.listener.SignsListener;
 import lombok.Getter;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -20,19 +19,27 @@ import java.util.UUID;
 
 public class Signs {
 
+    @Getter private FC core;
+
+    public Signs(FC core) {
+        this.core = core;
+
+        onEnable();
+    }
+
     /**
      * Contains players who have recently interacted with a shop sign, prevents double-clicks
      */
-    @Getter static Set<UUID> interactLock = new HashSet<>();
+    @Getter Set<UUID> interactLock = new HashSet<>();
 
     /**
      * Returns an ItemStack based on name, checks for custom materials as well
      * @param itemName The item to be looked up
      * @return ItemStack based on name
      */
-    public static ItemStack getItemStackFromString(String itemName) {
+    public ItemStack getItemStackFromString(String itemName) {
         if(itemName.equalsIgnoreCase(CustomMaterial.CROWBAR.toString()))
-            return Crowbar.getCrowbar();
+            return core.getMechanics().getCrowbars().getCrowbar();
 
         if(itemName.equalsIgnoreCase(CustomMaterial.CHAIN_HELMET.toString().replace("_", " ")))
             return new ItemStack(Material.CHAINMAIL_HELMET);
@@ -92,7 +99,7 @@ public class Signs {
      * @param lineFour
      * @return Is a valid sign or not
      */
-    public static boolean isBuySign(String lineOne, String lineTwo, String lineThree, String lineFour) {
+    public boolean isBuySign(String lineOne, String lineTwo, String lineThree, String lineFour) {
         if(!lineOne.equals(ChatColor.GREEN + "" + ChatColor.BOLD + "- Buy -"))
             return false;
 
@@ -118,7 +125,7 @@ public class Signs {
      * @param lineFour
      * @return Is a valid sell sign
      */
-    public static boolean isSellSign(String lineOne, String lineTwo, String lineThree, String lineFour) {
+    public boolean isSellSign(String lineOne, String lineTwo, String lineThree, String lineFour) {
         if(!lineOne.equals(ChatColor.RED + "" + ChatColor.BOLD + "- Sell -"))
             return false;
 
@@ -140,7 +147,7 @@ public class Signs {
      * @param lineFour
      * @return
      */
-    public static boolean isValidSign(String lineTwo, String lineThree, String lineFour) {
+    public boolean isValidSign(String lineTwo, String lineThree, String lineFour) {
         if(!NumberUtils.isNumber(lineTwo)) return false;
 
         ItemStack item = getItemStackFromString(lineThree);
@@ -152,12 +159,12 @@ public class Signs {
         return true;
     }
 
-    public static void onEnable() {
+    public void onEnable() {
         loadListeners();
     }
 
-    public static void loadListeners() {
-        Bukkit.getPluginManager().registerEvents(new SignsListener(), FC.getFactionsCore());
+    public void loadListeners() {
+        Bukkit.getPluginManager().registerEvents(new SignsListener(core), core);
     }
 
 }

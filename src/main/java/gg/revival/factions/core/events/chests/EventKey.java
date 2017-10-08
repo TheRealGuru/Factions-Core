@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class EventKey {
 
-    public static ItemStack getKeys(int amount) {
+    public ItemStack getKeys(int amount) {
         ItemStack key = new ItemStack(Material.TRIPWIRE_HOOK);
         ItemMeta meta = key.getItemMeta();
 
@@ -27,7 +27,7 @@ public class EventKey {
         return key;
     }
 
-    public static boolean isKey(ItemStack item) {
+    public boolean isKey(ItemStack item) {
         ItemStack key = getKeys(1);
         return item != null && item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null && item.getItemMeta().getDisplayName().equals(key.getItemMeta().getDisplayName());
     }

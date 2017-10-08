@@ -1,7 +1,7 @@
 package gg.revival.factions.core.limits.listeners;
 
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.tools.Configuration;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,9 +21,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PotionLimitListener implements Listener {
 
+    @Getter private FC core;
+
+    public PotionLimitListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerConsume(PlayerItemConsumeEvent event) {
-        if(!Configuration.limitPotions)
+        if(!core.getConfiguration().limitPotions)
             return;
 
         Player player = event.getPlayer();
@@ -33,8 +39,8 @@ public class PotionLimitListener implements Listener {
 
         Potion potion = Potion.fromItemStack(item);
 
-        if(Configuration.potionLimits.containsKey(potion.getType().getEffectType())) {
-            int lvl = Configuration.potionLimits.get(potion.getType().getEffectType());
+        if(core.getConfiguration().potionLimits.containsKey(potion.getType().getEffectType())) {
+            int lvl = core.getConfiguration().potionLimits.get(potion.getType().getEffectType());
 
             if(potion.getLevel() > lvl) {
                 player.sendMessage(ChatColor.RED + "This potion is disabled");
@@ -47,14 +53,14 @@ public class PotionLimitListener implements Listener {
 
     @EventHandler
     public void onPotionSplash(PotionSplashEvent event) {
-        if(!Configuration.limitPotions)
+        if(!core.getConfiguration().limitPotions)
             return;
 
         ThrownPotion potion = event.getPotion();
 
         for(PotionEffect effects : potion.getEffects()) {
-            if(Configuration.potionLimits.containsKey(effects.getType())) {
-                int lvl = Configuration.potionLimits.get(effects.getType());
+            if(core.getConfiguration().potionLimits.containsKey(effects.getType())) {
+                int lvl = core.getConfiguration().potionLimits.get(effects.getType());
 
                 if((effects.getAmplifier() + 1) > lvl) {
                     if(event.getPotion().getShooter() instanceof Player) {
@@ -70,7 +76,7 @@ public class PotionLimitListener implements Listener {
 
     @EventHandler
     public void onBrew(BrewEvent event) {
-        if(!Configuration.limitPotions)
+        if(!core.getConfiguration().limitPotions)
             return;
 
         new BukkitRunnable() {
@@ -84,8 +90,8 @@ public class PotionLimitListener implements Listener {
 
                     Potion potion = Potion.fromItemStack(contents);
 
-                    if(Configuration.potionLimits.containsKey(potion.getType().getEffectType())) {
-                        int lvl = Configuration.potionLimits.get(potion.getType().getEffectType());
+                    if(core.getConfiguration().potionLimits.containsKey(potion.getType().getEffectType())) {
+                        int lvl = core.getConfiguration().potionLimits.get(potion.getType().getEffectType());
 
                         if(potion.getLevel() > lvl) {
                             event.getContents().remove(contents);
@@ -98,7 +104,7 @@ public class PotionLimitListener implements Listener {
                     }
                 }
             }
-        }.runTaskLater(FC.getFactionsCore(), 1L);
+        }.runTaskLater(core, 1L);
     }
 
 }

@@ -1,11 +1,12 @@
 package gg.revival.factions.core.events.gui;
 
-import gg.revival.factions.core.events.engine.EventManager;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.PlayerFaction;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,14 +22,20 @@ import java.util.List;
 
 public class EventsGUI {
 
-    public static boolean isGUI(Inventory inventory) {
+    @Getter private FC core;
+
+    public EventsGUI(FC core) {
+        this.core = core;
+    }
+
+    public boolean isGUI(Inventory inventory) {
         return inventory != null && inventory.getName() != null && inventory.getName().equals(ChatColor.BLACK + "Events");
     }
 
-    public static void update(Inventory inventory) {
+    public void update(Inventory inventory) {
         inventory.clear();
 
-        for(Event events : EventManager.getEvents()) {
+        for(Event events : core.getEvents().getEventManager().getEvents()) {
             ItemStack activeEvent = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)13);
             ItemStack inactiveEvent = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)14);
 
@@ -121,10 +128,10 @@ public class EventsGUI {
         }
     }
 
-    public static void open(Player player) {
+    public void open(Player player) {
         Inventory inventory = Bukkit.createInventory(null, 9, ChatColor.BLACK + "Events");
 
-        for(Event events : EventManager.getEvents()) {
+        for(Event events : core.getEvents().getEventManager().getEvents()) {
             ItemStack activeEvent = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)13);
             ItemStack inactiveEvent = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)14);
 

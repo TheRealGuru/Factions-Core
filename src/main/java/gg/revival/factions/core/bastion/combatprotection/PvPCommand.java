@@ -1,12 +1,13 @@
 package gg.revival.factions.core.bastion.combatprotection;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.core.tools.TimeTools;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerManager;
 import gg.revival.factions.timers.TimerType;
+import lombok.Getter;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,6 +17,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class PvPCommand implements CommandExecutor {
+
+    @Getter private FC core;
+
+    public PvPCommand(FC core) {
+        this.core = core;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[]) {
@@ -28,7 +35,7 @@ public class PvPCommand implements CommandExecutor {
 
         Player player = (Player)sender;
 
-        if(!Configuration.pvpProtEnabled) {
+        if(!core.getConfiguration().pvpProtEnabled) {
             player.sendMessage(ChatColor.RED + "PvP protection is disabled on this server");
             return false;
         }
@@ -51,7 +58,7 @@ public class PvPCommand implements CommandExecutor {
                     return false;
                 }
 
-                CombatProtection.takeProtection(player);
+                core.getBastion().getCombatProtection().takeProtection(player);
 
                 return false;
             }
@@ -83,7 +90,7 @@ public class PvPCommand implements CommandExecutor {
                     return false;
                 }
 
-                CombatProtection.takeProtection(pvpPlayer);
+                core.getBastion().getCombatProtection().takeProtection(pvpPlayer);
 
                 return false;
             }

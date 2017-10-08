@@ -1,7 +1,7 @@
 package gg.revival.factions.core.stats.command;
 
-import gg.revival.factions.core.stats.Stats;
-import gg.revival.factions.core.tools.OfflinePlayerLookup;
+import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +9,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class StatsCommand implements CommandExecutor {
+
+    @Getter private FC core;
+
+    public StatsCommand(FC core) {
+        this.core = core;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -22,13 +28,13 @@ public class StatsCommand implements CommandExecutor {
         Player player = (Player)sender;
 
         if(args.length == 0) {
-            Stats.getStats(player.getUniqueId(), stats -> {
+            core.getStats().getStats(player.getUniqueId(), stats -> {
                 if(stats == null) {
                     player.sendMessage(ChatColor.RED + "Player not found");
                     return;
                 }
 
-                player.sendMessage(Stats.getFormattedStats(stats, player.getName()));
+                player.sendMessage(core.getStats().getFormattedStats(stats, player.getName()));
             });
 
             return false;
@@ -37,19 +43,19 @@ public class StatsCommand implements CommandExecutor {
         if(args.length == 1) {
             String namedPlayer = args[0];
 
-            OfflinePlayerLookup.getOfflinePlayerByName(namedPlayer, (uuid, username) -> {
+            core.getOfflinePlayerLookup().getOfflinePlayerByName(namedPlayer, (uuid, username) -> {
                 if(uuid == null || username == null) {
                     player.sendMessage(ChatColor.RED + "Player not found");
                     return;
                 }
 
-                Stats.getStats(uuid, stats -> {
+                core.getStats().getStats(uuid, stats -> {
                     if(stats == null) {
                         player.sendMessage(ChatColor.RED + "Player not found");
                         return;
                     }
 
-                    player.sendMessage(Stats.getFormattedStats(stats, username));
+                    player.sendMessage(core.getStats().getFormattedStats(stats, username));
                 });
             });
 

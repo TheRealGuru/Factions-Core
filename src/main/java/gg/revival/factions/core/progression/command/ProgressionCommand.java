@@ -1,10 +1,11 @@
 package gg.revival.factions.core.progression.command;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerType;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -14,11 +15,17 @@ import org.bukkit.entity.Player;
 
 public class ProgressionCommand implements CommandExecutor {
 
+    @Getter private FC core;
+
+    public ProgressionCommand(FC core) {
+        this.core = core;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         if(!command.getName().equalsIgnoreCase("progression")) return false;
 
-        if(!Configuration.progressEnabled) {
+        if(!core.getConfiguration().progressEnabled) {
             sender.sendMessage(ChatColor.RED + "Progression is disabled on this server");
             return false;
         }

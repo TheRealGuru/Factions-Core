@@ -12,14 +12,14 @@ public class Shield {
     /**
      * Contains all ShiledPlayer sessions loaded on the server
      */
-    @Getter static Set<ShieldPlayer> shieldPlayers = new HashSet<>();
+    @Getter Set<ShieldPlayer> shieldPlayers = new HashSet<>();
 
     /**
      * Returns a ShieldPlayer object for the given UUID
      * @param uuid
      * @return
      */
-    static ShieldPlayer getShieldPlayer(UUID uuid) {
+    ShieldPlayer getShieldPlayer(UUID uuid) {
         ImmutableList<ShieldPlayer> cache = ImmutableList.copyOf(shieldPlayers);
 
         for(ShieldPlayer players : cache)

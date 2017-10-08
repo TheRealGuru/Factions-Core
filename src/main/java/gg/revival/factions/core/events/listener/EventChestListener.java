@@ -1,11 +1,12 @@
 package gg.revival.factions.core.events.listener;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.events.chests.*;
-import gg.revival.factions.core.events.engine.PalaceManager;
-import gg.revival.factions.core.events.messages.EventsMessages;
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.events.chests.ClaimChest;
+import gg.revival.factions.core.events.chests.EventChest;
+import gg.revival.factions.core.events.chests.PalaceChest;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,6 +24,12 @@ import java.util.List;
 
 public class EventChestListener implements Listener {
 
+    @Getter private FC core;
+
+    public EventChestListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
@@ -33,7 +40,7 @@ public class EventChestListener implements Listener {
         if(block.getType() == null || !block.getType().equals(Material.CHEST))
             return;
 
-        if(ChestManager.getEventChestByLocation(block.getLocation()) != null)
+        if(core.getEvents().getChestManager().getEventChestByLocation(block.getLocation()) != null)
             event.setCancelled(true);
     }
 
@@ -49,17 +56,17 @@ public class EventChestListener implements Listener {
         if(block.getType() == null || !block.getType().equals(Material.CHEST))
             return;
 
-        if(ChestManager.getEventChestByLocation(block.getLocation()) == null)
+        if(core.getEvents().getChestManager().getEventChestByLocation(block.getLocation()) == null)
             return;
 
-        EventChest eventChest = ChestManager.getEventChestByLocation(block.getLocation());
+        EventChest eventChest = core.getEvents().getChestManager().getEventChestByLocation(block.getLocation());
 
         if(eventChest instanceof ClaimChest) {
             ClaimChest claimChest = (ClaimChest)eventChest;
 
             event.setCancelled(true);
 
-            if(player.getItemInHand() != null && EventKey.isKey(player.getItemInHand())) {
+            if(player.getItemInHand() != null && core.getEvents().getEventKeys().isKey(player.getItemInHand())) {
                 if(player.getItemInHand().getAmount() == 1) {
                     player.setItemInHand(null);
                 } else {
@@ -68,7 +75,7 @@ public class EventChestListener implements Listener {
                     player.setItemInHand(hand);
                 }
 
-                List<ItemStack> receivedLoot = LootTables.getLoot(LootTables.getLootTableByName(claimChest.getLootTable()), Configuration.pullsPerKey);
+                List<ItemStack> receivedLoot = core.getEvents().getLootTables().getLoot(core.getEvents().getLootTables().getLootTableByName(claimChest.getLootTable()), core.getConfiguration().pullsPerKey);
 
                 for(ItemStack loot : receivedLoot) {
                     if(player.getInventory().firstEmpty() == -1) {
@@ -80,11 +87,11 @@ public class EventChestListener implements Listener {
                     player.getInventory().addItem(loot);
                 }
 
-                Bukkit.broadcastMessage(EventsMessages.asGeneral(EventsMessages.receivedLoot(player.getName(), receivedLoot)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asGeneral(core.getEvents().getEventMessages().receivedLoot(player.getName(), receivedLoot)));
                 return;
             }
 
-            LootTables.viewTable(player, claimChest.getLootTable());
+            core.getEvents().getLootTables().viewTable(player, claimChest.getLootTable());
             return;
         }
 
@@ -97,23 +104,23 @@ public class EventChestListener implements Listener {
             if(player.hasPermission(Permissions.CORE_ADMIN))
                 return;
 
-            if(!PalaceManager.isCaptured()) {
+            if(!core.getEvents().getPalaceManager().isCaptured()) {
                 player.sendMessage(ChatColor.RED + "This chest belongs to " + ChatColor.BLUE + "Palace");
                 event.setCancelled(true);
                 return;
             }
 
-            if(PalaceManager.getPalaceSecurityLevel() <= palaceChest.getTier()) return;
+            if(core.getEvents().getPalaceManager().getPalaceSecurityLevel() <= palaceChest.getTier()) return;
 
-            if(FactionManager.getFactionByUUID(PalaceManager.getCapturedFaction()) == null) {
+            if(FactionManager.getFactionByUUID(core.getEvents().getPalaceManager().getCapturedFaction()) == null) {
                 player.sendMessage(ChatColor.RED + "This chest belongs to " + ChatColor.BLUE + "Palace");
                 event.setCancelled(true);
                 return;
             }
 
-            if(!PalaceManager.isCapper(player)) {
-                if(palaceChest.getTier() > PalaceManager.getPalaceSecurityLevel()) {
-                    player.sendMessage(ChatColor.RED + "This chest belongs to " + ChatColor.BLUE + PalaceManager.getCappedFaction().getDisplayName());
+            if(!core.getEvents().getPalaceManager().isCapper(player)) {
+                if(palaceChest.getTier() > core.getEvents().getPalaceManager().getPalaceSecurityLevel()) {
+                    player.sendMessage(ChatColor.RED + "This chest belongs to " + ChatColor.BLUE + core.getEvents().getPalaceManager().getCappedFaction().getDisplayName());
                     event.setCancelled(true);
                     return;
                 }

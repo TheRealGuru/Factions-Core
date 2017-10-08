@@ -1,6 +1,7 @@
 package gg.revival.factions.core.limits.listeners;
 
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
@@ -16,9 +17,15 @@ import java.util.Map;
 
 public class EnchantLimitListener implements Listener {
 
+    @Getter private FC core;
+
+    public EnchantLimitListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(!Configuration.limitEnchants)
+        if(!core.getConfiguration().limitEnchants)
             return;
 
         if(event.isCancelled())
@@ -31,10 +38,10 @@ public class EnchantLimitListener implements Listener {
                 if(armor == null || armor.getEnchantments().isEmpty()) continue;
 
                 for(Enchantment foundEnchants : armor.getEnchantments().keySet()) {
-                    if(!Configuration.enchantmentLimits.containsKey(foundEnchants)) continue;
+                    if(!core.getConfiguration().enchantmentLimits.containsKey(foundEnchants)) continue;
 
                     int currentLvl = armor.getEnchantmentLevel(foundEnchants);
-                    int maxLvl = Configuration.enchantmentLimits.get(foundEnchants);
+                    int maxLvl = core.getConfiguration().enchantmentLimits.get(foundEnchants);
 
                     if(maxLvl == 0) {
                         armor.removeEnchantment(foundEnchants);
@@ -47,7 +54,6 @@ public class EnchantLimitListener implements Listener {
                         armor.addEnchantment(foundEnchants, maxLvl);
                         damaged.sendMessage(ChatColor.BLUE + "Modified Enchantment" + ChatColor.WHITE + ": " +
                                 StringUtils.capitalize(foundEnchants.getName().toLowerCase().replace("_", " ") + " " + currentLvl + " -> " + maxLvl));
-                        continue;
                     }
                 }
             }
@@ -60,10 +66,10 @@ public class EnchantLimitListener implements Listener {
                 ItemStack hand = damager.getItemInHand();
 
                 for(Enchantment foundEnchants : hand.getEnchantments().keySet()) {
-                    if(!Configuration.enchantmentLimits.containsKey(foundEnchants)) continue;
+                    if(!core.getConfiguration().enchantmentLimits.containsKey(foundEnchants)) continue;
 
                     int currentLvl = hand.getEnchantmentLevel(foundEnchants);
-                    int maxLvl = Configuration.enchantmentLimits.get(foundEnchants);
+                    int maxLvl = core.getConfiguration().enchantmentLimits.get(foundEnchants);
 
                     if(maxLvl == 0) {
                         hand.removeEnchantment(foundEnchants);
@@ -84,17 +90,17 @@ public class EnchantLimitListener implements Listener {
 
     @EventHandler
     public void onEnchantItem(EnchantItemEvent event) {
-        if(!Configuration.limitEnchants)
+        if(!core.getConfiguration().limitEnchants)
             return;
 
         Player player = event.getEnchanter();
         Map<Enchantment, Integer> toAdd = new HashMap<>(event.getEnchantsToAdd());
 
         for(Enchantment enchantment : toAdd.keySet()) {
-            if(!Configuration.enchantmentLimits.containsKey(enchantment)) continue;
+            if(!core.getConfiguration().enchantmentLimits.containsKey(enchantment)) continue;
 
             int currentLvl = toAdd.get(enchantment);
-            int maxLvl = Configuration.enchantmentLimits.get(enchantment);
+            int maxLvl = core.getConfiguration().enchantmentLimits.get(enchantment);
 
             if(maxLvl == 0) {
                 event.getEnchantsToAdd().remove(enchantment);

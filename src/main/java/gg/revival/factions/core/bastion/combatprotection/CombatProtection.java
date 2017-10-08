@@ -1,22 +1,28 @@
 package gg.revival.factions.core.bastion.combatprotection;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.db.DBManager;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerManager;
 import gg.revival.factions.timers.TimerType;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class CombatProtection {
+
+    @Getter private FC core;
+
+    public CombatProtection(FC core) {
+        this.core = core;
+    }
 
     /**
      * Returns true if the given player has PvP protection
      * @param player
      * @return
      */
-    public static boolean hasProt(Player player) {
+    public boolean hasProt(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
         if(facPlayer == null) return false;
@@ -29,7 +35,7 @@ public class CombatProtection {
      * @param player
      * @return
      */
-    public static boolean hasSafety(Player player) {
+    public boolean hasSafety(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
         if(facPlayer == null) return false;
@@ -41,7 +47,7 @@ public class CombatProtection {
      * Removes a given players PvP protection
      * @param player
      */
-    public static void takeProtection(Player player) {
+    public void takeProtection(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
         if(facPlayer == null) return;
@@ -51,14 +57,14 @@ public class CombatProtection {
 
         player.sendMessage(ChatColor.YELLOW + "Your PvP protection has been removed");
 
-        DBManager.saveTimerData(facPlayer, false);
+        core.getDatabaseManager().saveTimerData(facPlayer, false);
     }
 
     /**
      * Returns a given players PvP safety
      * @param player
      */
-    public static void takeSafety(Player player) {
+    public void takeSafety(Player player) {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
         if(facPlayer == null) return;
@@ -74,8 +80,8 @@ public class CombatProtection {
      * @param player
      * @param duration
      */
-    public static void giveProtection(Player player, int duration) {
-        if(!Configuration.pvpProtEnabled) return;
+    public void giveProtection(Player player, int duration) {
+        if(!core.getConfiguration().pvpProtEnabled) return;
 
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
@@ -92,8 +98,8 @@ public class CombatProtection {
      * @param player
      * @param duration
      */
-    public static void giveSafety(Player player, int duration) {
-        if(!Configuration.pvpSafetyEnabled) return;
+    public void giveSafety(Player player, int duration) {
+        if(!core.getConfiguration().pvpSafetyEnabled) return;
 
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 

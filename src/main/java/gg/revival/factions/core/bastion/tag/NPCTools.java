@@ -3,6 +3,7 @@ package gg.revival.factions.core.bastion.tag;
 import com.google.common.collect.ImmutableList;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,12 +19,18 @@ import java.util.UUID;
 
 public class NPCTools {
 
+    @Getter private FC core;
+
+    public NPCTools(FC core) {
+        this.core = core;
+    }
+
     /**
      * Spawns a combat-logger for the given Player. Duration is the time (in seconds) the logger should stay alive until it is despawned
      * @param player
      * @param duration
      */
-    public static void spawnLogger(Player player, int duration) {
+    void spawnLogger(Player player, int duration) {
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
         List<ItemStack> contents = new ArrayList<>();
@@ -42,7 +49,7 @@ public class NPCTools {
 
         logger.build();
 
-        CombatManager.getCombatLoggers().put(player.getUniqueId(), logger);
+        core.getBastion().getCombatManager().getCombatLoggers().put(player.getUniqueId(), logger);
 
         logger.getNpc().setFireTicks(player.getFireTicks());
         logger.getNpc().setFallDistance(player.getFallDistance());
@@ -58,16 +65,16 @@ public class NPCTools {
                 if(logger.getNpc() != null && !logger.getNpc().isDead())
                     despawnLogger(logger);
             }
-        }.runTaskLater(FC.getFactionsCore(), duration * 20L);
+        }.runTaskLater(core, duration * 20L);
     }
 
     /**
      * Removes a CombatLogger object's logger NPC from the world
      * @param logger
      */
-    public static void despawnLogger(CombatLogger logger) {
+    private void despawnLogger(CombatLogger logger) {
         logger.destroy();
-        CombatManager.getCombatLoggers().remove(logger.getUuid());
+        core.getBastion().getCombatManager().getCombatLoggers().remove(logger.getUuid());
     }
 
     /**
@@ -75,8 +82,8 @@ public class NPCTools {
      * @param entity
      * @return
      */
-    public static boolean isLogger(Entity entity) {
-        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+    boolean isLogger(Entity entity) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(core.getBastion().getCombatManager().getCombatLoggers().values());
 
         for(CombatLogger loggers : cache) {
             if(loggers.getNpc() != entity) continue;
@@ -92,8 +99,8 @@ public class NPCTools {
      * @param entity
      * @return
      */
-    public static CombatLogger getLoggerByEntity(Entity entity) {
-        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+    CombatLogger getLoggerByEntity(Entity entity) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(core.getBastion().getCombatManager().getCombatLoggers().values());
 
         for(CombatLogger loggers : cache) {
             if(loggers.getNpc() != entity) continue;
@@ -109,8 +116,8 @@ public class NPCTools {
      * @param uuid
      * @return
      */
-    public static CombatLogger getLoggerByUUID(UUID uuid) {
-        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+    CombatLogger getLoggerByUUID(UUID uuid) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(core.getBastion().getCombatManager().getCombatLoggers().values());
 
         for(CombatLogger loggers : cache) {
             if(!loggers.getUuid().equals(uuid)) continue;
@@ -126,8 +133,8 @@ public class NPCTools {
      * @param name
      * @return
      */
-    public static CombatLogger getLoggerByName(String name) {
-        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(CombatManager.getCombatLoggers().values());
+    public CombatLogger getLoggerByName(String name) {
+        ImmutableList<CombatLogger> cache = ImmutableList.copyOf(core.getBastion().getCombatManager().getCombatLoggers().values());
 
         for(CombatLogger loggers : cache) {
             if(!loggers.getDisplayName().equals(name)) continue;

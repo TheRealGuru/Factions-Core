@@ -1,9 +1,8 @@
 package gg.revival.factions.core.deathbans.listener;
 
-import gg.revival.factions.core.deathbans.DeathMessages;
-import gg.revival.factions.core.deathbans.Deathbans;
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -17,19 +16,25 @@ import java.util.UUID;
 
 public class DeathbanListener implements Listener {
 
+    @Getter private FC core;
+
+    public DeathbanListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerLoginAttempt(AsyncPlayerPreLoginEvent event) {
-        if(!Configuration.deathbansEnabled)
+        if(!core.getConfiguration().deathbansEnabled)
             return;
 
         UUID uuid = event.getUniqueId();
 
-        Deathbans.getActiveDeathban(uuid, death -> {
+        core.getDeathbans().getActiveDeathban(uuid, death -> {
             if(death == null) return;
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Deathbans.getDeathbanMessage(death));
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, core.getDeathbans().getDeathbanMessage(death));
 
             if(Bukkit.getPlayer(uuid) != null || event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED))
-                Bukkit.getPlayer(uuid).kickPlayer(Deathbans.getDeathbanMessage(death));
+                Bukkit.getPlayer(uuid).kickPlayer(core.getDeathbans().getDeathbanMessage(death));
         });
     }
 
@@ -38,12 +43,12 @@ public class DeathbanListener implements Listener {
         Player player = event.getEntity();
         final String originalDeathMessage = event.getDeathMessage();
 
-        event.setDeathMessage(DeathMessages.getDeathMessage(player));
+        event.setDeathMessage(core.getDeathbans().getDeathMessages().getDeathMessage(player));
 
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
-        if(Configuration.deathbansEnabled)
-            Deathbans.getDeathbanDurationByLocation(player.getUniqueId(), player.getLocation(), duration -> Deathbans.deathbanPlayer(player.getUniqueId(), originalDeathMessage, duration));
+        if(core.getConfiguration().deathbansEnabled)
+            core.getDeathbans().getDeathbanDurationByLocation(player.getUniqueId(), player.getLocation(), duration -> core.getDeathbans().deathbanPlayer(player.getUniqueId(), originalDeathMessage, duration));
     }
 
     @EventHandler
@@ -58,7 +63,7 @@ public class DeathbanListener implements Listener {
 
         if((player.getHealth() - damage) > 0.0 || player.isDead()) return;
 
-        Bukkit.broadcastMessage(DeathMessages.getDeathMessage(player, damager));
+        Bukkit.broadcastMessage(core.getDeathbans().getDeathMessages().getDeathMessage(player, damager));
     }
 
 }

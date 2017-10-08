@@ -1,15 +1,15 @@
 package gg.revival.factions.core.tools;
 
-import gg.revival.factions.core.classes.Classes;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.classes.cont.Archer;
 import gg.revival.factions.core.classes.cont.Bard;
 import gg.revival.factions.core.classes.cont.Miner;
 import gg.revival.factions.core.classes.cont.Scout;
-import gg.revival.factions.core.events.chests.*;
-import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.locations.Locations;
-import gg.revival.factions.core.servermode.ServerMode;
+import gg.revival.factions.core.events.chests.ClaimChest;
+import gg.revival.factions.core.events.chests.ClaimChestType;
+import gg.revival.factions.core.events.chests.PalaceChest;
 import gg.revival.factions.core.servermode.ServerState;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,121 +25,129 @@ import java.util.logging.Level;
 
 public class Configuration {
 
-    public static String databaseName = "factions";
+    @Getter private FC core;
 
-    public static boolean automateEvents = true;
-    public static boolean playChestEffects = true;
-    public static int pullsPerKey = 3;
-    public static int defaultKothDuration = 60;
-    public static int defaultKothWinCondition = 15;
-    public static int defaultKothKeys = 3;
-    public static int defaultDtcRegen = 15;
-    public static int defaultDtcWincond = 500;
-    public static int defaultDtcKeys = 3;
-    public static int defaultPalaceKeys = 10;
+    public Configuration(FC core) {
+        this.core = core;
 
-    public static int logoutTimer = 30;
-    public static int tagAttacker = 60;
-    public static int tagAttacked = 30;
-    public static boolean pvpProtEnabled = true;
-    public static int pvpProtDuration = 1800;
-    public static boolean pvpSafetyEnabled = true;
-    public static int pvpSafetyDuration = 5;
-    public static int loggerDuration = 20;
-    public static int loggerEnemyDistance = 30;
+        load();
+    }
 
-    public static int classWarmupDelay = 15;
-    public static int activeSpeedCooldown = 60;
-    public static int activeJumpCooldown = 60;
-    public static int activeRegenCooldown = 90;
-    public static int activeStrengthCooldown = 120;
-    public static boolean archerEnabled = true;
-    public static double maxArcherDamage = 4.0;
-    public static boolean scoutEnabled = true;
-    public static boolean bardEnabled = true;
-    public static double bardNearbyCheckDistance = 15.0;
-    public static boolean minerEnabled = true;
+    public String databaseName = "factions";
 
-    public static boolean deathbansEnabled = true;
-    public static long normalDeathban = 10000L;
-    public static long eventDeathban = 10000L;
+    public boolean automateEvents = true;
+    public boolean playChestEffects = true;
+    public int pullsPerKey = 3;
+    public int defaultKothDuration = 60;
+    public int defaultKothWinCondition = 15;
+    public int defaultKothKeys = 3;
+    public int defaultDtcRegen = 15;
+    public int defaultDtcWincond = 500;
+    public int defaultDtcKeys = 3;
+    public int defaultPalaceKeys = 10;
 
-    public static boolean livesEnabled = true;
+    public int logoutTimer = 30;
+    public int tagAttacker = 60;
+    public int tagAttacked = 30;
+    public boolean pvpProtEnabled = true;
+    public int pvpProtDuration = 1800;
+    public boolean pvpSafetyEnabled = true;
+    public int pvpSafetyDuration = 5;
+    public int loggerDuration = 20;
+    public int loggerEnemyDistance = 30;
 
-    public static boolean emeraldXpEnabled = true;
-    public static boolean hardmodeEnabled = true;
-    public static boolean enderpearlCooldownsEnabled = true;
-    public static int enderpearlCooldownsDuration = 16;
-    public static boolean mobstackingEnabled = true;
-    public static int mobstackingMaxStack = 30;
-    public static int mobstackingInterval = 5;
-    public static boolean crowbarsEnabled = true;
-    public static int crowbarSpawnerUse = 1;
-    public static int crowbarPortalUse = 6;
-    public static boolean bookUnenchantingEnabled = true;
-    public static boolean invalidPearlBlocksEnabled = true;
-    public static boolean highSpawnersDisabled = true;
-    public static int highSpawnersHeight = 125;
+    public int classWarmupDelay = 15;
+    public int activeSpeedCooldown = 60;
+    public int activeJumpCooldown = 60;
+    public int activeRegenCooldown = 90;
+    public int activeStrengthCooldown = 120;
+    public boolean archerEnabled = true;
+    public double maxArcherDamage = 4.0;
+    public boolean scoutEnabled = true;
+    public boolean bardEnabled = true;
+    public double bardNearbyCheckDistance = 15.0;
+    public boolean minerEnabled = true;
 
-    public static boolean miningEnabled = true;
-    public static float miningGoldChance = 0.006f;
-    public static float miningDiamondChance = 0.004f;
-    public static float miningEmeraldChance = 0.001f;
-    public static float miningGlowstoneChance = 0.002f;
-    public static boolean announceFoundGold = false;
-    public static boolean announceFoundDiamond = true;
-    public static boolean announceFoundEmerald = true;
-    public static boolean announceFoundGlowstone = false;
+    public boolean deathbansEnabled = true;
+    public long normalDeathban = 10000L;
+    public long eventDeathban = 10000L;
 
-    public static boolean progressEnabled = true;
-    public static int progressDuration = 3600;
+    public boolean livesEnabled = true;
 
-    public static boolean settingsDisableEndermites = true;
-    public static boolean settingsDisableBreakingSpawners = true;
-    public static boolean settingsRemoveGApples = true;
-    public static boolean protectNetherPortals = true;
+    public boolean emeraldXpEnabled = true;
+    public boolean hardmodeEnabled = true;
+    public boolean enderpearlCooldownsEnabled = true;
+    public int enderpearlCooldownsDuration = 16;
+    public boolean mobstackingEnabled = true;
+    public int mobstackingMaxStack = 30;
+    public int mobstackingInterval = 5;
+    public boolean crowbarsEnabled = true;
+    public int crowbarSpawnerUse = 1;
+    public int crowbarPortalUse = 6;
+    public boolean bookUnenchantingEnabled = true;
+    public boolean invalidPearlBlocksEnabled = true;
+    public boolean highSpawnersDisabled = true;
+    public int highSpawnersHeight = 125;
 
-    public static boolean limitEnchants = true;
-    public static Map<Enchantment, Integer> enchantmentLimits = new HashMap<>();
+    public boolean miningEnabled = true;
+    public float miningGoldChance = 0.006f;
+    public float miningDiamondChance = 0.004f;
+    public float miningEmeraldChance = 0.001f;
+    public float miningGlowstoneChance = 0.002f;
+    public boolean announceFoundGold = false;
+    public boolean announceFoundDiamond = true;
+    public boolean announceFoundEmerald = true;
+    public boolean announceFoundGlowstone = false;
 
-    public static boolean limitPotions = true;
-    public static Map<PotionEffectType, Integer> potionLimits = new HashMap<>();
+    public boolean progressEnabled = true;
+    public int progressDuration = 3600;
 
-    public static boolean statsEnabled = true;
-    public static boolean trackStats = true;
+    public boolean settingsDisableEndermites = true;
+    public boolean settingsDisableBreakingSpawners = true;
+    public boolean settingsRemoveGApples = true;
+    public boolean protectNetherPortals = true;
 
-    public static void reload() {
-        FileManager.reloadFiles();
+    public boolean limitEnchants = true;
+    public Map<Enchantment, Integer> enchantmentLimits = new HashMap<>();
 
-        Classes.getEnabledClasses().clear();
-        EventManager.getEvents().clear();
-        ChestManager.getLoadedChests().clear();
+    public boolean limitPotions = true;
+    public Map<PotionEffectType, Integer> potionLimits = new HashMap<>();
+
+    public boolean statsEnabled = true;
+    public boolean trackStats = true;
+
+    public void reload() {
+        core.getFileManager().reloadFiles();
+
+        core.getClasses().getEnabledClasses().clear();
+        core.getEvents().getEventManager().getEvents().clear();
+        core.getEvents().getChestManager().getLoadedChests().clear();
         enchantmentLimits.clear();
         potionLimits.clear();
 
         load();
 
-        Logger.log("Reloaded Configuration");
+        core.getLog().log("Reloaded Configuration");
     }
 
-    public static void load() {
-        FileManager.createFiles();
+    public void load() {
+        core.getFileManager().createFiles();
 
-        FileConfiguration config = FileManager.getConfig();
-        FileConfiguration events = FileManager.getEvents();
+        FileConfiguration config = core.getFileManager().getConfig();
+        FileConfiguration events = core.getFileManager().getEvents();
 
         databaseName = config.getString("database.database-name");
 
         for(ServerState states : ServerState.values()) {
             if(!states.toString().equalsIgnoreCase(config.getString("servermode"))) continue;
-            ServerMode.setCurrentState(states);
+            core.getServerMode().setCurrentState(states);
         }
 
-        if(ServerMode.getCurrentState() == null) {
-            ServerMode.setCurrentState(ServerState.NORMAL);
-            Logger.log(Level.SEVERE, "Server state not found in config.yml! Defaulting to normal settings...");
+        if(core.getServerMode().getCurrentState() == null) {
+            core.getServerMode().setCurrentState(ServerState.NORMAL);
+            core.getLog().log(Level.SEVERE, "Server state not found in config.yml! Defaulting to normal settings...");
         } else {
-            Logger.log("Server state has been set to '" + ServerMode.getCurrentState().toString() + "'");
+            core.getLog().log("Server state has been set to '" + core.getServerMode().getCurrentState().toString() + "'");
         }
 
         automateEvents = events.getBoolean("configuration.automated");
@@ -177,22 +185,22 @@ public class Configuration {
 
         if(archerEnabled) {
             Archer archer = new Archer();
-            Classes.getEnabledClasses().add(archer);
+            core.getClasses().getEnabledClasses().add(archer);
         }
 
         if(scoutEnabled) {
             Scout scout = new Scout();
-            Classes.getEnabledClasses().add(scout);
+            core.getClasses().getEnabledClasses().add(scout);
         }
 
         if(bardEnabled) {
             Bard bard = new Bard();
-            Classes.getEnabledClasses().add(bard);
+            core.getClasses().getEnabledClasses().add(bard);
         }
 
         if(minerEnabled) {
             Miner miner = new Miner();
-            Classes.getEnabledClasses().add(miner);
+            core.getClasses().getEnabledClasses().add(miner);
         }
 
         deathbansEnabled = config.getBoolean("deathbans.enabled");
@@ -264,7 +272,7 @@ public class Configuration {
 
                 ClaimChest claimChest = new ClaimChest(uuid, chestLocation, lootTable, type);
 
-                ChestManager.getLoadedChests().add(claimChest);
+                core.getEvents().getChestManager().getLoadedChests().add(claimChest);
             }
         }
 
@@ -283,7 +291,7 @@ public class Configuration {
 
                 PalaceChest palaceChest = new PalaceChest(uuid, chestLocation, lootTable, tier);
 
-                ChestManager.getLoadedChests().add(palaceChest);
+                core.getEvents().getChestManager().getLoadedChests().add(palaceChest);
             }
         }
 
@@ -292,7 +300,7 @@ public class Configuration {
                 try {
                     Inventory inventory = InvTools.inventoryFromBase64(events.getString("loot-tables." + lootTableKeys + ".contents"));
 
-                    LootTables.getLootTables().put(lootTableKeys, inventory);
+                    core.getEvents().getLootTables().getLootTables().put(lootTableKeys, inventory);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -328,14 +336,14 @@ public class Configuration {
             endExit.setWorld(Bukkit.getWorld(config.getString("locations.end-exit.world")));
         }
 
-        Locations.setSpawnLocation(overworldSpawn);
-        Locations.setEndSpawnLocation(endSpawn);
-        Locations.setEndExitLocation(endExit);
+        core.getLocations().setSpawnLocation(overworldSpawn);
+        core.getLocations().setEndSpawnLocation(endSpawn);
+        core.getLocations().setEndExitLocation(endExit);
 
-        Logger.log("Loaded " + enchantmentLimits.size() + " Enchantment limits");
-        Logger.log("Loaded " + potionLimits.size() + " Potion limits");
-        Logger.log("Loaded " + ChestManager.getLoadedChests().size() + " Event chests");
-        Logger.log("Loaded " + LootTables.getLootTables().size() + " Loot tables");
+        core.getLog().log("Loaded " + enchantmentLimits.size() + " Enchantment limits");
+        core.getLog().log("Loaded " + potionLimits.size() + " Potion limits");
+        core.getLog().log("Loaded " + core.getEvents().getChestManager().getLoadedChests().size() + " Event chests");
+        core.getLog().log("Loaded " + core.getEvents().getLootTables().getLootTables().size() + " Loot tables");
     }
 
 }

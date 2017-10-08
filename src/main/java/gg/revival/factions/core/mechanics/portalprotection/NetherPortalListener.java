@@ -2,7 +2,7 @@ package gg.revival.factions.core.mechanics.portalprotection;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.BlockTools;
-import gg.revival.factions.core.tools.Configuration;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -14,9 +14,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class NetherPortalListener implements Listener {
 
+    @Getter private FC core;
+
+    public NetherPortalListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPortalUse(PlayerTeleportEvent event) {
-        if(!Configuration.protectNetherPortals) return;
+        if(!core.getConfiguration().protectNetherPortals) return;
 
         if(!event.getCause().equals(PlayerTeleportEvent.TeleportCause.NETHER_PORTAL)) return;
 
@@ -38,7 +44,7 @@ public class NetherPortalListener implements Listener {
                     }
                 }
             }
-        }.runTask(FC.getFactionsCore());
+        }.runTask(core);
     }
 
 }

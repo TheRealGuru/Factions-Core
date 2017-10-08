@@ -17,7 +17,6 @@ public class EmeraldEXPListener implements Listener {
         Player player = (Player)bottle.getShooter();
 
         event.setExperience(0);
-
         player.setLevel(player.getLevel() + 1);
     }
 

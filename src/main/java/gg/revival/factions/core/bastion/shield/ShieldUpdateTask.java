@@ -4,22 +4,27 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ServerClaimType;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.PlayerFaction;
 import gg.revival.factions.obj.ServerFaction;
 import gg.revival.factions.timers.TimerType;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@RequiredArgsConstructor
 public class ShieldUpdateTask extends AbstractFuture implements Runnable, ListenableFuture {
 
-    private final ShieldUpdateRequest request;
+    private FC core;
+    private ShieldUpdateRequest request;
+
+    ShieldUpdateTask(FC core, ShieldUpdateRequest request) {
+        this.core = core;
+        this.request = request;
+    }
 
     /**
      * Performs the shield updating for a given player, draws blocks that should be seen and unrenders blocks that should not
@@ -32,7 +37,7 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
 
         if(facPlayer == null) return;
 
-        for(Claim claims : ShieldTools.getNearbyClaims(request.getPosition())) {
+        for(Claim claims : core.getBastion().getShieldTools().getNearbyClaims(request.getPosition())) {
             if(claims.getClaimOwner() instanceof PlayerFaction) {
                 PlayerFaction playerFaction = (PlayerFaction)claims.getClaimOwner();
 
@@ -58,7 +63,7 @@ public class ShieldUpdateTask extends AbstractFuture implements Runnable, Listen
             int endingY = y + 7;
 
             for(int i = y; i < endingY; i++) {
-                for(BlockPos nearby : ShieldTools.getClaimPerimeterAsBlockPos(claims, i)) {
+                for(BlockPos nearby : core.getBastion().getShieldTools().getClaimPerimeterAsBlockPos(claims, i)) {
                     if(nearby.distanceSquared(request.getPosition()) > 100) continue;
                     if(request.getPlayer().getLastShownBlocks() != null && request.getPlayer().getLastShownBlocks().contains(shownGlass)) continue;
                     if(nearby.isSolid()) continue;

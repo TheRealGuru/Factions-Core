@@ -6,18 +6,15 @@ import gg.revival.driver.MongoAPI;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.deathbans.callbacks.ActiveDeathbanCallback;
 import gg.revival.factions.core.deathbans.callbacks.DeathbanCallback;
 import gg.revival.factions.core.deathbans.callbacks.DeathbanDurationCallback;
 import gg.revival.factions.core.deathbans.command.DeathbanCommand;
 import gg.revival.factions.core.deathbans.command.DeathsCommand;
 import gg.revival.factions.core.deathbans.listener.DeathbanListener;
-import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
-import gg.revival.factions.core.stats.Stats;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.ServerFaction;
+import lombok.Getter;
 import mkremins.fanciful.FancyMessage;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -31,18 +28,28 @@ import java.util.*;
 
 public class Deathbans {
 
+    @Getter private FC core;
+    @Getter public DeathMessages deathMessages;
+
+    public Deathbans(FC core) {
+        this.core = core;
+        this.deathMessages = new DeathMessages();
+
+        onEnable();
+    }
+
     /**
      * Returns a Death object if the given UUID has an active deathban
      * @param uuid
      * @return
      */
-    public static void getActiveDeathban(UUID uuid, ActiveDeathbanCallback callback) {
+    public void getActiveDeathban(UUID uuid, ActiveDeathbanCallback callback) {
         new BukkitRunnable() {
             public void run() {
-                if(DBManager.getDeathbans() == null)
-                    DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
+                if(core.getDatabaseManager().getDeathbans() == null)
+                    core.getDatabaseManager().setDeathbans(MongoAPI.getCollection(core.getConfiguration().databaseName, "deathbans"));
 
-                MongoCollection collection = DBManager.getDeathbans();
+                MongoCollection collection = core.getDatabaseManager().getDeathbans();
                 FindIterable<Document> query = null;
 
                 try {
@@ -65,7 +72,7 @@ public class Deathbans {
                             public void run() {
                                 callback.onQueryDone(death);
                             }
-                        }.runTask(FC.getFactionsCore());
+                        }.runTask(core);
 
                         return;
                     }
@@ -75,9 +82,9 @@ public class Deathbans {
                     public void run() {
                         callback.onQueryDone(null);
                     }
-                }.runTask(FC.getFactionsCore());
+                }.runTask(core);
             }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+        }.runTaskAsynchronously(core);
     }
 
     /**
@@ -85,7 +92,7 @@ public class Deathbans {
      * @param uuid
      * @param callback
      */
-    public static void getDeathsByUUID(UUID uuid, DeathbanCallback callback) {
+    public void getDeathsByUUID(UUID uuid, DeathbanCallback callback) {
         if(!MongoAPI.isConnected()) {
             Set<Death> emptyResult = new HashSet<>();
             callback.onQueryDone(emptyResult);
@@ -95,7 +102,7 @@ public class Deathbans {
             public void run() {
                 Set<Death> result = new HashSet<>();
 
-                MongoCollection collection = DBManager.getDeathbans();
+                MongoCollection collection = core.getDatabaseManager().getDeathbans();
                 FindIterable<Document> query = null;
 
                 try {
@@ -126,22 +133,22 @@ public class Deathbans {
                     public void run() {
                         callback.onQueryDone(result);
                     }
-                }.runTask(FC.getFactionsCore());
+                }.runTask(core);
             }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+        }.runTaskAsynchronously(core);
     }
 
     /**
      * Saves a Death object to DB
      * @param death
      */
-    public static void saveDeathban(Death death) {
+    public void saveDeathban(Death death) {
         new BukkitRunnable() {
             public void run() {
-                if(DBManager.getDeathbans() == null)
-                    DBManager.setDeathbans(MongoAPI.getCollection(Configuration.databaseName, "deathbans"));
+                if(core.getDatabaseManager().getDeathbans() == null)
+                    core.getDatabaseManager().setDeathbans(MongoAPI.getCollection(core.getConfiguration().databaseName, "deathbans"));
 
-                MongoCollection collection = DBManager.getDeathbans();
+                MongoCollection collection = core.getDatabaseManager().getDeathbans();
                 FindIterable<Document> query = null;
 
                 try {
@@ -168,7 +175,7 @@ public class Deathbans {
                 }
 
             }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+        }.runTaskAsynchronously(core);
     }
 
     /**
@@ -177,7 +184,7 @@ public class Deathbans {
      * @param reason
      * @param duration
      */
-    public static void deathbanPlayer(UUID uuid, String reason, long duration) {
+    public void deathbanPlayer(UUID uuid, String reason, long duration) {
         UUID dbID = UUID.randomUUID();
         long created = System.currentTimeMillis();
         long expires = System.currentTimeMillis() + duration;
@@ -196,11 +203,11 @@ public class Deathbans {
      * @param location
      * @param callback
      */
-    public static void getDeathbanDurationByLocation(UUID uuid, Location location, DeathbanDurationCallback callback) {
-        Stats.getStats(uuid, stats -> {
+    public void getDeathbanDurationByLocation(UUID uuid, Location location, DeathbanDurationCallback callback) {
+        core.getStats().getStats(uuid, stats -> {
             long deathbanDuration = stats.getCurrentPlaytime();
 
-            for(Event event : EventManager.getActiveEvents()) {
+            for(Event event : core.getEvents().getEventManager().getActiveEvents()) {
                 if(event.getHookedFactionId() == null || FactionManager.getFactionByUUID(event.getHookedFactionId()) == null) continue;
 
                 ServerFaction serverFaction = (ServerFaction)FactionManager.getFactionByUUID(event.getHookedFactionId());
@@ -210,13 +217,13 @@ public class Deathbans {
                 for(Claim claim : serverFaction.getClaims()) {
                     if(!claim.inside(location, true)) continue;
 
-                    if(deathbanDuration > Configuration.eventDeathban)
-                        deathbanDuration = Configuration.eventDeathban;
+                    if(deathbanDuration > core.getConfiguration().eventDeathban)
+                        deathbanDuration = core.getConfiguration().eventDeathban;
                 }
             }
 
-            if(deathbanDuration > Configuration.normalDeathban)
-                deathbanDuration = Configuration.normalDeathban;
+            if(deathbanDuration > core.getConfiguration().normalDeathban)
+                deathbanDuration = core.getConfiguration().normalDeathban;
 
             callback.onLookupComplete(deathbanDuration);
         });
@@ -227,7 +234,7 @@ public class Deathbans {
      * @param death
      * @return
      */
-    public static String getDeathbanMessage(Death death) {
+    public String getDeathbanMessage(Death death) {
         long duration = death.getExpiresTime() - System.currentTimeMillis();
 
         int seconds = (int) (duration / 1000) % 60;
@@ -262,7 +269,7 @@ public class Deathbans {
      * @param username
      * @param deaths
      */
-    public static void sendDeathbans(Player player, String username, Set<Death> deaths) {
+    public void sendDeathbans(Player player, String username, Set<Death> deaths) {
         player.sendMessage(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------");
         player.sendMessage(username + ChatColor.BOLD + " | " + ChatColor.GREEN + deaths.size() + " deaths on record");
         player.sendMessage(ChatColor.YELLOW + "Hover over each death to view more information");
@@ -290,19 +297,19 @@ public class Deathbans {
         player.sendMessage(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------");
     }
 
-    public static void onEnable() {
+    public void onEnable() {
         loadCommands();
         loadListeners();
         loadCommands();
     }
 
-    public static void loadCommands() {
-        FC.getFactionsCore().getCommand("deathban").setExecutor(new DeathbanCommand());
-        FC.getFactionsCore().getCommand("deaths").setExecutor(new DeathsCommand());
+    private void loadCommands() {
+        core.getCommand("deathban").setExecutor(new DeathbanCommand(core));
+        core.getCommand("deaths").setExecutor(new DeathsCommand(core));
     }
 
-    public static void loadListeners() {
-        Bukkit.getPluginManager().registerEvents(new DeathbanListener(), FC.getFactionsCore());
+    private void loadListeners() {
+        Bukkit.getPluginManager().registerEvents(new DeathbanListener(core), core);
     }
 
 }

@@ -13,27 +13,31 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-public class LogoutTask
-{
+public class LogoutTask {
+
+    @Getter private FC core;
+
+    public LogoutTask(FC core) {
+        this.core = core;
+    }
 
     /**
      * Contains every player who is actively safelogging. Players are stored in this 1 extra second after they're disconnected to bypass the combat-logger checks
      */
-    @Getter static List<UUID> safeloggers = new ArrayList<>();
+    @Getter List<UUID> safeloggers = new ArrayList<>();
 
     /**
      * Contains every player who is currently performing a /logout's starting location
      */
-    @Getter static Map<UUID, Location> startingLocations = new HashMap<>();
+    @Getter Map<UUID, Location> startingLocations = new HashMap<>();
 
     /**
      * Get a players /logout starting location
      * @param uuid The player UUID
      * @return Players starting location
      */
-    public static Location getStartingLocation(UUID uuid) {
+    public Location getStartingLocation(UUID uuid) {
         if(startingLocations.containsKey(uuid))
             return startingLocations.get(uuid);
 
@@ -43,7 +47,7 @@ public class LogoutTask
     /**
      * Checks to make sure every player performing a /logout has not moved too far
      */
-    public static void checkLocations() {
+    public void checkLocations() {
         ImmutableList<UUID> cache = ImmutableList.copyOf(safeloggers);
 
         for(UUID uuid : cache) {
@@ -72,7 +76,7 @@ public class LogoutTask
      * Logs the player out, essentially just a kick with a kind message
      * @param uuid The player UUID
      */
-    public static void logoutPlayer(UUID uuid) {
+    public void logoutPlayer(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
 
         if(player == null) {
@@ -88,7 +92,7 @@ public class LogoutTask
             public void run() {
                 safeloggers.remove(uuid);
             }
-        }.runTaskLater(FC.getFactionsCore(), 20L);
+        }.runTaskLater(core, 20L);
     }
 
 }

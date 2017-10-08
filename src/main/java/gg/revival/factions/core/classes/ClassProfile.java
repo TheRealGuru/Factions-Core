@@ -16,7 +16,7 @@ public class ClassProfile {
 
     @Getter Map<Material, Long> consumeCooldowns;
 
-    public ClassProfile(UUID uuid) {
+    ClassProfile(UUID uuid) {
         this.uuid = uuid;
         this.active = false;
         this.consumeCooldowns = Maps.newHashMap();

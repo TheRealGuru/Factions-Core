@@ -2,11 +2,12 @@ package gg.revival.factions.core.mechanics.crowbars;
 
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import gg.revival.factions.obj.ServerFaction;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,21 +26,27 @@ import java.util.List;
 
 public class Crowbar {
 
-    public static ItemStack getCrowbar() {
+    @Getter private FC core;
+
+    public Crowbar(FC core) {
+        this.core = core;
+    }
+
+    public ItemStack getCrowbar() {
         ItemStack item = new ItemStack(Material.DIAMOND_HOE);
         ItemMeta itemMeta = item.getItemMeta();
 
         itemMeta.setDisplayName(ChatColor.DARK_RED + "Crowbar");
 
-        itemMeta.setLore(Arrays.asList(ChatColor.YELLOW + "Mob-spawner uses: " + ChatColor.BLUE + Configuration.crowbarSpawnerUse,
-                ChatColor.YELLOW + "Portal-frame uses: " + ChatColor.BLUE + Configuration.crowbarPortalUse));
+        itemMeta.setLore(Arrays.asList(ChatColor.YELLOW + "Mob-spawner uses: " + ChatColor.BLUE + core.getConfiguration().crowbarSpawnerUse,
+                ChatColor.YELLOW + "Portal-frame uses: " + ChatColor.BLUE + core.getConfiguration().crowbarPortalUse));
 
         item.setItemMeta(itemMeta);
 
         return item;
     }
 
-    public static boolean isCrowbar(ItemStack item) {
+    boolean isCrowbar(ItemStack item) {
         if(item == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) return false;
 
         String name = item.getItemMeta().getDisplayName();
@@ -49,7 +56,7 @@ public class Crowbar {
         return true;
     }
 
-    public static int getRemainingSpawnerUses(ItemStack item) {
+    private int getRemainingSpawnerUses(ItemStack item) {
         if(!isCrowbar(item)) return 0;
 
         List<String> lore = item.getItemMeta().getLore();
@@ -64,7 +71,7 @@ public class Crowbar {
         return spawners;
     }
 
-    public static int getRemainingPortalUses(ItemStack item) {
+    private int getRemainingPortalUses(ItemStack item) {
         if(!isCrowbar(item)) return 0;
 
         List<String> lore = item.getItemMeta().getLore();
@@ -79,7 +86,7 @@ public class Crowbar {
         return portalFrames;
     }
 
-    public static void attemptCrowbar(Player player, ItemStack item, Block block) {
+    void attemptCrowbar(Player player, ItemStack item, Block block) {
         Claim claim = ClaimManager.getClaimAt(block.getLocation(), false);
 
         if(claim != null) {

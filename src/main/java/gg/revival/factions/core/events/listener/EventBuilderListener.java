@@ -1,16 +1,16 @@
 package gg.revival.factions.core.events.listener;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.events.builder.DTCBuilder;
-import gg.revival.factions.core.events.builder.EventBuilder;
 import gg.revival.factions.core.events.builder.KOTHBuilder;
-import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.ServerFaction;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,6 +22,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class EventBuilderListener implements Listener {
 
+    @Getter private FC core;
+
+    public EventBuilderListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -29,10 +35,10 @@ public class EventBuilderListener implements Listener {
 
         if(message == null || message.length() == 0) return;
         if(!player.hasPermission(Permissions.CORE_ADMIN)) return;
-        if(!EventBuilder.isBuilding(player.getUniqueId())) return;
+        if(!core.getEvents().getEventBuilder().isBuilding(player.getUniqueId())) return;
 
-        if(EventBuilder.getKOTHBuilder(player.getUniqueId()) != null) {
-            KOTHBuilder builder = EventBuilder.getKOTHBuilder(player.getUniqueId());
+        if(core.getEvents().getEventBuilder().getKOTHBuilder(player.getUniqueId()) != null) {
+            KOTHBuilder builder = core.getEvents().getEventBuilder().getKOTHBuilder(player.getUniqueId());
 
             if(builder.getBuildPhase() == 1) {
                 builder.setEventName(message);
@@ -80,8 +86,8 @@ public class EventBuilderListener implements Listener {
                     player.sendMessage(builder.getPhaseResponse());
 
                     KOTHEvent kothEvent = builder.convertToKOTH();
-                    EventManager.getEvents().add(kothEvent);
-                    EventBuilder.saveEvent(kothEvent);
+                    core.getEvents().getEventManager().getEvents().add(kothEvent);
+                    core.getEvents().getEventBuilder().saveEvent(kothEvent);
 
                     event.setCancelled(true);
 
@@ -94,8 +100,8 @@ public class EventBuilderListener implements Listener {
                     player.sendMessage(builder.getPhaseResponse());
 
                     KOTHEvent kothEvent = builder.convertToKOTH();
-                    EventManager.getEvents().add(kothEvent);
-                    EventBuilder.saveEvent(kothEvent);
+                    core.getEvents().getEventManager().getEvents().add(kothEvent);
+                    core.getEvents().getEventBuilder().saveEvent(kothEvent);
 
                     event.setCancelled(true);
 
@@ -110,8 +116,8 @@ public class EventBuilderListener implements Listener {
         /*
          *  DTC Event Configuration Start
          */
-        if(EventBuilder.getDTCBuilder(player.getUniqueId()) != null) {
-            DTCBuilder builder = EventBuilder.getDTCBuilder(player.getUniqueId());
+        if(core.getEvents().getEventBuilder().getDTCBuilder(player.getUniqueId()) != null) {
+            DTCBuilder builder = core.getEvents().getEventBuilder().getDTCBuilder(player.getUniqueId());
 
             if(builder.getBuildPhase() == 1) {
                 builder.setEventName(message);
@@ -159,8 +165,8 @@ public class EventBuilderListener implements Listener {
                     player.sendMessage(builder.getPhaseResponse());
 
                     DTCEvent dtcEvent = builder.convertToDTC();
-                    EventManager.getEvents().add(dtcEvent);
-                    EventBuilder.saveEvent(dtcEvent);
+                    core.getEvents().getEventManager().getEvents().add(dtcEvent);
+                    core.getEvents().getEventBuilder().saveEvent(dtcEvent);
 
                     event.setCancelled(true);
 
@@ -173,8 +179,8 @@ public class EventBuilderListener implements Listener {
                     player.sendMessage(builder.getPhaseResponse());
 
                     DTCEvent dtcEvent = builder.convertToDTC();
-                    EventManager.getEvents().add(dtcEvent);
-                    EventBuilder.saveEvent(dtcEvent);
+                    core.getEvents().getEventManager().getEvents().add(dtcEvent);
+                    core.getEvents().getEventBuilder().saveEvent(dtcEvent);
 
                     event.setCancelled(true);
 
@@ -195,10 +201,10 @@ public class EventBuilderListener implements Listener {
         if(!action.equals(Action.RIGHT_CLICK_BLOCK)) return;
         if(!player.hasPermission(Permissions.CORE_ADMIN)) return;
         if(event.getClickedBlock() == null) return;
-        if(!EventBuilder.isBuilding(player.getUniqueId())) return;
+        if(!core.getEvents().getEventBuilder().isBuilding(player.getUniqueId())) return;
 
-        if(EventBuilder.getKOTHBuilder(player.getUniqueId()) != null) {
-            KOTHBuilder builder = EventBuilder.getKOTHBuilder(player.getUniqueId());
+        if(core.getEvents().getEventBuilder().getKOTHBuilder(player.getUniqueId()) != null) {
+            KOTHBuilder builder = core.getEvents().getEventBuilder().getKOTHBuilder(player.getUniqueId());
             CapZone capZone = null;
 
             if(builder.getBuildPhase() == 4) {
@@ -244,8 +250,8 @@ public class EventBuilderListener implements Listener {
             }
         }
 
-        if(EventBuilder.getDTCBuilder(player.getUniqueId()) != null) {
-            DTCBuilder builder = EventBuilder.getDTCBuilder(player.getUniqueId());
+        if(core.getEvents().getEventBuilder().getDTCBuilder(player.getUniqueId()) != null) {
+            DTCBuilder builder = core.getEvents().getEventBuilder().getDTCBuilder(player.getUniqueId());
 
             if(builder.getBuildPhase() == 4) {
                 if(!event.getClickedBlock().getType().equals(Material.CHEST)) {

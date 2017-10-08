@@ -7,7 +7,6 @@ import gg.revival.driver.MongoAPI;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.db.listener.DatabaseListener;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.Timer;
@@ -25,31 +24,37 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class DBManager {
 
+    @Getter private FC core;
+
+    public DBManager(FC core) {
+        this.core = core;
+    }
+
     /**
      * Combat-Tag, PvP Protection and Progression
      */
-    @Getter @Setter static MongoCollection<Document> bastion;
+    @Getter @Setter MongoCollection<Document> bastion;
 
     /**
      * Deathbans
      */
-    @Getter @Setter static MongoCollection<Document> deathbans;
+    @Getter @Setter MongoCollection<Document> deathbans;
 
     /**
      * Lives
      */
-    @Getter @Setter static MongoCollection<Document> lives;
+    @Getter @Setter MongoCollection<Document> lives;
 
     /**
      * Statistics
      */
-    @Getter @Setter static MongoCollection<Document> stats;
+    @Getter @Setter MongoCollection<Document> stats;
 
     /**
      * Saves a given FPlayer objects timer data to DB
      * @param player
      */
-    public static void saveTimerData(final FPlayer player, boolean unsafe) {
+    public void saveTimerData(final FPlayer player, boolean unsafe) {
         final ImmutableList<Timer> timers = ImmutableList.copyOf(player.getTimers());
 
         if(unsafe) {
@@ -57,7 +62,7 @@ public class DBManager {
 
             Runnable saveTask = () -> {
                 if(bastion == null)
-                    bastion = MongoAPI.getCollection(Configuration.databaseName, "bastion");
+                    bastion = MongoAPI.getCollection(core.getConfiguration().databaseName, "bastion");
 
                 MongoCollection<Document> collection = bastion;
                 FindIterable<Document> query;
@@ -99,7 +104,7 @@ public class DBManager {
             new BukkitRunnable() {
                 public void run() {
                     if(bastion == null)
-                        bastion = MongoAPI.getCollection(Configuration.databaseName, "bastion");
+                        bastion = MongoAPI.getCollection(core.getConfiguration().databaseName, "bastion");
 
                     MongoCollection<Document> collection = bastion;
                     FindIterable<Document> query;
@@ -133,7 +138,7 @@ public class DBManager {
                     else
                         collection.insertOne(newDocument);
                 }
-            }.runTaskAsynchronously(FC.getFactionsCore());
+            }.runTaskAsynchronously(core);
         }
     }
 
@@ -141,11 +146,11 @@ public class DBManager {
      * Loads a given UUIDs timer data and applys it to the given player if they are online
      * @param uuid
      */
-    public static void loadTimerData(UUID uuid) {
+    public void loadTimerData(UUID uuid) {
         new BukkitRunnable() {
             public void run() {
                 if(bastion == null)
-                    bastion = MongoAPI.getCollection(Configuration.databaseName, "bastion");
+                    bastion = MongoAPI.getCollection(core.getConfiguration().databaseName, "bastion");
 
                 MongoCollection<Document> collection = bastion;
                 FindIterable<Document> query;
@@ -165,8 +170,8 @@ public class DBManager {
                     protectionDuration = foundDocument.getInteger("protection");
                     progressionDuration = foundDocument.getInteger("progression");
                 } else {
-                    protectionDuration = Configuration.pvpProtDuration;
-                    progressionDuration = Configuration.progressDuration;
+                    protectionDuration = core.getConfiguration().pvpProtDuration;
+                    progressionDuration = core.getConfiguration().progressDuration;
                 }
 
                 FPlayer facPlayer = PlayerManager.getPlayer(uuid);
@@ -187,17 +192,17 @@ public class DBManager {
                                 facPlayer.removeTimer(TimerType.PROGRESSION);
                         }
                     }
-                }.runTask(FC.getFactionsCore());
+                }.runTask(core);
             }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+        }.runTaskAsynchronously(core);
     }
 
-    public static void onEnable() {
+    public void onEnable() {
         loadListeners();
     }
 
-    public static void loadListeners() {
-        Bukkit.getPluginManager().registerEvents(new DatabaseListener(), FC.getFactionsCore());
+    public void loadListeners() {
+        Bukkit.getPluginManager().registerEvents(new DatabaseListener(core), core);
     }
 
 }

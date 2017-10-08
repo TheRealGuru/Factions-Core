@@ -1,7 +1,7 @@
 package gg.revival.factions.core.events.chests;
 
 import com.google.common.collect.Sets;
-import gg.revival.factions.core.tools.FileManager;
+import gg.revival.factions.core.FC;
 import lombok.Getter;
 import org.bukkit.Location;
 
@@ -10,9 +10,14 @@ import java.util.UUID;
 
 public class ChestManager {
 
-    @Getter static Set<EventChest> loadedChests = Sets.newHashSet();
+    @Getter private FC core;
+    @Getter Set<EventChest> loadedChests = Sets.newHashSet();
 
-    public static EventChest getEventChestById(UUID uuid) {
+    public ChestManager(FC core) {
+        this.core = core;
+    }
+
+    public EventChest getEventChestById(UUID uuid) {
         if(loadedChests.isEmpty()) return null;
 
         for(EventChest eventChest : loadedChests)
@@ -21,7 +26,7 @@ public class ChestManager {
         return null;
     }
 
-    public static EventChest getEventChestByLocation(Location location) {
+    public EventChest getEventChestByLocation(Location location) {
         if(loadedChests.isEmpty()) return null;
 
         for(EventChest eventChest : loadedChests)
@@ -30,7 +35,7 @@ public class ChestManager {
         return null;
     }
 
-    public static ClaimChest getClaimChestByLocation(Location location) {
+    public ClaimChest getClaimChestByLocation(Location location) {
         EventChest eventChest = getEventChestByLocation(location);
 
         if(!(eventChest instanceof ClaimChest)) return null;
@@ -38,7 +43,7 @@ public class ChestManager {
         return (ClaimChest) eventChest;
     }
 
-    public static PalaceChest getPalaceChestByLocation(Location location) {
+    public PalaceChest getPalaceChestByLocation(Location location) {
         EventChest eventChest = getEventChestByLocation(location);
 
         if(!(eventChest instanceof PalaceChest)) return null;
@@ -46,20 +51,20 @@ public class ChestManager {
         return (PalaceChest)eventChest;
     }
 
-    public static void createChest(EventChest eventChest) {
+    public void createChest(EventChest eventChest) {
         if(eventChest instanceof ClaimChest) {
             ClaimChest claimChest = (ClaimChest)eventChest;
             String uuid = claimChest.getUuid().toString();
 
-            FileManager.getEvents().set("claim-chests." + uuid + ".location.x", claimChest.getLocation().getBlockX());
-            FileManager.getEvents().set("claim-chests." + uuid + ".location.y", claimChest.getLocation().getBlockY());
-            FileManager.getEvents().set("claim-chests." + uuid + ".location.z", claimChest.getLocation().getBlockZ());
-            FileManager.getEvents().set("claim-chests." + uuid + ".location.world", claimChest.getLocation().getWorld().getName());
+            core.getFileManager().getEvents().set("claim-chests." + uuid + ".location.x", claimChest.getLocation().getBlockX());
+            core.getFileManager().getEvents().set("claim-chests." + uuid + ".location.y", claimChest.getLocation().getBlockY());
+            core.getFileManager().getEvents().set("claim-chests." + uuid + ".location.z", claimChest.getLocation().getBlockZ());
+            core.getFileManager().getEvents().set("claim-chests." + uuid + ".location.world", claimChest.getLocation().getWorld().getName());
 
-            FileManager.getEvents().set("claim-chests." + uuid + ".table", claimChest.getLootTable());
-            FileManager.getEvents().set("claim-chests." + uuid + ".type", claimChest.getType().toString());
+            core.getFileManager().getEvents().set("claim-chests." + uuid + ".table", claimChest.getLootTable());
+            core.getFileManager().getEvents().set("claim-chests." + uuid + ".type", claimChest.getType().toString());
 
-            FileManager.saveEvents();
+            core.getFileManager().saveEvents();
 
             loadedChests.add(eventChest);
 
@@ -70,28 +75,28 @@ public class ChestManager {
             PalaceChest palaceChest = (PalaceChest)eventChest;
             String uuid = palaceChest.getUuid().toString();
 
-            FileManager.getEvents().set("palace-chests." + uuid + ".location.x", palaceChest.getLocation().getBlockX());
-            FileManager.getEvents().set("palace-chests." + uuid + ".location.y", palaceChest.getLocation().getBlockY());
-            FileManager.getEvents().set("palace-chests." + uuid + ".location.z", palaceChest.getLocation().getBlockZ());
-            FileManager.getEvents().set("palace-chests." + uuid + ".location.world", palaceChest.getLocation().getWorld().getName());
+            core.getFileManager().getEvents().set("palace-chests." + uuid + ".location.x", palaceChest.getLocation().getBlockX());
+            core.getFileManager().getEvents().set("palace-chests." + uuid + ".location.y", palaceChest.getLocation().getBlockY());
+            core.getFileManager().getEvents().set("palace-chests." + uuid + ".location.z", palaceChest.getLocation().getBlockZ());
+            core.getFileManager().getEvents().set("palace-chests." + uuid + ".location.world", palaceChest.getLocation().getWorld().getName());
 
-            FileManager.getEvents().set("palace-chests." + uuid + ".table", palaceChest.getLootTable());
-            FileManager.getEvents().set("palace-chests." + uuid + ".type", palaceChest.getTier());
+            core.getFileManager().getEvents().set("palace-chests." + uuid + ".table", palaceChest.getLootTable());
+            core.getFileManager().getEvents().set("palace-chests." + uuid + ".type", palaceChest.getTier());
 
-            FileManager.saveEvents();
+            core.getFileManager().saveEvents();
 
             loadedChests.add(eventChest);
         }
     }
 
-    public static void deleteChest(EventChest eventChest) {
+    public void deleteChest(EventChest eventChest) {
         if(eventChest instanceof ClaimChest) {
             ClaimChest claimChest = (ClaimChest)eventChest;
             String uuid = claimChest.getUuid().toString();
 
-            FileManager.getEvents().set("claim-chests." + uuid, null);
+            core.getFileManager().getEvents().set("claim-chests." + uuid, null);
 
-            FileManager.saveEvents();
+            core.getFileManager().saveEvents();
 
             loadedChests.remove(eventChest);
         }
@@ -100,9 +105,9 @@ public class ChestManager {
             PalaceChest palaceChest = (PalaceChest) eventChest;
             String uuid = palaceChest.getUuid().toString();
 
-            FileManager.getEvents().set("palace-chests." + uuid, null);
+            core.getFileManager().getEvents().set("palace-chests." + uuid, null);
 
-            FileManager.saveEvents();
+            core.getFileManager().saveEvents();
 
             loadedChests.remove(eventChest);
         }

@@ -4,10 +4,6 @@ import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.stats.PlayerStats;
-import gg.revival.factions.core.stats.Stats;
-import gg.revival.factions.core.stats.StatsCallback;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import lombok.Getter;
@@ -21,17 +17,25 @@ import java.util.Random;
 
 public class Mining {
 
+    @Getter private FC core;
+
+    public Mining(FC core) {
+        this.core = core;
+
+        onEnable();
+    }
+
     /**
      * Contains all stone that has been placed below Y=32 since the server started up
      */
-    @Getter static List<Location> placedBlocks = new ArrayList<>();
+    @Getter List<Location> placedBlocks = new ArrayList<>();
 
     /**
      * Runs a lottery to determine if a player should receive a drop and how big that drop should be
      * @param player The drop player
      * @param location The location the drop should be placed at if it does happen
      */
-    public static void runLottery(Player player, Location location) {
+    void runLottery(Player player, Location location) {
         Random random = new Random();
         int size = random.nextInt(8);
         float runA = random.nextFloat(), runB = random.nextFloat(), runC = random.nextFloat();
@@ -39,25 +43,24 @@ public class Mining {
         if(size < 2) size = 2;
 
         if(location.getWorld().getEnvironment().equals(World.Environment.NETHER)) {
-            if(runA <= Configuration.miningGlowstoneChance)
+            if(runA <= core.getConfiguration().miningGlowstoneChance)
                 generateVein(player, location, random, size, Material.GLOWSTONE);
 
             return;
         }
 
-        if(runA <= Configuration.miningGoldChance && location.getBlockY() <= 24) {
+        if(runA <= core.getConfiguration().miningGoldChance && location.getBlockY() <= 24) {
             generateVein(player, location, random, size, Material.GOLD_ORE);
             return;
         }
 
-        if(runB <= Configuration.miningDiamondChance && location.getBlockY() <= 16) {
+        if(runB <= core.getConfiguration().miningDiamondChance && location.getBlockY() <= 16) {
             generateVein(player, location, random, size, Material.DIAMOND_ORE);
             return;
         }
 
-        if(runC <= Configuration.miningEmeraldChance && location.getBlockY() <= 16) {
+        if(runC <= core.getConfiguration().miningEmeraldChance && location.getBlockY() <= 16) {
             generateVein(player, location, random, size, Material.EMERALD_ORE);
-            return;
         }
     }
 
@@ -69,7 +72,7 @@ public class Mining {
      * @param size How big the vein should be
      * @param material What material the vein should consist of
      */
-    public static void generateVein(Player player, Location location, Random random, int size, Material material) {
+    private void generateVein(Player player, Location location, Random random, int size, Material material) {
         Faction faction = FactionManager.getFactionByPlayer(player.getUniqueId());
         PlayerFaction playerFaction = null;
 
@@ -160,37 +163,37 @@ public class Mining {
             final int foundAmount = found;
 
             if(material.equals(Material.GOLD_ORE)) {
-                if(Configuration.announceFoundGold) {
+                if(core.getConfiguration().announceFoundGold) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
                 } else {
                     player.sendMessage("[RM] " + ChatColor.GOLD + player.getName() + " uncovered " + found + " Gold Ore");
                 }
 
-                Stats.getStats(player.getUniqueId(), stats -> stats.addGold(foundAmount));
+                core.getStats().getStats(player.getUniqueId(), stats -> stats.addGold(foundAmount));
             }
 
             if(material.equals(Material.DIAMOND_ORE)) {
-                if(Configuration.announceFoundDiamond) {
+                if(core.getConfiguration().announceFoundDiamond) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
                 } else {
                     player.sendMessage("[RM] " + ChatColor.AQUA + player.getName() + " uncovered " + found + " Diamond Ore");
                 }
 
-                Stats.getStats(player.getUniqueId(), stats -> stats.addDiamond(foundAmount));
+                core.getStats().getStats(player.getUniqueId(), stats -> stats.addDiamond(foundAmount));
             }
 
             if(material.equals(Material.EMERALD_ORE)) {
-                if(Configuration.announceFoundEmerald) {
+                if(core.getConfiguration().announceFoundEmerald) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
                 } else {
                     player.sendMessage("[RM] " + ChatColor.GREEN + player.getName() + " uncovered " + found + " Emerald Ore");
                 }
 
-                Stats.getStats(player.getUniqueId(), stats -> stats.addEmerald(foundAmount));
+                core.getStats().getStats(player.getUniqueId(), stats -> stats.addEmerald(foundAmount));
             }
 
             if(material.equals(Material.GLOWSTONE)) {
-                if(Configuration.announceFoundGlowstone) {
+                if(core.getConfiguration().announceFoundGlowstone) {
                     Bukkit.broadcastMessage("[RM] " + ChatColor.YELLOW + player.getName() + " uncovered " + found + " Glowstone Blocks");
                 } else {
                     player.sendMessage("[RM] " + ChatColor.YELLOW + player.getName() + " uncovered " + found + " Glowstone Blocks");
@@ -199,12 +202,12 @@ public class Mining {
         }
     }
 
-    public static void onEnable() {
+    public void onEnable() {
         loadListeners();
     }
 
-    public static void loadListeners() {
-        Bukkit.getPluginManager().registerEvents(new MiningEventsListener(), FC.getFactionsCore());
+    public void loadListeners() {
+        Bukkit.getPluginManager().registerEvents(new MiningEventsListener(core), core);
     }
 
 }

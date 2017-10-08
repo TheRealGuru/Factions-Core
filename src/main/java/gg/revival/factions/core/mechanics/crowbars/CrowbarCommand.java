@@ -1,7 +1,8 @@
 package gg.revival.factions.core.mechanics.crowbars;
 
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CrowbarCommand implements CommandExecutor {
+
+    @Getter private FC core;
+
+    public CrowbarCommand(FC core) {
+        this.core = core;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[]) {
@@ -23,12 +30,12 @@ public class CrowbarCommand implements CommandExecutor {
             return false;
         }
 
-        if(!Configuration.crowbarsEnabled) {
+        if(!core.getConfiguration().crowbarsEnabled) {
             player.sendMessage(ChatColor.RED + "Crowbars are disabled");
             return false;
         }
 
-        player.getInventory().addItem(Crowbar.getCrowbar());
+        player.getInventory().addItem(core.getMechanics().getCrowbars().getCrowbar());
         player.sendMessage(ChatColor.YELLOW + "Given Crowbar (1)");
 
         return false;

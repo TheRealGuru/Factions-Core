@@ -2,19 +2,25 @@ package gg.revival.factions.core.events.task;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.events.engine.KOTHManager;
-import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class KOTHTask extends BukkitRunnable {
+
+    @Getter private FC core;
+
+    public KOTHTask(FC core) {
+        this.core = core;
+    }
 
     private Set<KOTHEvent> recentlyBroadcasted = new HashSet<>();
 
@@ -27,14 +33,14 @@ public class KOTHTask extends BukkitRunnable {
             public void run() {
                 recentlyBroadcasted.remove(event);
             }
-        }.runTaskLater(FC.getFactionsCore(), 10 * 20L);
+        }.runTaskLater(core, 10 * 20L);
     }
 
     @Override
     public void run() {
-        if(KOTHManager.getActiveKOTHEvents().isEmpty()) return;
+        if(core.getEvents().getKothManager() == null || core.getEvents().getKothManager().getActiveKOTHEvents().isEmpty()) return;
 
-        for(KOTHEvent koth : KOTHManager.getActiveKOTHEvents()) {
+        for(KOTHEvent koth : core.getEvents().getKothManager().getActiveKOTHEvents()) {
             Set<UUID> capzonePlayers = new HashSet<>();
 
             for(Player players : Bukkit.getOnlinePlayers()) {
@@ -48,9 +54,9 @@ public class KOTHTask extends BukkitRunnable {
                 if(koth.getCapDuration() <= (koth.getDuration() - 10)) {
                     if(!recentlyBroadcasted.contains(koth)) {
                         if(koth.isPalace())
-                            Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
+                            Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().controlLost(koth.getCappingFaction(), koth)));
                         else
-                            Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
+                            Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().controlLost(koth.getCappingFaction(), koth)));
 
                         silence(koth);
                     }
@@ -61,7 +67,7 @@ public class KOTHTask extends BukkitRunnable {
                 continue;
             }
 
-            if(!KOTHManager.shouldBeContested(capzonePlayers)) {
+            if(!core.getEvents().getKothManager().shouldBeContested(capzonePlayers)) {
                 if(koth.isContested()) {
                     koth.setContested(false);
                     koth.setPauseDuration(0L);
@@ -92,12 +98,12 @@ public class KOTHTask extends BukkitRunnable {
                             PlayerFaction capper = factions.iterator().next();
 
                             koth.setCappingFaction(capper);
-                            KOTHManager.updateCapTimer(koth);
+                            core.getEvents().getKothManager().updateCapTimer(koth);
 
                             if(koth.isPalace())
-                                capper.sendMessage(EventsMessages.asPalace(EventsMessages.nowControlling(koth)));
+                                capper.sendMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().nowControlling(koth)));
                             else
-                                capper.sendMessage(EventsMessages.asKOTH(EventsMessages.nowControlling(koth)));
+                                capper.sendMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().nowControlling(koth)));
                         }
                     }
 
@@ -132,17 +138,17 @@ public class KOTHTask extends BukkitRunnable {
                         for(PlayerFaction foundFactions : factions) {
                             if(!foundFactions.getFactionID().equals(koth.getCappingFaction().getFactionID())) {
                                 if(koth.isPalace())
-                                    Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
+                                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().controlLost(koth.getCappingFaction(), koth)));
                                 else
-                                    Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.controlLost(koth.getCappingFaction(), koth)));
+                                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().controlLost(koth.getCappingFaction(), koth)));
 
-                                KOTHManager.updateCapTimer(koth);
+                                core.getEvents().getKothManager().updateCapTimer(koth);
                                 koth.setCappingFaction(foundFactions);
 
                                 if(koth.isPalace())
-                                    Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.nowControlling(koth)));
+                                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().nowControlling(koth)));
                                 else
-                                    Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.nowControlling(koth)));
+                                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().nowControlling(koth)));
                             }
                         }
                     }
@@ -150,9 +156,9 @@ public class KOTHTask extends BukkitRunnable {
                     if(koth.getCapDuration() % 30 == 0 && koth.getCapDuration() > 0 && koth.getCapDuration() < koth.getDuration()) {
                         if(!recentlyBroadcasted.contains(koth)) {
                             if(koth.isPalace())
-                                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.beingControlled(koth.getCappingFaction(), koth)));
+                                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().beingControlled(koth.getCappingFaction(), koth)));
                             else
-                                Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.beingControlled(koth.getCappingFaction(), koth)));
+                                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().beingControlled(koth.getCappingFaction(), koth)));
 
                             silence(koth);
                         }
@@ -160,9 +166,9 @@ public class KOTHTask extends BukkitRunnable {
                 }
 
                 if(koth.getNextTicketTime() <= System.currentTimeMillis()) {
-                    KOTHManager.updateCapTimer(koth);
+                    core.getEvents().getKothManager().updateCapTimer(koth);
 
-                    EventManager.tickEvent(koth);
+                    core.getEvents().getEventManager().tickEvent(koth);
                 }
             }
 
@@ -177,9 +183,9 @@ public class KOTHTask extends BukkitRunnable {
 
                 if(!recentlyBroadcasted.contains(koth)) {
                     if(koth.isPalace())
-                        Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.beingContested(koth)));
+                        Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().beingContested(koth)));
                     else
-                        Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.beingContested(koth)));
+                        Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().beingContested(koth)));
 
                     silence(koth);
                 }

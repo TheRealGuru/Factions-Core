@@ -1,11 +1,12 @@
 package gg.revival.factions.core.mechanics.invalidpearl;
 
 import com.google.common.collect.ImmutableSet;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.tools.BlockTools;
-import gg.revival.factions.core.tools.Configuration;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerType;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,6 +21,12 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class InvalidPearlListener implements Listener {
+
+    @Getter private FC core;
+
+    public InvalidPearlListener(FC core) {
+        this.core = core;
+    }
 
     private final ImmutableSet<Material> invalidBlocks = ImmutableSet.of(Material.IRON_TRAPDOOR, Material.ACACIA_DOOR, Material.BIRCH_DOOR, Material.DARK_OAK_DOOR, Material.IRON_DOOR, Material.IRON_DOOR_BLOCK,
             Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.TRAP_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.IRON_DOOR, Material.HOPPER, Material.BREWING_STAND, Material.ANVIL,
@@ -38,7 +45,7 @@ public class InvalidPearlListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if(!Configuration.invalidPearlBlocksEnabled)
+        if(!core.getConfiguration().invalidPearlBlocksEnabled)
             return;
 
         if(event.isCancelled())
@@ -61,7 +68,7 @@ public class InvalidPearlListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onTeleport(PlayerTeleportEvent event) {
-        if(!Configuration.invalidPearlBlocksEnabled)
+        if(!core.getConfiguration().invalidPearlBlocksEnabled)
             return;
 
         if(event.isCancelled())

@@ -3,23 +3,17 @@ package gg.revival.factions.core.bastion.tag;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.claims.ServerClaimType;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.bastion.logout.tasks.LogoutTask;
-import gg.revival.factions.core.deathbans.DeathMessages;
-import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.stats.PlayerStats;
-import gg.revival.factions.core.stats.Stats;
-import gg.revival.factions.core.stats.StatsCallback;
-import gg.revival.factions.core.tools.Configuration;
-import gg.revival.factions.core.tools.Logger;
-import gg.revival.factions.core.tools.PlayerTools;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
 import gg.revival.factions.obj.ServerFaction;
 import gg.revival.factions.timers.TimerType;
 import gg.revival.factions.tools.Messages;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -41,6 +35,12 @@ import java.math.BigDecimal;
 
 public class CombatListener implements Listener {
 
+    @Getter private FC core;
+
+    public CombatListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
@@ -55,7 +55,7 @@ public class CombatListener implements Listener {
     public void onEntityInteract(PlayerInteractEntityEvent event) {
         Entity entity = event.getRightClicked();
 
-        if(NPCTools.isLogger(entity))
+        if(core.getBastion().getNpcTools().isLogger(entity))
             event.setCancelled(true);
     }
 
@@ -91,11 +91,11 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        CombatLogger logger = NPCTools.getLoggerByUUID(player.getUniqueId());
+        CombatLogger logger = core.getBastion().getNpcTools().getLoggerByUUID(player.getUniqueId());
 
         if(logger == null || logger.isDead) return;
 
-        Logger.log("Combatlogger was found");
+        core.getLog().log("Combatlogger was found");
 
         player.teleport(logger.getNpc().getLocation());
         player.setHealth(((LivingEntity)logger.getNpc()).getHealth());
@@ -112,22 +112,21 @@ public class CombatListener implements Listener {
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
         final Location location = event.getPlayer().getLocation();
 
-        if(LogoutTask.getSafeloggers().contains(player.getUniqueId())) return;
+        if(core.getBastion().getLogoutTask().getSafeloggers().contains(player.getUniqueId())) return;
         if(player.isDead() || player.getHealth() <= 0.0) return;
 
         if(facPlayer.isBeingTimed(TimerType.TAG)) {
-            NPCTools.spawnLogger(player, Configuration.loggerDuration);
+            core.getBastion().getNpcTools().spawnLogger(player, core.getConfiguration().loggerDuration);
             return;
         }
 
-        if(PlayerTools.isNearbyEnemy(player, Configuration.loggerEnemyDistance)) {
-            NPCTools.spawnLogger(player, Configuration.loggerDuration);
+        if(core.getPlayerTools().isNearbyEnemy(player, core.getConfiguration().loggerEnemyDistance)) {
+            core.getBastion().getNpcTools().spawnLogger(player, core.getConfiguration().loggerDuration);
             return;
         }
 
         if(player.getFireTicks() > 0 || player.getFallDistance() > 0 || player.getRemainingAir() != player.getMaximumAir()) {
-            NPCTools.spawnLogger(player, Configuration.loggerDuration);
-            return;
+            core.getBastion().getNpcTools().spawnLogger(player, core.getConfiguration().loggerDuration);
         }
     }
 
@@ -139,18 +138,18 @@ public class CombatListener implements Listener {
         Entity damaged = event.getEntity();
         Entity damager = event.getDamager();
 
-        if(!NPCTools.isLogger(damaged)) return;
+        if(!core.getBastion().getNpcTools().isLogger(damaged)) return;
 
         if(damager instanceof Player) {
             Player playerDamager = (Player)damager;
-            CombatLogger logger = NPCTools.getLoggerByEntity(damaged);
+            CombatLogger logger = core.getBastion().getNpcTools().getLoggerByEntity(damaged);
 
             if(FactionManager.isFactionMember(playerDamager.getUniqueId(), logger.getUuid())) {
                 event.setCancelled(true);
                 return;
             }
 
-            CombatManager.tagPlayer(playerDamager, TagReason.ATTACKER);
+            core.getBastion().getCombatManager().tagPlayer(playerDamager, TagReason.ATTACKER);
         }
 
         if(damager instanceof Projectile) {
@@ -159,14 +158,14 @@ public class CombatListener implements Listener {
 
             if(source instanceof Player) {
                 Player playerDamager = (Player)source;
-                CombatLogger logger = NPCTools.getLoggerByEntity(damaged);
+                CombatLogger logger = core.getBastion().getNpcTools().getLoggerByEntity(damaged);
 
                 if(FactionManager.isFactionMember(playerDamager.getUniqueId(), logger.getUuid())) {
                     event.setCancelled(true);
                     return;
                 }
 
-                CombatManager.tagPlayer(playerDamager, TagReason.ATTACKER);
+                core.getBastion().getCombatManager().tagPlayer(playerDamager, TagReason.ATTACKER);
             }
         }
     }
@@ -185,8 +184,8 @@ public class CombatListener implements Listener {
 
             if(playerDamaged.getUniqueId().equals(playerDamager.getUniqueId())) return;
 
-            CombatManager.tagPlayer(playerDamaged, TagReason.ATTACKED);
-            CombatManager.tagPlayer(playerDamager, TagReason.ATTACKER);
+            core.getBastion().getCombatManager().tagPlayer(playerDamaged, TagReason.ATTACKED);
+            core.getBastion().getCombatManager().tagPlayer(playerDamager, TagReason.ATTACKER);
         }
 
         if(damaged instanceof Player && damager instanceof Projectile) {
@@ -199,8 +198,8 @@ public class CombatListener implements Listener {
 
             if(playerDamaged.getUniqueId().equals(playerDamager.getUniqueId())) return;
 
-            CombatManager.tagPlayer(playerDamaged, TagReason.ATTACKED);
-            CombatManager.tagPlayer(playerDamager, TagReason.ATTACKER);
+            core.getBastion().getCombatManager().tagPlayer(playerDamaged, TagReason.ATTACKED);
+            core.getBastion().getCombatManager().tagPlayer(playerDamager, TagReason.ATTACKER);
         }
     }
 
@@ -208,9 +207,9 @@ public class CombatListener implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
 
-        if(!NPCTools.isLogger(entity)) return;
+        if(!core.getBastion().getNpcTools().isLogger(entity)) return;
 
-        CombatLogger logger = NPCTools.getLoggerByEntity(entity);
+        CombatLogger logger = core.getBastion().getNpcTools().getLoggerByEntity(entity);
 
         logger.setDead(true);
 
@@ -220,7 +219,7 @@ public class CombatListener implements Listener {
             }
         }
 
-        Deathbans.getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation(), duration -> Deathbans.deathbanPlayer(logger.getUuid(), "Combat Logger Slain", duration));
+        core.getDeathbans().getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation(), duration -> core.getDeathbans().deathbanPlayer(logger.getUuid(), "Combat Logger Slain", duration));
 
         Faction faction = FactionManager.getFactionByPlayer(logger.getUuid());
 
@@ -233,15 +232,15 @@ public class CombatListener implements Listener {
         }
 
         if(event.getEntity().getKiller() != null)
-            Bukkit.broadcastMessage(DeathMessages.getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain by " + ChatColor.GOLD + event.getEntity().getKiller().getName());
+            Bukkit.broadcastMessage(core.getDeathbans().getDeathMessages().getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain by " + ChatColor.GOLD + event.getEntity().getKiller().getName());
         else
-            Bukkit.broadcastMessage(DeathMessages.getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain");
+            Bukkit.broadcastMessage(core.getDeathbans().getDeathMessages().getPrefix() + ChatColor.GOLD + logger.getDisplayName() + ChatColor.RED + "'s combat-logger has been slain");
 
-        Stats.getStats(logger.getUuid(), PlayerStats::addDeath);
+        core.getStats().getStats(logger.getUuid(), PlayerStats::addDeath);
 
         if(event.getEntity().getKiller() instanceof Player) {
             Player killer = event.getEntity().getKiller();
-            Stats.getStats(killer.getUniqueId(), PlayerStats::addKill);
+            core.getStats().getStats(killer.getUniqueId(), PlayerStats::addKill);
         }
     }
 

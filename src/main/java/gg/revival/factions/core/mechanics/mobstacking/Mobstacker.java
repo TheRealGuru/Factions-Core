@@ -1,7 +1,6 @@
 package gg.revival.factions.core.mechanics.mobstacking;
 
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.tools.Configuration;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,22 +13,28 @@ import java.util.*;
 
 public class Mobstacker {
 
+    @Getter private FC core;
+
+    public Mobstacker(FC core) {
+        this.core = core;
+    }
+
     /**
      * Multimap that contains players split cooldowns for each entity type
      */
-    @Getter static Map<UUID, List<EntityType>> splitCooldowns = new HashMap<>();
+    @Getter Map<UUID, List<EntityType>> splitCooldowns = new HashMap<>();
 
     /**
      * Contains a list of protected (cant be stacked) entities
      */
-    @Getter static List<UUID> protectedEntities = new ArrayList<>();
+    @Getter List<UUID> protectedEntities = new ArrayList<>();
 
     /**
      * Makes an entity has protected so it cant be merged
      * @param entity The entity to be protected
      * @param time Time it should be protected for
      */
-    public static void setProtected(Entity entity, int time) {
+    public void setProtected(Entity entity, int time) {
         if(protectedEntities.contains(entity.getUniqueId())) return;
 
         UUID uuid = entity.getUniqueId();
@@ -40,7 +45,7 @@ public class Mobstacker {
             public void run() {
                 protectedEntities.remove(uuid);
             }
-        }.runTaskLaterAsynchronously(FC.getFactionsCore(), time * 20L);
+        }.runTaskLaterAsynchronously(core, time * 20L);
     }
 
     /**
@@ -49,7 +54,7 @@ public class Mobstacker {
      * @param entityTwo
      * @return Both entities are the same
      */
-    public static boolean isSame(Entity entityOne, Entity entityTwo) {
+    public boolean isSame(Entity entityOne, Entity entityTwo) {
         if(!entityOne.getType().equals(entityTwo.getType())) return false;
 
         if(entityOne.getType().equals(EntityType.SHEEP) && entityTwo.getType().equals(EntityType.SHEEP)) {
@@ -77,7 +82,7 @@ public class Mobstacker {
      * @param entity
      * @return
      */
-    public static boolean isStack(Entity entity) {
+    boolean isStack(Entity entity) {
         return getStackSize(entity) > 0;
     }
 
@@ -86,7 +91,7 @@ public class Mobstacker {
      * @param entity The stacked entity
      * @return How many entities are stacked on given entity
      */
-    public static int getStackSize(Entity entity) {
+    private int getStackSize(Entity entity) {
         if(entity.getCustomName() == null) return 0;
 
         String name = entity.getCustomName();
@@ -106,7 +111,7 @@ public class Mobstacker {
      * @param entity
      * @param anotherEntity
      */
-    public static void attemptStack(Entity entity, Entity anotherEntity) {
+    private void attemptStack(Entity entity, Entity anotherEntity) {
         LivingEntity entityOne = (LivingEntity)entity, entityTwo = (LivingEntity)anotherEntity;
 
         if(!isSame(entityOne, entityTwo)) return;
@@ -141,7 +146,7 @@ public class Mobstacker {
      * Subtracts a stack from a given entity stack
      * @param entity The entity stack
      */
-    public static void subtractFromStack(Entity entity) {
+    void subtractFromStack(Entity entity) {
         if(!isStack(entity)) return;
 
         int currentStack = getStackSize(entity);
@@ -176,14 +181,14 @@ public class Mobstacker {
 
                 setProtected(newEntity, 5);
             }
-        }.runTask(FC.getFactionsCore());
+        }.runTask(core);
     }
 
     /**
      * Splits a stack in half and spawns two protected entity stacks
      * @param entity The entity to be split
      */
-    public static void splitStack(Entity entity) {
+    void splitStack(Entity entity) {
         if(!isStack(entity)) return;
         if(entity instanceof Monster) return;
         if(getStackSize(entity) <= 1) return;
@@ -213,8 +218,8 @@ public class Mobstacker {
     /**
      * Timer that constantly checks for new mobs to merge
      */
-    public static void run() {
-        if(!Configuration.mobstackingEnabled) return;
+    public void run() {
+        if(!core.getConfiguration().mobstackingEnabled) return;
 
         new BukkitRunnable()
         {
@@ -223,7 +228,7 @@ public class Mobstacker {
                 for(World worlds : Bukkit.getServer().getWorlds()) {
                     for(LivingEntity entity : worlds.getLivingEntities()) {
                         if(protectedEntities.contains(entity.getUniqueId())) continue;
-                        if(getStackSize(entity) >= Configuration.mobstackingMaxStack) continue;
+                        if(getStackSize(entity) >= core.getConfiguration().mobstackingMaxStack) continue;
 
                         EntityType type = entity.getType();
 
@@ -247,7 +252,7 @@ public class Mobstacker {
                                 if(!nearbyEntities.getType().equals(type)) continue;
                                 if(!(nearbyEntities instanceof LivingEntity)) continue;
                                 if(protectedEntities.contains(nearbyEntities.getUniqueId())) continue;
-                                if(getStackSize(nearbyEntities) >= Configuration.mobstackingMaxStack) continue;
+                                if(getStackSize(nearbyEntities) >= core.getConfiguration().mobstackingMaxStack) continue;
 
                                 attemptStack(entity, nearbyEntities);
                             }
@@ -255,6 +260,6 @@ public class Mobstacker {
                     }
                 }
             }
-        }.runTaskTimer(FC.getFactionsCore(), 0L, Configuration.mobstackingInterval * 20L);
+        }.runTaskTimer(core, 0L, core.getConfiguration().mobstackingInterval * 20L);
     }
 }

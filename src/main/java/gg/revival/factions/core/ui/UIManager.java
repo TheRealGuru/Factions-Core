@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
@@ -31,17 +30,23 @@ import java.util.UUID;
 
 public class UIManager {
 
+    @Getter private FC core;
+
+    public UIManager(FC core) {
+        this.core = core;
+    }
+
     /**
      * Contains every players scoreboard information
      */
-    @Getter public static Map<UUID, RScoreboard> scoreboards = new HashMap<>();
+    @Getter public Map<UUID, RScoreboard> scoreboards = new HashMap<>();
 
     /**
      * Returns a players scoreboard object
      * @param player The player
      * @return RScoreboard object
      */
-    private static RScoreboard getScoreboard(Player player) {
+    private RScoreboard getScoreboard(Player player) {
         if(scoreboards.containsKey(player.getUniqueId()))
             return scoreboards.get(player.getUniqueId());
 
@@ -52,7 +57,7 @@ public class UIManager {
      * Updates all UI information for the player
      * @param player The player
      */
-    public static void update(Player player) {
+    public void update(Player player) {
         RScoreboard scoreboard = getScoreboard(player);
         Scoreboard mcBoard;
         Team fac, ally, admin, mod;
@@ -144,7 +149,7 @@ public class UIManager {
      * Sends the hotbar message, used to display cooldowns/timers
      * @param player
      */
-    private static void sendActionbar(Player player) {
+    private void sendActionbar(Player player) {
         new BukkitRunnable() {
             public void run() {
                 FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
@@ -198,8 +203,8 @@ public class UIManager {
                     builder.append(" " + ChatColor.BLUE + "" + ChatColor.BOLD + "Class Warmup" + ChatColor.WHITE + ": " + ChatColor.YELLOW + TimeTools.getFormattedCooldown(true, dur) + ChatColor.RESET + " ");
                 }
 
-                if(!EventManager.getActiveEvents().isEmpty()) {
-                    ImmutableList<Event> cache = ImmutableList.copyOf(EventManager.getActiveEvents());
+                if(!core.getEvents().getEventManager().getActiveEvents().isEmpty()) {
+                    ImmutableList<Event> cache = ImmutableList.copyOf(core.getEvents().getEventManager().getActiveEvents());
 
                     for(Event activeEvents : cache) {
                         if(activeEvents instanceof KOTHEvent) {
@@ -244,7 +249,7 @@ public class UIManager {
                 PacketPlayOutChat bar = new PacketPlayOutChat(packet, (byte)2);
                 ((CraftPlayer)player).getHandle().playerConnection.sendPacket(bar);
             }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+        }.runTaskAsynchronously(core);
     }
 
 }

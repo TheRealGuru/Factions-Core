@@ -14,7 +14,7 @@ public class DeathMessages {
     /**
      * Standard prefix used for all death notifications
      */
-    @Getter  public static final String prefix = ChatColor.RED + "RIP: ";
+    @Getter public final String prefix = ChatColor.RED + "RIP: ";
 
     /**
      * Returns a String of the formatted Death message based on PvP
@@ -22,7 +22,7 @@ public class DeathMessages {
      * @param killer
      * @return
      */
-    public static String getDeathMessage(Player killed, Entity killer) {
+    public String getDeathMessage(Player killed, Entity killer) {
         if(killer instanceof Player) {
             Player playerKiller = (Player)killer;
             String hand = "Fist";
@@ -54,7 +54,7 @@ public class DeathMessages {
      * @param killed
      * @return
      */
-    public static String getDeathMessage(Player killed) {
+    public String getDeathMessage(Player killed) {
         EntityDamageEvent.DamageCause cause = killed.getLastDamageCause().getCause();
 
         if(cause.equals(EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) || cause.equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION))

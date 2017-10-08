@@ -19,7 +19,7 @@ public class EnderpearlCDTask {
      * @param dur The duration the enderpearl should be locked for
      * @return Enderpearl throw was successful
      */
-    public static boolean attemptEnderpearl(UUID uuid, int dur) {
+    public boolean attemptEnderpearl(UUID uuid, int dur) {
         if(Bukkit.getPlayer(uuid) == null)
             return false;
 

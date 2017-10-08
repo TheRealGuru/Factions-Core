@@ -1,15 +1,10 @@
 package gg.revival.factions.core.events.engine;
 
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.events.chests.EventKey;
-import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
-import gg.revival.factions.core.tools.Configuration;
-import gg.revival.factions.core.tools.FileManager;
-import gg.revival.factions.core.tools.Logger;
 import gg.revival.factions.obj.PlayerFaction;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -26,9 +21,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventManager {
 
-    @Getter static Set<Event> events = new HashSet<>();
+    @Getter private FC core;
+    @Getter Set<Event> events = new HashSet<>();
 
-    public static Event getEventByName(String name) {
+    public EventManager(FC core) {
+        this.core = core;
+    }
+
+    public Event getEventByName(String name) {
         List<Event> cache = new CopyOnWriteArrayList<>(events);
 
         for(Event event : cache) {
@@ -39,7 +39,7 @@ public class EventManager {
         return null;
     }
 
-    public static Event getEventByLootChest(Location lootChestLocation) {
+    public Event getEventByLootChest(Location lootChestLocation) {
         List<Event> cache = new CopyOnWriteArrayList<>(events);
 
         for(Event event : cache) {
@@ -50,7 +50,7 @@ public class EventManager {
         return null;
     }
 
-    public static Set<Event> getActiveEvents() {
+    public Set<Event> getActiveEvents() {
         List<Event> cache = new CopyOnWriteArrayList<>(events);
         Set<Event> result = new HashSet<>();
 
@@ -62,7 +62,7 @@ public class EventManager {
         return result;
     }
 
-    public static void startEvent(Event event) {
+    public void startEvent(Event event) {
         if(event.isActive()) return;
 
         event.setActive(true);
@@ -75,9 +75,9 @@ public class EventManager {
             koth.getTickets().clear();
 
             if(event.isPalace())
-                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.started(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().started(event)));
             else
-                Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.started(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().started(event)));
         }
 
         if(event instanceof DTCEvent) {
@@ -88,16 +88,16 @@ public class EventManager {
             dtc.getTickets().clear();
 
             if(event.isPalace())
-                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.started(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().started(event)));
             else
-                Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.started(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asDTC(core.getEvents().getEventMessages().started(event)));
         }
 
         if(event.isPalace())
-            PalaceManager.resetPalace();
+            core.getEvents().getPalaceManager().resetPalace();
     }
 
-    public static void stopEvent(Event event) {
+    public void stopEvent(Event event) {
         if(!event.isActive()) return;
 
         event.setActive(false);
@@ -110,9 +110,9 @@ public class EventManager {
             koth.getTickets().clear();
 
             if(event.isPalace())
-                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.stopped(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().stopped(event)));
             else
-                Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.stopped(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().stopped(event)));
         }
 
         if(event instanceof DTCEvent) {
@@ -122,13 +122,13 @@ public class EventManager {
             dtc.getTickets().clear();
 
             if(event.isPalace())
-                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.stopped(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().stopped(event)));
             else
-                Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.stopped(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asDTC(core.getEvents().getEventMessages().stopped(event)));
         }
     }
 
-    public static void finishEvent(Event event) {
+    public void finishEvent(Event event) {
         if(!event.isActive()) return;
         event.setActive(false);
 
@@ -140,10 +140,10 @@ public class EventManager {
             koth.getTickets().clear();
 
             if(event.isPalace()) {
-                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
-                PalaceManager.setCappers(koth.getCappingFaction());
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().captured(event)));
+                core.getEvents().getPalaceManager().setCappers(koth.getCappingFaction());
             } else {
-                Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.captured(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().captured(event)));
             }
 
             event.setLootChestFaction(koth.getCappingFaction());
@@ -157,10 +157,10 @@ public class EventManager {
             dtc.getTickets().clear();
 
             if(event.isPalace()) {
-                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.captured(event)));
-                PalaceManager.setCappers(dtc.getCappingFaction());
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().captured(event)));
+                core.getEvents().getPalaceManager().setCappers(dtc.getCappingFaction());
             } else {
-                Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.captured(event)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asDTC(core.getEvents().getEventMessages().captured(event)));
             }
 
             event.setLootChestFaction(dtc.getCappingFaction());
@@ -168,12 +168,12 @@ public class EventManager {
         }
 
         if(event.isPalace())
-            spawnKeys(event, Configuration.defaultPalaceKeys);
+            spawnKeys(event, core.getConfiguration().defaultPalaceKeys);
         else
-            spawnKeys(event, Configuration.defaultKothKeys);
+            spawnKeys(event, core.getConfiguration().defaultKothKeys);
     }
 
-    public static void tickEvent(Event event) {
+    public void tickEvent(Event event) {
         if(event instanceof KOTHEvent) {
             KOTHEvent koth = (KOTHEvent)event;
             PlayerFaction capper = koth.getCappingFaction();
@@ -185,9 +185,9 @@ public class EventManager {
                 koth.getTickets().put(capper, 1);
 
                 if(koth.isPalace())
-                    Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.ticked(koth)));
+                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().ticked(koth)));
                 else
-                    Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.ticked(koth)));
+                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().ticked(koth)));
 
                 return;
             }
@@ -214,9 +214,9 @@ public class EventManager {
             }
 
             if(koth.isPalace())
-                Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.ticked(koth)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().ticked(koth)));
             else
-                Bukkit.broadcastMessage(EventsMessages.asKOTH(EventsMessages.ticked(koth)));
+                Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().ticked(koth)));
         }
 
         if(event instanceof DTCEvent) {
@@ -244,14 +244,14 @@ public class EventManager {
 
             if(tickets % 50 == 0 && tickets < dtc.getWinCond()) {
                 if(dtc.isPalace())
-                    Bukkit.broadcastMessage(EventsMessages.asPalace(EventsMessages.ticked(dtc)));
+                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().ticked(dtc)));
                 else
-                    Bukkit.broadcastMessage(EventsMessages.asDTC(EventsMessages.ticked(dtc)));
+                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asDTC(core.getEvents().getEventMessages().ticked(dtc)));
             }
         }
     }
 
-    public static void spawnKeys(Event event, int amount) {
+    public void spawnKeys(Event event, int amount) {
         Location lootChestLocation = event.getLootChest();
         Chest chest = (Chest)lootChestLocation.getBlock().getState();
         Inventory inventory = chest.getBlockInventory();
@@ -268,54 +268,54 @@ public class EventManager {
 
         new BukkitRunnable() {
             public void run() {
-                inventory.addItem(EventKey.getKeys(amount));
+                inventory.addItem(core.getEvents().getEventKeys().getKeys(amount));
             }
-        }.runTaskLater(FC.getFactionsCore(), 5L);
+        }.runTaskLater(core, 5L);
 
         new BukkitRunnable() {
             public void run() {
                 if(event instanceof KOTHEvent) {
                     if(event.isPalace())
-                        event.getLootChestFaction().sendMessage(EventsMessages.asPalace(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest." + "\n" + ChatColor.AQUA + "You will also be able to loot the chests within the Palace for the following week!"));
+                        event.getLootChestFaction().sendMessage(core.getEvents().getEventMessages().asPalace(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest." + "\n" + ChatColor.AQUA + "You will also be able to loot the chests within the Palace for the following week!"));
                     else
-                        event.getLootChestFaction().sendMessage(EventsMessages.asKOTH(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest."));
+                        event.getLootChestFaction().sendMessage(core.getEvents().getEventMessages().asKOTH(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest."));
                 }
 
                 if(event instanceof DTCEvent) {
                     if(event.isPalace())
-                        event.getLootChestFaction().sendMessage(EventsMessages.asPalace(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest." + "\n" + ChatColor.AQUA + "You will also be able to loot the chests within the Palace for the following week!"));
+                        event.getLootChestFaction().sendMessage(core.getEvents().getEventMessages().asPalace(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest." + "\n" + ChatColor.AQUA + "You will also be able to loot the chests within the Palace for the following week!"));
                     else
-                        event.getLootChestFaction().sendMessage(EventsMessages.asDTC(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest."));
+                        event.getLootChestFaction().sendMessage(core.getEvents().getEventMessages().asDTC(ChatColor.LIGHT_PURPLE + "" + ChatColor.UNDERLINE + amount + " Event Keys" + ChatColor.YELLOW + " have spawned in the Event Loot Chest."));
                 }
             }
-        }.runTaskLater(FC.getFactionsCore(), 5 * 20L);
+        }.runTaskLater(core, 5 * 20L);
     }
 
-    public static void loadEvents() {
-        if(FileManager.getEvents().get("events") == null)
+    public void loadEvents() {
+        if(core.getFileManager().getEvents().get("events") == null)
             return;
 
-        for(String eventNames : FileManager.getEvents().getConfigurationSection("events").getKeys(false)) {
+        for(String eventNames : core.getFileManager().getEvents().getConfigurationSection("events").getKeys(false)) {
             Location lootChest;
 
-            if(EventManager.getEventByName(eventNames) != null) continue;
+            if(core.getEvents().getEventManager() == null || core.getEvents().getEventManager().getEventByName(eventNames) != null) continue;
 
-            String displayName = ChatColor.translateAlternateColorCodes('&', FileManager.getEvents().getString("events." + eventNames + ".display-name"));
-            boolean palace = FileManager.getEvents().getBoolean("events." + eventNames + ".palace");
-            int winCond = FileManager.getEvents().getInt("events." + eventNames + ".win-cond");
-            UUID hookedFactionId = UUID.fromString(FileManager.getEvents().getString("events." + eventNames + ".hooked-claim"));
+            String displayName = ChatColor.translateAlternateColorCodes('&', core.getFileManager().getEvents().getString("events." + eventNames + ".display-name"));
+            boolean palace = core.getFileManager().getEvents().getBoolean("events." + eventNames + ".palace");
+            int winCond = core.getFileManager().getEvents().getInt("events." + eventNames + ".win-cond");
+            UUID hookedFactionId = UUID.fromString(core.getFileManager().getEvents().getString("events." + eventNames + ".hooked-claim"));
 
-            int lootChestX = FileManager.getEvents().getInt("events." + eventNames + ".loot-chest.x");
-            int lootChestY = FileManager.getEvents().getInt("events." + eventNames + ".loot-chest.y");
-            int lootChestZ = FileManager.getEvents().getInt("events." + eventNames + ".loot-chest.z");
-            String lootChestWorld = FileManager.getEvents().getString("events." + eventNames + ".loot-chest.world");
+            int lootChestX = core.getFileManager().getEvents().getInt("events." + eventNames + ".loot-chest.x");
+            int lootChestY = core.getFileManager().getEvents().getInt("events." + eventNames + ".loot-chest.y");
+            int lootChestZ = core.getFileManager().getEvents().getInt("events." + eventNames + ".loot-chest.z");
+            String lootChestWorld = core.getFileManager().getEvents().getString("events." + eventNames + ".loot-chest.world");
             lootChest = new Location(Bukkit.getWorld(lootChestWorld), lootChestX, lootChestY, lootChestZ);
 
             Map<Integer, Map<Integer, Integer>> schedule = new HashMap<>();
 
-            for(String days : FileManager.getEvents().getConfigurationSection("events." + eventNames + ".schedule").getKeys(false)) {
-                int hr = FileManager.getEvents().getInt("events." + eventNames + ".schedule." + days + ".hr");
-                int min = FileManager.getEvents().getInt("events." + eventNames + ".schedule." + days + ".min");
+            for(String days : core.getFileManager().getEvents().getConfigurationSection("events." + eventNames + ".schedule").getKeys(false)) {
+                int hr = core.getFileManager().getEvents().getInt("events." + eventNames + ".schedule." + days + ".hr");
+                int min = core.getFileManager().getEvents().getInt("events." + eventNames + ".schedule." + days + ".min");
 
                 Map<Integer, Integer> time = new HashMap<>();
                 time.put(hr, min);
@@ -323,45 +323,45 @@ public class EventManager {
                 schedule.put(Integer.valueOf(days), time);
             }
 
-            if(FileManager.getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("KOTH")) {
+            if(core.getFileManager().getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("KOTH")) {
                 Location cornerOne = null, cornerTwo = null;
 
-                String worldName = FileManager.getEvents().getString("events." + eventNames + ".capzone.world");
+                String worldName = core.getFileManager().getEvents().getString("events." + eventNames + ".capzone.world");
 
-                int cornerOneX = FileManager.getEvents().getInt("events." + eventNames + ".capzone.cornerone.x");
-                int cornerOneY = FileManager.getEvents().getInt("events." + eventNames + ".capzone.cornerone.y");
-                int cornerOneZ = FileManager.getEvents().getInt("events." + eventNames + ".capzone.cornerone.z");
+                int cornerOneX = core.getFileManager().getEvents().getInt("events." + eventNames + ".capzone.cornerone.x");
+                int cornerOneY = core.getFileManager().getEvents().getInt("events." + eventNames + ".capzone.cornerone.y");
+                int cornerOneZ = core.getFileManager().getEvents().getInt("events." + eventNames + ".capzone.cornerone.z");
                 cornerOne = new Location(Bukkit.getWorld(worldName), cornerOneX, cornerOneY, cornerOneZ);
 
-                int cornerTwoX = FileManager.getEvents().getInt("events." + eventNames + ".capzone.cornertwo.x");
-                int cornerTwoY = FileManager.getEvents().getInt("events." + eventNames + ".capzone.cornertwo.y");
-                int cornerTwoZ = FileManager.getEvents().getInt("events." + eventNames + ".capzone.cornertwo.z");
+                int cornerTwoX = core.getFileManager().getEvents().getInt("events." + eventNames + ".capzone.cornertwo.x");
+                int cornerTwoY = core.getFileManager().getEvents().getInt("events." + eventNames + ".capzone.cornertwo.y");
+                int cornerTwoZ = core.getFileManager().getEvents().getInt("events." + eventNames + ".capzone.cornertwo.z");
                 cornerTwo = new Location(Bukkit.getWorld(worldName), cornerTwoX, cornerTwoY, cornerTwoZ);
 
-                int duration = FileManager.getEvents().getInt("events." + eventNames + ".duration");
+                int duration = core.getFileManager().getEvents().getInt("events." + eventNames + ".duration");
 
                 KOTHEvent kothEvent = new KOTHEvent(eventNames, displayName, hookedFactionId, lootChest, schedule, new CapZone(cornerOne, cornerTwo, worldName), duration, winCond, palace);
-                EventManager.getEvents().add(kothEvent);
+                core.getEvents().getEventManager().getEvents().add(kothEvent);
 
                 continue;
             }
 
-            if(FileManager.getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("DTC")) {
-                Location core = null;
+            if(core.getFileManager().getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("DTC")) {
+                Location coreLocation = null;
 
-                int coreX = FileManager.getEvents().getInt("events." + eventNames + ".core.x");
-                int coreY = FileManager.getEvents().getInt("events." + eventNames + ".core.y");
-                int coreZ = FileManager.getEvents().getInt("events." + eventNames + ".core.z");
-                String coreWorld = FileManager.getEvents().getString("events." + eventNames + ".core.world");
-                core = new Location(Bukkit.getWorld(coreWorld), coreX, coreY, coreZ);
+                int coreX = core.getFileManager().getEvents().getInt("events." + eventNames + ".core.x");
+                int coreY = core.getFileManager().getEvents().getInt("events." + eventNames + ".core.y");
+                int coreZ = core.getFileManager().getEvents().getInt("events." + eventNames + ".core.z");
+                String coreWorld = core.getFileManager().getEvents().getString("events." + eventNames + ".core.world");
+                coreLocation = new Location(Bukkit.getWorld(coreWorld), coreX, coreY, coreZ);
 
-                int regenTimer = FileManager.getEvents().getInt("events." + eventNames + ".regen-timer");
+                int regenTimer = core.getFileManager().getEvents().getInt("events." + eventNames + ".regen-timer");
 
-                DTCEvent dtcEvent = new DTCEvent(eventNames, displayName, hookedFactionId, lootChest, schedule, core, winCond, regenTimer, palace);
-                EventManager.getEvents().add(dtcEvent);
+                DTCEvent dtcEvent = new DTCEvent(eventNames, displayName, hookedFactionId, lootChest, schedule, coreLocation, winCond, regenTimer, palace);
+                core.getEvents().getEventManager().getEvents().add(dtcEvent);
             }
         }
 
-        Logger.log("Loaded " + events.size() + " Events");
+        core.getLog().log("Loaded " + events.size() + " Events");
     }
 }

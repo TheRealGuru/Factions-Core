@@ -3,9 +3,9 @@ package gg.revival.factions.core.locations.listener;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.claims.ServerClaimType;
-import gg.revival.factions.core.locations.Locations;
-import gg.revival.factions.core.tools.PlayerTools;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.obj.ServerFaction;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -17,20 +17,26 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class LocationsListener implements Listener {
 
+    @Getter private FC core;
+
+    public LocationsListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
         if(!player.hasPlayedBefore()) {
-            player.teleport(Locations.getSpawnLocation());
-            PlayerTools.cleanupPlayer(player);
+            player.teleport(core.getLocations().getSpawnLocation());
+            core.getPlayerTools().cleanupPlayer(player);
         }
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        event.setRespawnLocation(Locations.getSpawnLocation());
-        PlayerTools.cleanupPlayer(event.getPlayer());
+        event.setRespawnLocation(core.getLocations().getSpawnLocation());
+        core.getPlayerTools().cleanupPlayer(event.getPlayer());
     }
 
     @EventHandler
@@ -46,14 +52,14 @@ public class LocationsListener implements Listener {
 
             if(!serverFaction.getType().equals(ServerClaimType.SAFEZONE)) return;
 
-            event.setTo(Locations.getSpawnLocation());
+            event.setTo(core.getLocations().getSpawnLocation());
         }
 
         if(to.getWorld().getEnvironment().equals(World.Environment.THE_END))
-            event.setTo(Locations.getEndSpawnLocation());
+            event.setTo(core.getLocations().getEndSpawnLocation());
 
         if(from.getWorld().getEnvironment().equals(World.Environment.THE_END))
-            event.setTo(Locations.getEndExitLocation());
+            event.setTo(core.getLocations().getEndExitLocation());
     }
 
 }

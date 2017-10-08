@@ -14,7 +14,7 @@ public class ShieldTools {
      * @param pos
      * @return
      */
-    public static Collection<Claim> getNearbyClaims(BlockPos pos) {
+    public Collection<Claim> getNearbyClaims(BlockPos pos) {
         Collection<Claim> nearbyClaims = new CopyOnWriteArrayList<>();
         List<Claim> claimCache = new CopyOnWriteArrayList<>(ClaimManager.getActiveClaims());
 
@@ -33,7 +33,7 @@ public class ShieldTools {
      * @param pos
      * @return
      */
-    public static boolean isInsideClaim(Claim claim, BlockPos pos) {
+    public boolean isInsideClaim(Claim claim, BlockPos pos) {
         if (!pos.getWorldName().equals(claim.getWorldName())) return false;
 
         double xMin = Math.min(claim.getX1(), claim.getX2());
@@ -53,7 +53,7 @@ public class ShieldTools {
      * @param dist
      * @return
      */
-    public static boolean isNearbyClaim(Claim claim, BlockPos pos, int dist) {
+    public boolean isNearbyClaim(Claim claim, BlockPos pos, int dist) {
         if (!pos.getWorldName().equalsIgnoreCase(claim.getWorldName())) return false;
 
         if(isInsideClaim(claim, new BlockPos(pos.getX(), pos.getY(), pos.getZ() + dist, pos.getWorldName())))
@@ -89,7 +89,7 @@ public class ShieldTools {
      * @param yLevel
      * @return
      */
-    public static Collection<BlockPos> getClaimPerimeterAsBlockPos(Claim claim, int yLevel) {
+    public Collection<BlockPos> getClaimPerimeterAsBlockPos(Claim claim, int yLevel) {
         Collection<BlockPos> blocks = new CopyOnWriteArrayList<>();
 
         double xMin = Math.min(claim.getX1(), claim.getX2());

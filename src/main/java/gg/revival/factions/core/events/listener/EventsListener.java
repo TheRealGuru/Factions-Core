@@ -5,10 +5,10 @@ import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.claims.ServerClaimType;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.ServerFaction;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,6 +21,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.UUID;
 
 public class EventsListener implements Listener {
+
+    @Getter private FC core;
+
+    public EventsListener(FC core) {
+        this.core = core;
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -42,9 +48,9 @@ public class EventsListener implements Listener {
 
                 if(serverFaction == null || !serverFaction.getType().equals(ServerClaimType.EVENT)) return;
 
-                if(EventManager.getActiveEvents().isEmpty()) return;
+                if(core.getEvents().getEventManager().getActiveEvents().isEmpty()) return;
 
-                for(Event activeEvents : EventManager.getActiveEvents()) {
+                for(Event activeEvents : core.getEvents().getEventManager().getActiveEvents()) {
                     if(activeEvents.getHookedFactionId() == null || !activeEvents.getHookedFactionId().equals(serverFaction.getFactionID())) continue;
                     needsTeleport = true;
                 }
@@ -64,7 +70,7 @@ public class EventsListener implements Listener {
                 player.teleport(safeBlock.add(0, 2, 0));
                 player.sendMessage(ChatColor.RED + "" + ChatColor.UNDERLINE + "You have been teleported outside the event claims");
             }
-        }.runTaskLater(FC.getFactionsCore(), 20L);
+        }.runTaskLater(core, 20L);
     }
 
 }

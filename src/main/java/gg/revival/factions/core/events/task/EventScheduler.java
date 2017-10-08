@@ -1,18 +1,23 @@
 package gg.revival.factions.core.events.task;
 
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.events.engine.EventManager;
 import gg.revival.factions.core.events.obj.Event;
-import gg.revival.factions.core.tools.Configuration;
+import lombok.Getter;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Calendar;
 
 public class EventScheduler extends BukkitRunnable implements Runnable {
 
+    @Getter private FC core;
+
+    public EventScheduler(FC core) {
+        this.core = core;
+    }
+
     @Override
     public void run() {
-        if(EventManager.getEvents().isEmpty() || !Configuration.automateEvents) return;
+        if(core.getEvents().getEventManager() == null || core.getEvents().getEventManager().getEvents().isEmpty() || !core.getConfiguration().automateEvents) return;
 
         Calendar calendar = Calendar.getInstance();
 
@@ -20,7 +25,7 @@ public class EventScheduler extends BukkitRunnable implements Runnable {
         int hr = calendar.get(Calendar.HOUR);
         int min = calendar.get(Calendar.MINUTE);
 
-        for(Event events : EventManager.getEvents()) {
+        for(Event events : core.getEvents().getEventManager().getEvents()) {
             if(events.isActive() || !events.getSchedule().containsKey(day)) continue;
 
             int foundHr = events.getSchedule().get(day).keySet().iterator().next();
@@ -30,9 +35,9 @@ public class EventScheduler extends BukkitRunnable implements Runnable {
 
             new BukkitRunnable() {
                 public void run() {
-                    EventManager.startEvent(events);
+                    core.getEvents().getEventManager().startEvent(events);
                 }
-            }.runTask(FC.getFactionsCore());
+            }.runTask(core);
         }
     }
 }

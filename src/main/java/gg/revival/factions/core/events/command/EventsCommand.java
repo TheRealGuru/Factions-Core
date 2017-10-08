@@ -1,21 +1,15 @@
 package gg.revival.factions.core.events.command;
 
 import com.google.common.base.Joiner;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.events.builder.DTCBuilder;
-import gg.revival.factions.core.events.builder.EventBuilder;
 import gg.revival.factions.core.events.builder.KOTHBuilder;
-import gg.revival.factions.core.events.chests.ChestManager;
 import gg.revival.factions.core.events.chests.ClaimChest;
 import gg.revival.factions.core.events.chests.ClaimChestType;
-import gg.revival.factions.core.events.chests.LootTables;
-import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.events.gui.EventsGUI;
-import gg.revival.factions.core.events.messages.EventsMessages;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.tools.BlockTools;
-import gg.revival.factions.core.tools.Configuration;
-import gg.revival.factions.core.tools.FileManager;
 import gg.revival.factions.core.tools.Permissions;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,6 +27,12 @@ import java.util.UUID;
 
 public class EventsCommand implements CommandExecutor {
 
+    @Getter private FC core;
+
+    public EventsCommand(FC core) {
+        this.core = core;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[]) {
         if(!command.getName().equalsIgnoreCase("events")) return false;
@@ -42,7 +42,7 @@ public class EventsCommand implements CommandExecutor {
         Player player = (Player)sender;
 
         if(args.length == 0) {
-            EventsGUI.open(player);
+            core.getEvents().getEventsGUI().open(player);
             return false;
         }
 
@@ -53,11 +53,11 @@ public class EventsCommand implements CommandExecutor {
                     return false;
                 }
 
-                Configuration.automateEvents = !Configuration.automateEvents;
-                FileManager.getEvents().set("configuration.automated", Configuration.automateEvents);
-                FileManager.saveEvents();
+                core.getConfiguration().automateEvents = !core.getConfiguration().automateEvents;
+                core.getFileManager().getEvents().set("configuration.automated", core.getConfiguration().automateEvents);
+                core.getFileManager().saveEvents();
 
-                if(Configuration.automateEvents)
+                if(core.getConfiguration().automateEvents)
                     player.sendMessage(ChatColor.GREEN + "Events will now run automatically");
                 else
                     player.sendMessage(ChatColor.GREEN + "Events will no longer run automatically");
@@ -67,12 +67,12 @@ public class EventsCommand implements CommandExecutor {
 
             String namedEvent = args[0];
 
-            if(EventManager.getEventByName(namedEvent) == null) {
+            if(core.getEvents().getEventManager().getEventByName(namedEvent) == null) {
                 player.sendMessage(ChatColor.RED + "Event not found, here's a list of valid events: ");
 
                 List<String> eventNames = new ArrayList<>();
 
-                for(Event events : EventManager.getActiveEvents()) {
+                for(Event events : core.getEvents().getEventManager().getActiveEvents()) {
                     eventNames.add(events.getEventName());
                 }
 
@@ -81,8 +81,8 @@ public class EventsCommand implements CommandExecutor {
                 return false;
             }
 
-            Event event = EventManager.getEventByName(namedEvent);
-            player.sendMessage(EventsMessages.eventInfo(event));
+            Event event = core.getEvents().getEventManager().getEventByName(namedEvent);
+            player.sendMessage(core.getEvents().getEventMessages().eventInfo(event));
 
             return false;
         }
@@ -96,19 +96,19 @@ public class EventsCommand implements CommandExecutor {
 
                 String namedEvent = args[1];
 
-                if(EventManager.getEventByName(namedEvent) == null) {
+                if(core.getEvents().getEventManager().getEventByName(namedEvent) == null) {
                     player.sendMessage(ChatColor.RED + "Event not found");
                     return false;
                 }
 
-                Event event = EventManager.getEventByName(namedEvent);
+                Event event = core.getEvents().getEventManager().getEventByName(namedEvent);
 
                 if(event.isActive()) {
                     player.sendMessage(ChatColor.RED + "Event is already active");
                     return false;
                 }
 
-                EventManager.startEvent(event);
+                core.getEvents().getEventManager().startEvent(event);
                 player.sendMessage(ChatColor.GREEN + "Event started");
 
                 return false;
@@ -122,19 +122,19 @@ public class EventsCommand implements CommandExecutor {
 
                 String namedEvent = args[1];
 
-                if(EventManager.getEventByName(namedEvent) == null) {
+                if(core.getEvents().getEventManager().getEventByName(namedEvent) == null) {
                     player.sendMessage(ChatColor.RED + "Event not found");
                     return false;
                 }
 
-                Event event = EventManager.getEventByName(namedEvent);
+                Event event = core.getEvents().getEventManager().getEventByName(namedEvent);
 
                 if(!event.isActive()) {
                     player.sendMessage(ChatColor.RED + "Event is already inactive");
                     return false;
                 }
 
-                EventManager.stopEvent(event);
+                core.getEvents().getEventManager().stopEvent(event);
                 player.sendMessage(ChatColor.GREEN + "Event stopped");
 
                 return false;
@@ -148,7 +148,7 @@ public class EventsCommand implements CommandExecutor {
 
                 String namedEvent = args[1];
 
-                if(EventManager.getEventByName(namedEvent) == null) {
+                if(core.getEvents().getEventManager().getEventByName(namedEvent) == null) {
                     player.sendMessage(ChatColor.RED + "Event not found");
                     return false;
                 }
@@ -165,26 +165,26 @@ public class EventsCommand implements CommandExecutor {
                 String namedEventType = args[1];
 
                 if(namedEventType.equalsIgnoreCase("KOTH")) {
-                    if(EventBuilder.getKOTHBuilder(player.getUniqueId()) != null) {
+                    if(core.getEvents().getEventBuilder().getKOTHBuilder(player.getUniqueId()) != null) {
                         player.sendMessage(ChatColor.RED + "You are already building an event. Finish building that one to start a new one.");
                         return false;
                     }
 
-                    KOTHBuilder builder = new KOTHBuilder(Configuration.defaultKothDuration, Configuration.defaultKothWinCondition);
-                    EventBuilder.getKothBuilders().put(player.getUniqueId(), builder);
+                    KOTHBuilder builder = new KOTHBuilder(core.getConfiguration().defaultKothDuration, core.getConfiguration().defaultKothWinCondition);
+                    core.getEvents().getEventBuilder().getKothBuilders().put(player.getUniqueId(), builder);
                     player.sendMessage(builder.getPhaseResponse());
 
                     return false;
                 }
 
                 if(namedEventType.equalsIgnoreCase("DTC")) {
-                    if(EventBuilder.getDTCBuilder(player.getUniqueId()) != null) {
+                    if(core.getEvents().getEventBuilder().getDTCBuilder(player.getUniqueId()) != null) {
                         player.sendMessage(ChatColor.RED + "You are already building an event. Finish building that one to start a new one.");
                         return false;
                     }
 
-                    DTCBuilder builder = new DTCBuilder(Configuration.defaultDtcRegen, Configuration.defaultDtcWincond);
-                    EventBuilder.getDtcBuilders().put(player.getUniqueId(), builder);
+                    DTCBuilder builder = new DTCBuilder(core.getConfiguration().defaultDtcRegen, core.getConfiguration().defaultDtcWincond);
+                    core.getEvents().getEventBuilder().getDtcBuilders().put(player.getUniqueId(), builder);
                     player.sendMessage(builder.getPhaseResponse());
                     return false;
                 }
@@ -202,17 +202,17 @@ public class EventsCommand implements CommandExecutor {
 
                 Block targetBlock = BlockTools.getTargetBlock(player, 4);
 
-                if(targetBlock == null || ChestManager.getClaimChestByLocation(targetBlock.getLocation()) == null) {
+                if(targetBlock == null || core.getEvents().getChestManager().getClaimChestByLocation(targetBlock.getLocation()) == null) {
                     player.sendMessage(ChatColor.RED + "You are not looking at a Claim Chest");
                     return false;
                 }
 
-                ClaimChest claimChest = ChestManager.getClaimChestByLocation(targetBlock.getLocation());
+                ClaimChest claimChest = core.getEvents().getChestManager().getClaimChestByLocation(targetBlock.getLocation());
 
                 if(claimChest != null && claimChest.getAboveArmorStand() != null)
                     claimChest.getAboveArmorStand().remove();
 
-                ChestManager.deleteChest(claimChest);
+                core.getEvents().getChestManager().deleteChest(claimChest);
 
                 player.sendMessage(ChatColor.GREEN + "Claim chest deleted");
 
@@ -230,7 +230,7 @@ public class EventsCommand implements CommandExecutor {
                 if(args[1].equalsIgnoreCase("create") || args[1].equalsIgnoreCase("update") || args[1].equalsIgnoreCase("edit")) {
                     String namedTable = args[2];
 
-                    LootTables.openEditor(player, namedTable);
+                    core.getEvents().getLootTables().openEditor(player, namedTable);
 
                     return false;
                 }
@@ -238,12 +238,12 @@ public class EventsCommand implements CommandExecutor {
                 if(args[1].equalsIgnoreCase("delete")) {
                     String namedTable = args[2];
 
-                    if(LootTables.getLootTableByName(namedTable) == null) {
-                        player.sendMessage(ChatColor.RED + "Invalid loot table. Valid loot tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(LootTables.getLootTables().keySet()));
+                    if(core.getEvents().getLootTables().getLootTableByName(namedTable) == null) {
+                        player.sendMessage(ChatColor.RED + "Invalid loot table. Valid loot tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(core.getEvents().getLootTables().getLootTables().keySet()));
                         return false;
                     }
 
-                    LootTables.deleteLootTable(namedTable);
+                    core.getEvents().getLootTables().deleteLootTable(namedTable);
                     player.sendMessage(ChatColor.RED + "Loot table deleted." + ChatColor.DARK_RED + " Warning: All event chests connected to this table are now fucked and you need to remove them.");
                     return false;
                 }
@@ -270,8 +270,8 @@ public class EventsCommand implements CommandExecutor {
                     return false;
                 }
 
-                if(LootTables.getLootTableByName(namedTable) == null) {
-                    player.sendMessage(ChatColor.RED + "Invalid loot table. Valid tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(LootTables.getLootTables().keySet()));
+                if(core.getEvents().getLootTables().getLootTableByName(namedTable) == null) {
+                    player.sendMessage(ChatColor.RED + "Invalid loot table. Valid tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(core.getEvents().getLootTables().getLootTables().keySet()));
                     return false;
                 }
 
@@ -283,7 +283,7 @@ public class EventsCommand implements CommandExecutor {
                 type = ClaimChestType.valueOf(namedType.toUpperCase());
 
                 ClaimChest claimChest = new ClaimChest(UUID.randomUUID(), targetBlock.getLocation(), namedTable, type);
-                ChestManager.createChest(claimChest);
+                core.getEvents().getChestManager().createChest(claimChest);
 
                 ArmorStand nameplate = (ArmorStand)targetBlock.getLocation().getWorld().spawnEntity(
                         new Location(targetBlock.getWorld(), targetBlock.getX() + 0.5, targetBlock.getY() - 1, targetBlock.getZ() + 0.5), EntityType.ARMOR_STAND);

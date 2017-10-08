@@ -13,7 +13,7 @@ public class Death {
     @Getter long createdTime;
     @Getter @Setter long expiresTime;
 
-    public Death(UUID uuid, UUID killed, String reason, long createdTimed, long expiresTime) {
+    Death(UUID uuid, UUID killed, String reason, long createdTimed, long expiresTime) {
         this.uuid = uuid;
         this.killed = killed;
         this.reason = reason;

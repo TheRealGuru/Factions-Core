@@ -1,7 +1,7 @@
 package gg.revival.factions.core.events.task;
 
-import gg.revival.factions.core.events.engine.EventManager;
-import gg.revival.factions.core.events.gui.EventsGUI;
+import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -10,9 +10,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GUIUpdaterTask extends BukkitRunnable implements Runnable {
 
+    @Getter private FC core;
+
+    public GUIUpdaterTask(FC core) {
+        this.core = core;
+    }
+
     @Override
     public void run() {
-        if(EventManager.getActiveEvents().isEmpty()) return;
+        if(core.getEvents().getEventManager() == null || core.getEvents().getEventManager().getActiveEvents().isEmpty()) return;
 
         for(Player players : Bukkit.getOnlinePlayers()) {
             if(players.getOpenInventory() == null) continue;
@@ -20,9 +26,9 @@ public class GUIUpdaterTask extends BukkitRunnable implements Runnable {
             InventoryView inventoryView = players.getOpenInventory();
             Inventory inventory = inventoryView.getTopInventory();
 
-            if(!EventsGUI.isGUI(inventory)) return;
+            if(!core.getEvents().getEventsGUI().isGUI(inventory)) return;
 
-            EventsGUI.update(inventory);
+            core.getEvents().getEventsGUI().update(inventory);
         }
     }
 

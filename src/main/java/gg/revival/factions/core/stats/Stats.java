@@ -6,10 +6,8 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import gg.revival.driver.MongoAPI;
 import gg.revival.factions.core.FC;
-import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.stats.command.StatsCommand;
 import gg.revival.factions.core.stats.listener.StatsListener;
-import gg.revival.factions.core.tools.Configuration;
 import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -23,9 +21,16 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class Stats {
 
-    @Getter static Set<PlayerStats> activeStats = Sets.newConcurrentHashSet();
+    @Getter private FC core;
+    @Getter Set<PlayerStats> activeStats = Sets.newConcurrentHashSet();
 
-    public static void loadStats(UUID uuid) {
+    public Stats(FC core) {
+        this.core = core;
+
+        onEnable();
+    }
+
+    public void loadStats(UUID uuid) {
         getStats(uuid, stats -> {
             PlayerStats result = null;
 
@@ -38,7 +43,7 @@ public class Stats {
         });
     }
 
-    public static void getStats(UUID uuid, StatsCallback callback) {
+    public void getStats(UUID uuid, StatsCallback callback) {
         ImmutableList<PlayerStats> cache = ImmutableList.copyOf(activeStats);
 
         for(PlayerStats stats : cache) {
@@ -50,10 +55,10 @@ public class Stats {
 
         new BukkitRunnable() {
             public void run() {
-                if(DBManager.getStats() == null)
-                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "playerstats"));
+                if(core.getDatabaseManager().getStats() == null)
+                    core.getDatabaseManager().setStats(MongoAPI.getCollection(core.getConfiguration().databaseName, "playerstats"));
 
-                MongoCollection<Document> collection = DBManager.getStats();
+                MongoCollection<Document> collection = core.getDatabaseManager().getStats();
                 FindIterable<Document> query = null;
 
                 try {
@@ -80,7 +85,7 @@ public class Stats {
                         public void run() {
                             callback.onQueryDone(playerStats);
                         }
-                    }.runTask(FC.getFactionsCore());
+                    }.runTask(core);
 
                     return;
                 }
@@ -89,20 +94,20 @@ public class Stats {
                     public void run() {
                         callback.onQueryDone(null);
                     }
-                }.runTask(FC.getFactionsCore());
+                }.runTask(core);
             }
-        }.runTaskAsynchronously(FC.getFactionsCore());
+        }.runTaskAsynchronously(core);
     }
 
-    public static void saveStats(PlayerStats stats, boolean unsafe) {
+    public void saveStats(PlayerStats stats, boolean unsafe) {
         if(unsafe) {
             ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
             Runnable saveTask = () -> {
-                if(DBManager.getStats() == null)
-                    DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "playerstats"));
+                if(core.getDatabaseManager().getStats() == null)
+                    core.getDatabaseManager().setStats(MongoAPI.getCollection(core.getConfiguration().databaseName, "playerstats"));
 
-                MongoCollection<Document> collection = DBManager.getStats();
+                MongoCollection<Document> collection = core.getDatabaseManager().getStats();
                 FindIterable<Document> query = null;
 
                 try {
@@ -134,10 +139,10 @@ public class Stats {
         else {
             new BukkitRunnable() {
                 public void run() {
-                    if(DBManager.getStats() == null)
-                        DBManager.setStats(MongoAPI.getCollection(Configuration.databaseName, "playerstats"));
+                    if(core.getDatabaseManager().getStats() == null)
+                        core.getDatabaseManager().setStats(MongoAPI.getCollection(core.getConfiguration().databaseName, "playerstats"));
 
-                    MongoCollection<Document> collection = DBManager.getStats();
+                    MongoCollection<Document> collection = core.getDatabaseManager().getStats();
                     FindIterable<Document> query = null;
 
                     try {
@@ -162,7 +167,7 @@ public class Stats {
                     else
                         collection.insertOne(newDocument);
                 }
-            }.runTaskAsynchronously(FC.getFactionsCore());
+            }.runTaskAsynchronously(core);
         }
     }
 
@@ -170,7 +175,7 @@ public class Stats {
 
      */
 
-    public static String getFormattedStats(PlayerStats stats, String statsUsername) {
+    public String getFormattedStats(PlayerStats stats, String statsUsername) {
         StringBuilder message = new StringBuilder();
 
         message.append(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "-----------------------------------" + "\n");
@@ -212,26 +217,26 @@ public class Stats {
         return message.toString();
     }
 
-    public static void onEnable() {
-        if(Configuration.statsEnabled)
+    public void onEnable() {
+        if(core.getConfiguration().statsEnabled)
             loadListeners();
 
         loadCommands();
     }
 
-    public static void onDisable() {
-        if(Configuration.statsEnabled && Configuration.trackStats) {
+    public void onDisable() {
+        if(core.getConfiguration().statsEnabled && core.getConfiguration().trackStats) {
             for(PlayerStats loaded : activeStats)
                 saveStats(loaded, true);
         }
     }
 
-    private static void loadListeners() {
-        Bukkit.getPluginManager().registerEvents(new StatsListener(), FC.getFactionsCore());
+    private void loadListeners() {
+        Bukkit.getPluginManager().registerEvents(new StatsListener(core), core);
     }
 
-    private static void loadCommands() {
-        FC.getFactionsCore().getCommand("statistics").setExecutor(new StatsCommand());
+    private void loadCommands() {
+        core.getCommand("statistics").setExecutor(new StatsCommand(core));
     }
 
 }

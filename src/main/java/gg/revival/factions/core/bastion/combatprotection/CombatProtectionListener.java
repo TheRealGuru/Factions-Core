@@ -1,6 +1,7 @@
 package gg.revival.factions.core.bastion.combatprotection;
 
-import gg.revival.factions.core.tools.Configuration;
+import gg.revival.factions.core.FC;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -21,13 +22,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CombatProtectionListener implements Listener {
 
+    @Getter private FC core;
+
+    public CombatProtectionListener(FC core) {
+        this.core = core;
+    }
+
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
 
-        if(!Configuration.pvpProtEnabled) return;
+        if(!core.getConfiguration().pvpProtEnabled) return;
 
-        CombatProtection.giveProtection(player, Configuration.pvpProtDuration);
+        core.getBastion().getCombatProtection().giveProtection(player, core.getConfiguration().pvpProtDuration);
     }
 
     @EventHandler
@@ -37,9 +44,9 @@ public class CombatProtectionListener implements Listener {
 
         if(!from.getEnvironment().equals(World.Environment.NORMAL)) return;
 
-        if(!Configuration.pvpSafetyEnabled) return;
+        if(!core.getConfiguration().pvpSafetyEnabled) return;
 
-        CombatProtection.giveSafety(player, Configuration.pvpSafetyDuration);
+        core.getBastion().getCombatProtection().giveSafety(player, core.getConfiguration().pvpSafetyDuration);
     }
 
     @EventHandler
@@ -62,7 +69,7 @@ public class CombatProtectionListener implements Listener {
 
             Player affectedPlayer = (Player)entities;
 
-            if((CombatProtection.hasProt(affectedPlayer) && Configuration.pvpProtEnabled) || (CombatProtection.hasSafety(affectedPlayer) && Configuration.pvpSafetyEnabled))
+            if((core.getBastion().getCombatProtection().hasProt(affectedPlayer) && core.getConfiguration().pvpProtEnabled) || (core.getBastion().getCombatProtection().hasSafety(affectedPlayer) && core.getConfiguration().pvpSafetyEnabled))
                 event.getAffectedEntities().remove(entities);
         }
     }
@@ -79,25 +86,25 @@ public class CombatProtectionListener implements Listener {
             Player playerDamaged = (Player)damaged;
             Player playerDamager = (Player)damager;
 
-            if(CombatProtection.hasSafety(playerDamaged) && Configuration.pvpSafetyEnabled) {
+            if(core.getBastion().getCombatProtection().hasSafety(playerDamaged) && core.getConfiguration().pvpSafetyEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP safety");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasSafety(playerDamager) && Configuration.pvpSafetyEnabled) {
-                CombatProtection.takeSafety(playerDamager);
+            if(core.getBastion().getCombatProtection().hasSafety(playerDamager) && core.getConfiguration().pvpSafetyEnabled) {
+                core.getBastion().getCombatProtection().takeSafety(playerDamager);
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamaged) && Configuration.pvpProtEnabled) {
+            if(core.getBastion().getCombatProtection().hasProt(playerDamaged) && core.getConfiguration().pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP protection");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamager) && Configuration.pvpProtEnabled) {
+            if(core.getBastion().getCombatProtection().hasProt(playerDamager) && core.getConfiguration().pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You have PvP protection. Type '/pvp enable' to enable combat");
                 event.setCancelled(true);
                 return;
@@ -112,25 +119,25 @@ public class CombatProtectionListener implements Listener {
             Player playerDamager = (Player)projectile.getShooter();
             Player playerDamaged = (Player)damaged;
 
-            if(CombatProtection.hasSafety(playerDamaged) && Configuration.pvpSafetyEnabled) {
+            if(core.getBastion().getCombatProtection().hasSafety(playerDamaged) && core.getConfiguration().pvpSafetyEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP safety");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasSafety(playerDamager) && Configuration.pvpSafetyEnabled) {
-                CombatProtection.takeSafety(playerDamager);
+            if(core.getBastion().getCombatProtection().hasSafety(playerDamager) && core.getConfiguration().pvpSafetyEnabled) {
+                core.getBastion().getCombatProtection().takeSafety(playerDamager);
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamaged) && Configuration.pvpProtEnabled) {
+            if(core.getBastion().getCombatProtection().hasProt(playerDamaged) && core.getConfiguration().pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You can not attack players with PvP protection");
                 event.setCancelled(true);
                 return;
             }
 
-            if(CombatProtection.hasProt(playerDamager) && Configuration.pvpProtEnabled) {
+            if(core.getBastion().getCombatProtection().hasProt(playerDamager) && core.getConfiguration().pvpProtEnabled) {
                 playerDamager.sendMessage(ChatColor.RED + "You have PvP protection. Type '/pvp enable' to enable combat");
                 event.setCancelled(true);
             }
@@ -141,7 +148,7 @@ public class CombatProtectionListener implements Listener {
     public void onPlayerChangeWorld(PlayerPortalEvent event) {
         Player player = event.getPlayer();
 
-        if(CombatProtection.hasProt(player) && Configuration.pvpProtEnabled) {
+        if(core.getBastion().getCombatProtection().hasProt(player) && core.getConfiguration().pvpProtEnabled) {
             if(!event.getTo().getWorld().getEnvironment().equals(World.Environment.THE_END))
                 player.sendMessage(ChatColor.RED + "You can not change worlds while you have PvP protection");
 

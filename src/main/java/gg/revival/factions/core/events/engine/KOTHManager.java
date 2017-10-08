@@ -1,10 +1,12 @@
 package gg.revival.factions.core.events.engine;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.core.events.obj.KOTHEvent;
 import gg.revival.factions.obj.Faction;
 import gg.revival.factions.obj.PlayerFaction;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.util.HashSet;
@@ -15,8 +17,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class KOTHManager {
 
-    public static Set<KOTHEvent> getActiveKOTHEvents() {
-        List<Event> cache = new CopyOnWriteArrayList<>(EventManager.getActiveEvents());
+    @Getter private FC core;
+
+    public KOTHManager(FC core) {
+        this.core = core;
+    }
+
+    public Set<KOTHEvent> getActiveKOTHEvents() {
+        List<Event> cache = new CopyOnWriteArrayList<>(core.getEvents().getEventManager().getActiveEvents());
         Set<KOTHEvent> result = new HashSet<>();
 
         for(Event event : cache) {
@@ -30,7 +38,7 @@ public class KOTHManager {
         return result;
     }
 
-    public static boolean shouldBeContested(Set<UUID> capzonePlayers) {
+    public boolean shouldBeContested(Set<UUID> capzonePlayers) {
         if(capzonePlayers.size() <= 1) return false;
 
         Set<Faction> factions = new HashSet<>();
@@ -50,7 +58,7 @@ public class KOTHManager {
         return factions.size() > 1;
     }
 
-    public static void updateCapTimer(KOTHEvent event) {
+    public void updateCapTimer(KOTHEvent event) {
         event.setNextTicketTime(System.currentTimeMillis() + (event.getDuration() * 1000L));
     }
 }

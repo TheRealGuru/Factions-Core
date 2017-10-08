@@ -1,9 +1,10 @@
 package gg.revival.factions.core.bastion.logout.listeners;
 
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
-import gg.revival.factions.core.bastion.logout.tasks.LogoutTask;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerType;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -14,8 +15,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
-public class LogoutListener implements Listener
-{
+public class LogoutListener implements Listener {
+
+    @Getter private FC core;
+
+    public LogoutListener(FC core) {
+        this.core = core;
+    }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDamage(EntityDamageEvent event) {
@@ -28,8 +34,8 @@ public class LogoutListener implements Listener
 
         if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
             facPlayer.removeTimer(TimerType.LOGOUT);
-            LogoutTask.getSafeloggers().remove(player.getUniqueId());
-            LogoutTask.getStartingLocations().remove(player.getUniqueId());
+            core.getBastion().getLogoutTask().getSafeloggers().remove(player.getUniqueId());
+            core.getBastion().getLogoutTask().getStartingLocations().remove(player.getUniqueId());
 
             player.sendMessage(ChatColor.RED + "Logout cancelled");
         }
@@ -45,8 +51,8 @@ public class LogoutListener implements Listener
 
             if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
                 facPlayer.removeTimer(TimerType.LOGOUT);
-                LogoutTask.getSafeloggers().remove(player.getUniqueId());
-                LogoutTask.getStartingLocations().remove(player.getUniqueId());
+                core.getBastion().getLogoutTask().getSafeloggers().remove(player.getUniqueId());
+                core.getBastion().getLogoutTask().getStartingLocations().remove(player.getUniqueId());
 
                 player.sendMessage(ChatColor.RED + "Logout cancelled");
             }
@@ -61,8 +67,8 @@ public class LogoutListener implements Listener
 
                 if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
                     facPlayer.removeTimer(TimerType.LOGOUT);
-                    LogoutTask.getSafeloggers().remove(player.getUniqueId());
-                    LogoutTask.getStartingLocations().remove(player.getUniqueId());
+                    core.getBastion().getLogoutTask().getSafeloggers().remove(player.getUniqueId());
+                    core.getBastion().getLogoutTask().getStartingLocations().remove(player.getUniqueId());
 
                     player.sendMessage(ChatColor.RED + "Logout cancelled");
                 }

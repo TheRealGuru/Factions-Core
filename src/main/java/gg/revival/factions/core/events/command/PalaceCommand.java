@@ -1,15 +1,14 @@
 package gg.revival.factions.core.events.command;
 
 import com.google.common.base.Joiner;
+import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
-import gg.revival.factions.core.events.chests.ChestManager;
 import gg.revival.factions.core.events.chests.EventChest;
-import gg.revival.factions.core.events.chests.LootTables;
 import gg.revival.factions.core.events.chests.PalaceChest;
-import gg.revival.factions.core.events.engine.PalaceManager;
 import gg.revival.factions.core.tools.BlockTools;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.obj.PlayerFaction;
+import lombok.Getter;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,13 +22,19 @@ import java.util.UUID;
 
 public class PalaceCommand implements CommandExecutor {
 
+    @Getter private FC core;
+
+    public PalaceCommand(FC core) {
+        this.core = core;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         if(!command.getName().equalsIgnoreCase("palace")) return false;
 
         if(args.length == 0) {
-            if(PalaceManager.isCaptured())
-                sender.sendMessage(ChatColor.BLUE + "Palace" + ChatColor.YELLOW + " is currently controlled by " + ChatColor.GREEN + PalaceManager.getCappedFaction().getDisplayName());
+            if(core.getEvents().getPalaceManager().isCaptured())
+                sender.sendMessage(ChatColor.BLUE + "Palace" + ChatColor.YELLOW + " is currently controlled by " + ChatColor.GREEN + core.getEvents().getPalaceManager().getCappedFaction().getDisplayName());
             else
                 sender.sendMessage(ChatColor.BLUE + "Palace" + ChatColor.YELLOW + " is currently not being controlled");
 
@@ -47,12 +52,12 @@ public class PalaceCommand implements CommandExecutor {
                     }
                 }
 
-                if(!PalaceManager.isCaptured()) {
+                if(!core.getEvents().getPalaceManager().isCaptured()) {
                     sender.sendMessage(ChatColor.RED + "Palace is not being controlled");
                     return false;
                 }
 
-                PalaceManager.resetPalace();
+                core.getEvents().getPalaceManager().resetPalace();
                 sender.sendMessage(ChatColor.GREEN + "Palace has been reset");
 
                 return false;
@@ -81,7 +86,7 @@ public class PalaceCommand implements CommandExecutor {
 
                 PlayerFaction faction = (PlayerFaction)FactionManager.getFactionByName(namedFaction);
 
-                PalaceManager.setCappers(faction);
+                core.getEvents().getPalaceManager().setCappers(faction);
 
                 faction.sendMessage(ChatColor.GREEN + "Your faction is now controlling the Palace");
                 sender.sendMessage(ChatColor.GREEN + faction.getDisplayName() + " is now controlling the Palace");
@@ -104,19 +109,19 @@ public class PalaceCommand implements CommandExecutor {
 
                 Block targetBlock = BlockTools.getTargetBlock(player, 4);
 
-                if(targetBlock == null || ChestManager.getEventChestByLocation(targetBlock.getLocation()) == null) {
+                if(targetBlock == null || core.getEvents().getChestManager().getEventChestByLocation(targetBlock.getLocation()) == null) {
                     player.sendMessage(ChatColor.RED + "You are not looking at a Palace Chest");
                     return false;
                 }
 
-                EventChest eventChest = ChestManager.getEventChestByLocation(targetBlock.getLocation());
+                EventChest eventChest = core.getEvents().getChestManager().getEventChestByLocation(targetBlock.getLocation());
 
                 if(!(eventChest instanceof PalaceChest)) {
                     player.sendMessage(ChatColor.RED + "This is indeed an Event chest, but not a Palace chest");
                     return false;
                 }
 
-                ChestManager.deleteChest(eventChest);
+                core.getEvents().getChestManager().deleteChest(eventChest);
                 player.sendMessage(ChatColor.GREEN + "Palace chest deleted");
 
                 return false;
@@ -153,15 +158,15 @@ public class PalaceCommand implements CommandExecutor {
                     return false;
                 }
 
-                if(LootTables.getLootTableByName(namedTable) == null) {
-                    player.sendMessage(ChatColor.RED + "Invalid loot table. Valid loot tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(LootTables.getLootTables().keySet()));
+                if(core.getEvents().getLootTables().getLootTableByName(namedTable) == null) {
+                    player.sendMessage(ChatColor.RED + "Invalid loot table. Valid loot tables" + ChatColor.WHITE + ": " + Joiner.on(", ").join(core.getEvents().getLootTables().getLootTables().keySet()));
                     return false;
                 }
 
                 int tier = NumberUtils.toInt(namedTier);
 
                 PalaceChest palaceChest = new PalaceChest(UUID.randomUUID(), targetBlock.getLocation(), namedTable, tier);
-                ChestManager.createChest(palaceChest);
+                core.getEvents().getChestManager().createChest(palaceChest);
 
                 player.sendMessage(ChatColor.GREEN + "Palace chest created");
 
