@@ -1,8 +1,12 @@
 package gg.revival.factions.core.tools;
 
+import gg.revival.factions.claims.ServerClaimType;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.FactionManager;
+import gg.revival.factions.core.PlayerManager;
+import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.PlayerFaction;
+import gg.revival.factions.obj.ServerFaction;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,6 +48,13 @@ public class PlayerTools {
             if(!(nearbyEntities instanceof Player)) continue;
 
             Player foundPlayer = (Player)nearbyEntities;
+            FPlayer facPlayer = PlayerManager.getPlayer(foundPlayer.getUniqueId());
+
+            if(facPlayer.getLocation() != null && facPlayer.getLocation().getCurrentClaim() != null && facPlayer.getLocation().getCurrentClaim().getClaimOwner() instanceof ServerFaction) {
+                ServerFaction serverFaction = (ServerFaction)facPlayer.getLocation().getCurrentClaim().getClaimOwner();
+
+                if(serverFaction.getType().equals(ServerClaimType.SAFEZONE)) continue;
+            }
 
             if(FactionManager.isFactionMember(player.getUniqueId(), foundPlayer.getUniqueId()) ||
                     FactionManager.isAllyMember(player.getUniqueId(), foundPlayer.getUniqueId())) continue;

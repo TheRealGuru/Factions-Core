@@ -1,13 +1,18 @@
 package gg.revival.factions.core.bastion.tag;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import gg.revival.driver.MongoAPI;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerManager;
 import gg.revival.factions.timers.TimerType;
 import lombok.Getter;
+import org.bson.Document;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,6 +100,101 @@ public class CombatManager {
         facPlayer.addTimer(TimerManager.createTimer(TimerType.TAG, duration));
 
         player.sendMessage(ChatColor.RED + "You are now combat-tagged. You will not be able to enter SafeZone claims until this timer expires");
+    }
+
+    /**
+     * Creates a combat-logger entry on database for given UUID
+     * @param uuid
+     */
+    public void creatLoggerEntry(UUID uuid) {
+        new BukkitRunnable() {
+            public void run() {
+                if(core.getDatabaseManager().getCombatLoggers() == null)
+                    core.getDatabaseManager().setCombatLoggers(MongoAPI.getCollection(core.getConfiguration().databaseName, "combatloggers"));
+
+                MongoCollection<Document> collection = core.getDatabaseManager().getCombatLoggers();
+                FindIterable<Document> query;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    creatLoggerEntry(uuid);
+                    return;
+                }
+
+                Document document = query.first();
+
+                if(document == null) {
+                    Document newDoc = new Document("uuid", uuid.toString());
+                    collection.insertOne(newDoc);
+
+                    core.getLog().log("Create combatlogger entry for '" + uuid.toString() + "'");
+                }
+            }
+        }.runTaskAsynchronously(core);
+    }
+
+    /**
+     * Removes combat-logger entry from database for given UUID
+     * @param uuid
+     */
+    public void clearLoggerEntry(UUID uuid) {
+        new BukkitRunnable() {
+            public void run() {
+                if(core.getDatabaseManager().getCombatLoggers() == null)
+                    core.getDatabaseManager().setCombatLoggers(MongoAPI.getCollection(core.getConfiguration().databaseName, "combatloggers"));
+
+                MongoCollection<Document> collection = core.getDatabaseManager().getCombatLoggers();
+                FindIterable<Document> query;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    clearLoggerEntry(uuid);
+                    return;
+                }
+
+                Document document = query.first();
+
+                if(document != null) {
+                    collection.deleteOne(document);
+
+                    core.getLog().log("Deleted combatlogger entry for '" + uuid.toString() + "'");
+                }
+            }
+        }.runTaskAsynchronously(core);
+    }
+
+    /**
+     * Returns a callback containing if the given UUID is a recent combat logger or not
+     * @param uuid
+     * @param callback
+     */
+    public void hasLoggerEntry(UUID uuid, CombatLoggerCallback callback) {
+        new BukkitRunnable() {
+            public void run() {
+                if(core.getDatabaseManager().getCombatLoggers() == null)
+                    core.getDatabaseManager().setCombatLoggers(MongoAPI.getCollection(core.getConfiguration().databaseName, "combatloggers"));
+
+                MongoCollection<Document> collection = core.getDatabaseManager().getCombatLoggers();
+                FindIterable<Document> query;
+
+                try {
+                    query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
+                } catch (LinkageError err) {
+                    hasLoggerEntry(uuid, callback);
+                    return;
+                }
+
+                Document document = query.first();
+
+                new BukkitRunnable() {
+                    public void run() {
+                        callback.onQueryDone(document != null);
+                    }
+                }.runTask(core);
+            }
+        }.runTaskAsynchronously(core);
     }
 
 }

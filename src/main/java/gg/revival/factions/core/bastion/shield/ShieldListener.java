@@ -74,9 +74,7 @@ public class ShieldListener implements Listener {
                 new BukkitRunnable() {
                     public void run() {
                         for(BlockPos lastShown : shieldPlayer.getLastShownBlocks())
-                        {
                             player.sendBlockChange(lastShown.getBukkitLocation(), Material.AIR, (byte)0);
-                        }
 
                         shieldPlayer.setLastShownBlocks(null);
                         currentlyProcessing.remove(shieldPlayer.getUuid());

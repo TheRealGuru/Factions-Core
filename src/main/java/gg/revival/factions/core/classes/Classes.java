@@ -7,6 +7,7 @@ import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.classes.cont.RClass;
 import gg.revival.factions.core.classes.listener.ArmorEventsListener;
 import gg.revival.factions.core.classes.listener.ClassListener;
+import gg.revival.factions.core.classes.tasks.ClassUpdateTask;
 import gg.revival.factions.core.tools.armorevents.ArmorListener;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.timers.TimerManager;
@@ -205,12 +206,17 @@ public class Classes {
 
     public void onEnable() {
         loadListeners();
+        loadTasks();
     }
 
-    public void loadListeners() {
+    private void loadListeners() {
         Bukkit.getPluginManager().registerEvents(new ArmorListener(), core);
         Bukkit.getPluginManager().registerEvents(new ArmorEventsListener(core), core);
         Bukkit.getPluginManager().registerEvents(new ClassListener(core), core);
+    }
+
+    private void loadTasks() {
+        Bukkit.getScheduler().runTaskTimer(core, new ClassUpdateTask(core), 0L, 20L);
     }
 
 }

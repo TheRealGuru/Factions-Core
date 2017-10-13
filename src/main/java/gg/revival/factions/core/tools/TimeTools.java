@@ -1,7 +1,6 @@
 package gg.revival.factions.core.tools;
 
-public class TimeTools
-{
+public class TimeTools {
 
     /**
      * Returns a fancy looking formatted decimal from a long

@@ -28,27 +28,15 @@ public class DBManager {
 
     public DBManager(FC core) {
         this.core = core;
+
+        onEnable();
     }
 
-    /**
-     * Combat-Tag, PvP Protection and Progression
-     */
     @Getter @Setter MongoCollection<Document> bastion;
-
-    /**
-     * Deathbans
-     */
     @Getter @Setter MongoCollection<Document> deathbans;
-
-    /**
-     * Lives
-     */
     @Getter @Setter MongoCollection<Document> lives;
-
-    /**
-     * Statistics
-     */
     @Getter @Setter MongoCollection<Document> stats;
+    @Getter @Setter MongoCollection<Document> combatLoggers;
 
     /**
      * Saves a given FPlayer objects timer data to DB
@@ -179,10 +167,10 @@ public class DBManager {
                 if(tagDuration > 0)
                     facPlayer.addTimer(TimerManager.createTimer(TimerType.TAG, tagDuration));
 
-                if(protectionDuration > 0)
+                if(protectionDuration > 0 && core.getConfiguration().pvpProtEnabled)
                     facPlayer.addTimer(TimerManager.createTimer(TimerType.PVPPROT, protectionDuration));
 
-                if(progressionDuration > 0)
+                if(progressionDuration > 0 && core.getConfiguration().progressEnabled)
                     facPlayer.addTimer(TimerManager.createTimer(TimerType.PROGRESSION, progressionDuration));
 
                 new BukkitRunnable() {

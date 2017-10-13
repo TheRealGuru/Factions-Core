@@ -91,6 +91,25 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
+        core.getBastion().getCombatManager().hasLoggerEntry(player.getUniqueId(), isLogger -> {
+            if(isLogger) {
+                FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+
+                if(facPlayer.isBeingTimed(TimerType.TAG))
+                    facPlayer.removeTimer(TimerType.TAG);
+
+                player.teleport(core.getLocations().getSpawnLocation());
+                core.getPlayerTools().cleanupPlayer(player);
+
+                core.getBastion().getCombatManager().clearLoggerEntry(player.getUniqueId());
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPlayerReconnect(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
         CombatLogger logger = core.getBastion().getNpcTools().getLoggerByUUID(player.getUniqueId());
 
         if(logger == null || logger.isDead) return;
@@ -170,7 +189,7 @@ public class CombatListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.isCancelled())
             return;
@@ -214,12 +233,12 @@ public class CombatListener implements Listener {
         logger.setDead(true);
 
         if(!logger.getInventoryContents().isEmpty()) {
-            for(ItemStack contents : logger.getInventoryContents()) {
+            for(ItemStack contents : logger.getInventoryContents())
                 event.getDrops().add(contents);
-            }
         }
 
         core.getDeathbans().getDeathbanDurationByLocation(logger.getUuid(), logger.getLocation(), duration -> core.getDeathbans().deathbanPlayer(logger.getUuid(), "Combat Logger Slain", duration));
+        core.getBastion().getCombatManager().creatLoggerEntry(logger.getUuid());
 
         Faction faction = FactionManager.getFactionByPlayer(logger.getUuid());
 

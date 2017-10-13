@@ -80,7 +80,7 @@ public class Events {
     private void loadThreads() {
         Bukkit.getScheduler().runTaskTimer(core, new KOTHTask(core), 0L, 5L);
         Bukkit.getScheduler().runTaskTimer(core, new DTCTask(core), 0L, 5L);
-        Bukkit.getScheduler().runTaskTimer(core, new GUIUpdaterTask(core), 0L, 20L);
+        Bukkit.getScheduler().runTaskTimer(core, new GUIUpdaterTask(core), 0L, 10L);
         Bukkit.getScheduler().runTaskTimer(core, new ChestTask(core), 0L, 10L);
         Bukkit.getScheduler().runTaskTimerAsynchronously(core, new EventScheduler(core), 0L, 20L);
     }

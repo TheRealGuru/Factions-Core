@@ -26,7 +26,7 @@ public class GUIUpdaterTask extends BukkitRunnable implements Runnable {
             InventoryView inventoryView = players.getOpenInventory();
             Inventory inventory = inventoryView.getTopInventory();
 
-            if(!core.getEvents().getEventsGUI().isGUI(inventory)) return;
+            if(!core.getEvents().getEventsGUI().isGUI(inventory)) continue;
 
             core.getEvents().getEventsGUI().update(inventory);
         }

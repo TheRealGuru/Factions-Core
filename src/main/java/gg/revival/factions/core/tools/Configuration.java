@@ -312,7 +312,7 @@ public class Configuration {
         if(config.getString("locations.overworld-spawn.world") != null) {
             overworldSpawn.setX(config.getDouble("locations.overworld-spawn.x"));
             overworldSpawn.setY(config.getDouble("locations.overworld-spawn.y"));
-            overworldSpawn.setZ(config.getDouble("locations.overworld.spawn.z"));
+            overworldSpawn.setZ(config.getDouble("locations.overworld-spawn.z"));
             overworldSpawn.setYaw((float)config.getDouble("locations.overworld-spawn.yaw"));
             overworldSpawn.setPitch((float)config.getDouble("locations.overworld-spawn.pitch"));
             overworldSpawn.setWorld(Bukkit.getWorld(config.getString("locations.overworld-spawn.world")));
