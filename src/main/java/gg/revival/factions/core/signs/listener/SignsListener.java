@@ -2,6 +2,7 @@ package gg.revival.factions.core.signs.listener;
 
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.PlayerManager;
+import gg.revival.factions.core.kits.FKit;
 import gg.revival.factions.core.tools.Permissions;
 import gg.revival.factions.obj.FPlayer;
 import lombok.Getter;
@@ -47,6 +48,20 @@ public class SignsListener implements Listener {
         String lineFour = event.getLine(3);
 
         if(!player.hasPermission(Permissions.CORE_ADMIN)) return;
+
+        if(lineOne.equalsIgnoreCase("kitsign")) {
+            FKit kit = core.getKits().getKitByName(lineTwo);
+
+            if(kit == null) {
+                player.sendMessage(ChatColor.RED + "Kit not found");
+                return;
+            }
+
+            event.setLine(0, ChatColor.BLUE + "" + ChatColor.BOLD + "- Kit -");
+            event.setLine(1, kit.getName());
+
+            player.sendMessage(ChatColor.GREEN + "Sign created");
+        }
 
         if(lineOne.equalsIgnoreCase("buysign")) {
             if(!core.getSigns().isValidSign(lineTwo, lineThree, lineFour)) {
@@ -125,6 +140,19 @@ public class SignsListener implements Listener {
         String lineThree = sign.getLine(2);
         String lineFour = sign.getLine(3);
 
+        if(core.getSigns().isKitSign(lineOne, lineTwo)) {
+            FKit kit = core.getKits().getKitByName(lineTwo);
+
+            if(kit == null) {
+                player.sendMessage(ChatColor.RED + "Kit not found");
+                return;
+            }
+
+            core.getKits().giveKit(player, kit);
+
+            return;
+        }
+
         if(core.getSigns().isBuySign(lineOne, lineTwo, lineThree, lineFour)) {
             int amount = Integer.valueOf(lineTwo.replace("Amt: ", ""));
             ItemStack item = core.getSigns().getItemStackFromString(lineThree);
@@ -159,6 +187,8 @@ public class SignsListener implements Listener {
                     core.getSigns().getInteractLock().remove(player.getUniqueId());
                 }
             }.runTaskLater(core, 5L);
+
+            return;
         }
 
         if(core.getSigns().isSellSign(lineOne, lineTwo, lineThree, lineFour)) {

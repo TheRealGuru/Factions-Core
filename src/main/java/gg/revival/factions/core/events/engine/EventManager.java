@@ -1,5 +1,6 @@
 package gg.revival.factions.core.events.engine;
 
+import com.google.common.collect.ImmutableMap;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
@@ -178,39 +179,28 @@ public class EventManager {
             KOTHEvent koth = (KOTHEvent)event;
             PlayerFaction capper = koth.getCappingFaction();
 
-            Map<PlayerFaction, Integer> ticketCache = new HashMap<>();
-            ticketCache.putAll(koth.getTickets());
+            if(!koth.getTickets().containsKey(capper))
+                koth.getTickets().put(capper, 0);
 
-            if(ticketCache.isEmpty()) {
-                koth.getTickets().put(capper, 1);
+            ImmutableMap<PlayerFaction, Integer> ticketCache = ImmutableMap.copyOf(koth.getTickets());
 
-                if(koth.isPalace())
-                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().ticked(koth)));
+            for(PlayerFaction faction : ticketCache.keySet()) {
+                int tickets = ticketCache.get(faction);
+
+                if(!capper.equals(faction))
+                    tickets -= 1;
                 else
-                    Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().ticked(koth)));
+                    tickets += 1;
 
-                return;
-            }
+                if(tickets <= 0)
+                    koth.getTickets().remove(faction);
+                else
+                    koth.getTickets().put(faction, tickets);
 
-            koth.getTickets().clear();
-
-            for(PlayerFaction factions : ticketCache.keySet()) {
-                int newTicketCount = ticketCache.get(factions);
-
-                if(factions.getFactionID().equals(capper.getFactionID())) {
-                    newTicketCount += 1;
-                } else {
-                    newTicketCount -= 1;
-                }
-
-                if(newTicketCount >= koth.getWinCond()) {
-                    finishEvent(event);
+                if(tickets >= koth.getWinCond()) {
+                    finishEvent(koth);
                     return;
                 }
-
-                if(newTicketCount <= 0) continue;
-
-                koth.getTickets().put(factions, newTicketCount);
             }
 
             if(koth.isPalace())
@@ -223,8 +213,7 @@ public class EventManager {
             DTCEvent dtc = (DTCEvent)event;
             PlayerFaction capper = dtc.getCappingFaction();
 
-            Map<PlayerFaction, Integer> ticketCache = new HashMap<>();
-            ticketCache.putAll(dtc.getTickets());
+            ImmutableMap<PlayerFaction, Integer> ticketCache = ImmutableMap.copyOf(dtc.getTickets());
 
             dtc.getTickets().clear();
 
@@ -324,7 +313,7 @@ public class EventManager {
             }
 
             if(core.getFileManager().getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("KOTH")) {
-                Location cornerOne = null, cornerTwo = null;
+                Location cornerOne, cornerTwo;
 
                 String worldName = core.getFileManager().getEvents().getString("events." + eventNames + ".capzone.world");
 

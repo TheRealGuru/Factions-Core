@@ -8,6 +8,7 @@ import gg.revival.factions.core.classes.cont.Scout;
 import gg.revival.factions.core.events.chests.ClaimChest;
 import gg.revival.factions.core.events.chests.ClaimChestType;
 import gg.revival.factions.core.events.chests.PalaceChest;
+import gg.revival.factions.core.kits.FKit;
 import gg.revival.factions.core.servermode.ServerState;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.IOException;
@@ -99,6 +101,8 @@ public class Configuration {
     public boolean announceFoundEmerald = true;
     public boolean announceFoundGlowstone = false;
 
+    public boolean kitsEnabled = true;
+
     public boolean progressEnabled = true;
     public int progressDuration = 3600;
 
@@ -119,6 +123,7 @@ public class Configuration {
     public void reload() {
         core.getFileManager().reloadFiles();
 
+        core.getKits().getLoadedKits().clear();
         core.getClasses().getEnabledClasses().clear();
         core.getEvents().getEventManager().getEvents().clear();
         core.getEvents().getChestManager().getLoadedChests().clear();
@@ -135,6 +140,7 @@ public class Configuration {
 
         FileConfiguration config = core.getFileManager().getConfig();
         FileConfiguration events = core.getFileManager().getEvents();
+        FileConfiguration kits = core.getFileManager().getKits();
 
         databaseName = config.getString("database.database-name");
 
@@ -234,6 +240,8 @@ public class Configuration {
         announceFoundEmerald = config.getBoolean("mining.announce.emerald");
         announceFoundGlowstone = config.getBoolean("mining.announce.glowstone");
 
+        kitsEnabled = config.getBoolean("kits.enabled");
+
         progressEnabled = config.getBoolean("progression.enabled");
         progressDuration = config.getInt("progression.duration");
 
@@ -307,6 +315,24 @@ public class Configuration {
             }
         }
 
+        if(kitsEnabled && kits.get("kits") != null) {
+            for(String kitNames : kits.getConfigurationSection("kits").getKeys(false)) {
+                try {
+                    Inventory contents = InvTools.inventoryFromBase64(kits.getString("kits." + kitNames + ".contents"));
+                    ItemStack[] helmet = InvTools.stacksFromBase64(kits.getString("kits." + kitNames + ".armor.helmet"));
+                    ItemStack[] chestplate = InvTools.stacksFromBase64(kits.getString("kits." + kitNames + ".armor.chestplate"));
+                    ItemStack[] leggings = InvTools.stacksFromBase64(kits.getString("kits." + kitNames + ".armor.leggings"));
+                    ItemStack[] boots = InvTools.stacksFromBase64(kits.getString("kits." + kitNames + ".armor.boots"));
+
+                    FKit kit = new FKit(kitNames, contents, helmet[0], chestplate[0], leggings[0], boots[0]);
+
+                    core.getKits().getLoadedKits().add(kit);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         Location overworldSpawn = new Location(Bukkit.getWorlds().get(0), 0, 100, 0), endSpawn = new Location(Bukkit.getWorlds().get(2), 0, 100, 0), endExit = new Location(Bukkit.getWorlds().get(0), 0, 100, 0);
 
         if(config.getString("locations.overworld-spawn.world") != null) {
@@ -344,6 +370,7 @@ public class Configuration {
         core.getLog().log("Loaded " + potionLimits.size() + " Potion limits");
         core.getLog().log("Loaded " + core.getEvents().getChestManager().getLoadedChests().size() + " Event chests");
         core.getLog().log("Loaded " + core.getEvents().getLootTables().getLootTables().size() + " Loot tables");
+        core.getLog().log("Loaded " + core.getKits().getLoadedKits().size() + " kits");
     }
 
 }

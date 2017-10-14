@@ -11,10 +11,13 @@ import java.io.IOException;
 public class FileManager {
 
     @Getter private FC core;
+
     private File configFile;
-    private FileConfiguration configConfig;
     private File eventsFile;
+    private File kitsFile;
+    private FileConfiguration configConfig;
     private FileConfiguration eventsConfig;
+    private FileConfiguration kitsConfig;
 
     public FileManager(FC core) {
         this.core = core;
@@ -28,6 +31,7 @@ public class FileManager {
 
             configFile = new File(core.getDataFolder(), "config.yml");
             eventsFile = new File(core.getDataFolder(), "events.yml");
+            kitsFile = new File(core.getDataFolder(), "kits.yml");
 
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
@@ -39,12 +43,19 @@ public class FileManager {
                 core.saveResource("events.yml", true);
             }
 
+            if(!kitsFile.exists()) {
+                kitsFile.getParentFile().mkdirs();
+                core.saveResource("kits.yml", true);
+            }
+
             configConfig = new YamlConfiguration();
             eventsConfig = new YamlConfiguration();
+            kitsConfig = new YamlConfiguration();
 
             try {
                 configConfig.load(configFile);
                 eventsConfig.load(eventsFile);
+                kitsConfig.load(kitsFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -53,10 +64,9 @@ public class FileManager {
         }
     }
 
-    public FileConfiguration getConfig() {
-        return configConfig;
-    }
+    public FileConfiguration getConfig() { return configConfig; }
     public FileConfiguration getEvents() { return eventsConfig; }
+    public FileConfiguration getKits() { return kitsConfig; }
 
     public void saveConfig() {
         try {
@@ -74,7 +84,15 @@ public class FileManager {
         }
     }
 
-    public void reloadFiles() {
+    public void saveKits() {
+        try {
+            kitsConfig.save(kitsFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void reloadFiles() {
         try {
             if (!core.getDataFolder().exists()) {
                 core.getDataFolder().mkdirs();
@@ -82,6 +100,7 @@ public class FileManager {
 
             configFile = new File(core.getDataFolder(), "config.yml");
             eventsFile = new File(core.getDataFolder(), "events.yml");
+            kitsFile = new File(core.getDataFolder(), "kits.yml");
 
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
@@ -93,12 +112,19 @@ public class FileManager {
                 core.saveResource("events.yml", true);
             }
 
+            if(!kitsFile.exists()) {
+                kitsFile.getParentFile().mkdirs();
+                core.saveResource("kits.yml", true);
+            }
+
             configConfig = new YamlConfiguration();
             eventsConfig = new YamlConfiguration();
+            kitsConfig = new YamlConfiguration();
 
             try {
                 configConfig.load(configFile);
                 eventsConfig.load(eventsFile);
+                kitsConfig.load(kitsFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }

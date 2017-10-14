@@ -70,6 +70,9 @@ mechanics:
   remove-gapple-recipe: true
   protect-nether-portals: true
 
+kits:
+  enabled: true
+
 mining:
   enabled: true
   odds:

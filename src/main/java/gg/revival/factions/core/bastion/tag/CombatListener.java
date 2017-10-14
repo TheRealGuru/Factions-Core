@@ -30,6 +30,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 
@@ -129,10 +130,18 @@ public class CombatListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
-        final Location location = event.getPlayer().getLocation();
 
         if(core.getBastion().getLogoutTask().getSafeloggers().contains(player.getUniqueId())) return;
         if(player.isDead() || player.getHealth() <= 0.0) return;
+
+        if(facPlayer.getLocation() != null &&
+                facPlayer.getLocation().getCurrentClaim() != null &&
+                facPlayer.getLocation().getCurrentClaim().getClaimOwner() instanceof ServerFaction) {
+
+            ServerFaction serverFaction = (ServerFaction)facPlayer.getLocation().getCurrentClaim().getClaimOwner();
+
+            if(serverFaction.getType().equals(ServerClaimType.SAFEZONE)) return;
+        }
 
         if(facPlayer.isBeingTimed(TimerType.TAG)) {
             core.getBastion().getNpcTools().spawnLogger(player, core.getConfiguration().loggerDuration);
@@ -159,9 +168,10 @@ public class CombatListener implements Listener {
 
         if(!core.getBastion().getNpcTools().isLogger(damaged)) return;
 
+        CombatLogger logger = core.getBastion().getNpcTools().getLoggerByEntity(damaged);
+
         if(damager instanceof Player) {
             Player playerDamager = (Player)damager;
-            CombatLogger logger = core.getBastion().getNpcTools().getLoggerByEntity(damaged);
 
             if(FactionManager.isFactionMember(playerDamager.getUniqueId(), logger.getUuid())) {
                 event.setCancelled(true);
@@ -177,7 +187,6 @@ public class CombatListener implements Listener {
 
             if(source instanceof Player) {
                 Player playerDamager = (Player)source;
-                CombatLogger logger = core.getBastion().getNpcTools().getLoggerByEntity(damaged);
 
                 if(FactionManager.isFactionMember(playerDamager.getUniqueId(), logger.getUuid())) {
                     event.setCancelled(true);
@@ -187,6 +196,13 @@ public class CombatListener implements Listener {
                 core.getBastion().getCombatManager().tagPlayer(playerDamager, TagReason.ATTACKER);
             }
         }
+
+        new BukkitRunnable() {
+            public void run() {
+                damaged.teleport(logger.getLocation());
+                damaged.setVelocity(damaged.getVelocity().setX(0).setY(0).setZ(0));
+            }
+        }.runTaskLater(core, 1L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

@@ -141,6 +141,20 @@ public class Signs {
     }
 
     /**
+     * Returns true if the given values match proper kit sign syntax
+     * @param lineOne
+     * @param lineTwo
+     * @return
+     */
+    public boolean isKitSign(String lineOne, String lineTwo) {
+        if(!lineOne.equalsIgnoreCase(ChatColor.BLUE + "" + ChatColor.BOLD + "- Kit -")) return false;
+
+        if(core.getKits().getKitByName(lineTwo) == null) return false;
+
+        return true;
+    }
+
+    /**
      * Returns true if the given strings meet a valid signs requirements
      * @param lineTwo
      * @param lineThree

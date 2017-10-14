@@ -48,3 +48,6 @@ commands:
   servermode:
     description: Server mode command
     aliases: [sm, mode]
+  kit:
+    description: Kit command
+    aliases: [kits]

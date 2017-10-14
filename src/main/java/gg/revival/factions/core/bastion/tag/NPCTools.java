@@ -11,6 +11,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -55,6 +57,7 @@ public class NPCTools {
         logger.getNpc().setFallDistance(player.getFallDistance());
         ((LivingEntity)logger.getNpc()).setRemainingAir(player.getRemainingAir());
         ((LivingEntity)logger.getNpc()).setHealth(player.getHealth());
+        ((LivingEntity)logger.getNpc()).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 257, false, false));
 
         Bukkit.broadcastMessage(ChatColor.YELLOW + "Combat-Logger: " + ChatColor.RED + player.getName());
 

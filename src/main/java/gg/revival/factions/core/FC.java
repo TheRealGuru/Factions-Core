@@ -6,6 +6,7 @@ import gg.revival.factions.core.command.FactionsCoreCommand;
 import gg.revival.factions.core.db.DBManager;
 import gg.revival.factions.core.deathbans.Deathbans;
 import gg.revival.factions.core.events.Events;
+import gg.revival.factions.core.kits.Kits;
 import gg.revival.factions.core.limits.Limiter;
 import gg.revival.factions.core.lives.Lives;
 import gg.revival.factions.core.locations.Locations;
@@ -35,6 +36,7 @@ public class FC extends JavaPlugin {
     @Getter public Lives lives;
     @Getter public Limiter limiter;
     @Getter public Mechanics mechanics;
+    @Getter public Kits kits;
     @Getter public Mining mining;
     @Getter public Progression progression;
     @Getter public ServerMode serverMode;
@@ -63,6 +65,7 @@ public class FC extends JavaPlugin {
         this.lives = new Lives(this);
         this.limiter = new Limiter(this);
         this.mining = new Mining(this);
+        this.kits = new Kits(this);
         this.progression = new Progression(this);
         this.signs = new Signs(this);
         this.deathbans = new Deathbans(this);
@@ -93,6 +96,7 @@ public class FC extends JavaPlugin {
         this.lives = null;
         this.limiter = null;
         this.mechanics = null;
+        this.kits = null;
         this.mining = null;
         this.progression = null;
         this.serverMode = null;
