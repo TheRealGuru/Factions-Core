@@ -35,6 +35,8 @@ public class PlayerTools {
 
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
+
+        player.getActivePotionEffects().clear();
     }
 
     /**

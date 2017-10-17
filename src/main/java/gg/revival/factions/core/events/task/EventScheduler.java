@@ -28,8 +28,8 @@ public class EventScheduler extends BukkitRunnable implements Runnable {
         for(Event events : core.getEvents().getEventManager().getEvents()) {
             if(events.isActive() || !events.getSchedule().containsKey(day)) continue;
 
-            int foundHr = events.getSchedule().get(day).keySet().iterator().next();
-            int foundMin = events.getSchedule().get(day).get(foundHr);
+            int foundHr = events.getSchedule().get(day).getKey();
+            int foundMin = events.getSchedule().get(day).getValue();
 
             if(foundHr != hr || foundMin != min) continue;
 

@@ -15,13 +15,13 @@ public class Event {
     @Getter @Setter String displayName;
     @Getter @Setter UUID hookedFactionId;
     @Getter @Setter Location lootChest;
-    @Getter Map<Integer, Map<Integer, Integer>> schedule;
+    @Getter Map<Integer, Map.Entry<Integer, Integer>> schedule;
     @Getter @Setter boolean palace;
     @Getter @Setter PlayerFaction lootChestFaction;
     @Getter @Setter long lootChestUnlockTime;
     @Getter @Setter boolean active;
 
-    Event(String eventName, String displayName, UUID hookedFactionId, Location lootChest, Map<Integer, Map<Integer, Integer>> schedule, boolean palace) {
+    Event(String eventName, String displayName, UUID hookedFactionId, Location lootChest, Map<Integer, Map.Entry<Integer, Integer>> schedule, boolean palace) {
         this.eventName = eventName;
         this.displayName = displayName;
         this.hookedFactionId = hookedFactionId;

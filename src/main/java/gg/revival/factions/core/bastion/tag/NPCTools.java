@@ -2,7 +2,9 @@ package gg.revival.factions.core.bastion.tag;
 
 import com.google.common.collect.ImmutableList;
 import gg.revival.factions.core.FC;
+import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.tools.Permissions;
+import gg.revival.factions.obj.FPlayer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -35,6 +37,8 @@ public class NPCTools {
     void spawnLogger(Player player, int duration) {
         if(player.hasPermission(Permissions.CORE_ADMIN) || player.hasPermission(Permissions.CORE_MOD)) return;
 
+        FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+
         List<ItemStack> contents = new ArrayList<>();
 
         for(ItemStack inventory : player.getInventory().getContents()) {
@@ -47,7 +51,7 @@ public class NPCTools {
             contents.add(armor);
         }
 
-        CombatLogger logger = new CombatLogger(player.getUniqueId(), player.getName(), player.getLocation(), contents);
+        CombatLogger logger = new CombatLogger(player.getUniqueId(), player.getName(), facPlayer.getLocation().getLastLocation(), contents);
 
         logger.build();
 
@@ -61,10 +65,11 @@ public class NPCTools {
 
         Bukkit.broadcastMessage(ChatColor.YELLOW + "Combat-Logger: " + ChatColor.RED + player.getName());
 
-        new BukkitRunnable()
-        {
-            public void run()
-            {
+        new BukkitRunnable() {
+            public void run() {
+                if(!logger.getLocation().getChunk().isLoaded())
+                    logger.getLocation().getChunk().load();
+
                 if(logger.getNpc() != null && !logger.getNpc().isDead())
                     despawnLogger(logger);
             }

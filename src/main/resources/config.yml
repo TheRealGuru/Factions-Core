@@ -67,6 +67,8 @@ mechanics:
     height: 125
   disable-endermites: true
   disable-breaking-spawners: true
+  disable-nether-beds: true
+  disable-explosive-block-damage: true
   remove-gapple-recipe: true
   protect-nether-portals: true
 

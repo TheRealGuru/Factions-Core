@@ -8,11 +8,13 @@ import gg.revival.factions.core.mechanics.emeraldxp.EmeraldEXPListener;
 import gg.revival.factions.core.mechanics.endermite.EndermiteListener;
 import gg.revival.factions.core.mechanics.enderpearlcd.EnderpearlCDListener;
 import gg.revival.factions.core.mechanics.enderpearlcd.EnderpearlCDTask;
+import gg.revival.factions.core.mechanics.explosiveblocks.ExplosiveBlockListener;
 import gg.revival.factions.core.mechanics.hardmode.HardmodeListener;
 import gg.revival.factions.core.mechanics.highspawners.HighSpawnerListener;
 import gg.revival.factions.core.mechanics.invalidpearl.InvalidPearlListener;
 import gg.revival.factions.core.mechanics.mobstacking.Mobstacker;
 import gg.revival.factions.core.mechanics.mobstacking.MobstackingListener;
+import gg.revival.factions.core.mechanics.netherbed.NetherBedListener;
 import gg.revival.factions.core.mechanics.portalprotection.NetherPortalListener;
 import gg.revival.factions.core.mechanics.spawnerbreaking.SpawnerBreakingListener;
 import gg.revival.factions.core.mechanics.unenchantablebooks.BookUnenchantmentListener;
@@ -46,7 +48,7 @@ public class Mechanics {
 
     public void loadListeners() {
         Bukkit.getPluginManager().registerEvents(new CrowbarListener(core), core);
-        Bukkit.getPluginManager().registerEvents(new EmeraldEXPListener(), core);
+        Bukkit.getPluginManager().registerEvents(new EmeraldEXPListener(core), core);
         Bukkit.getPluginManager().registerEvents(new EnderpearlCDListener(core), core);
         Bukkit.getPluginManager().registerEvents(new MobstackingListener(core), core);
         Bukkit.getPluginManager().registerEvents(new NetherPortalListener(core), core);
@@ -56,6 +58,8 @@ public class Mechanics {
         Bukkit.getPluginManager().registerEvents(new SpawnerBreakingListener(core), core);
         Bukkit.getPluginManager().registerEvents(new EndermiteListener(core), core);
         Bukkit.getPluginManager().registerEvents(new HardmodeListener(core), core);
+        Bukkit.getPluginManager().registerEvents(new NetherBedListener(core), core);
+        Bukkit.getPluginManager().registerEvents(new ExplosiveBlockListener(core), core);
 
         mobstacker.run();
     }

@@ -47,6 +47,9 @@ public class ShieldListener implements Listener {
         Player player = event.getPlayer();
         ShieldPlayer shieldPlayer = core.getBastion().getShield().getShieldPlayer(player.getUniqueId());
         core.getBastion().getShield().getShieldPlayers().remove(shieldPlayer);
+
+        if(currentlyProcessing.contains(player.getUniqueId()))
+            currentlyProcessing.remove(player.getUniqueId());
     }
 
     @EventHandler

@@ -300,16 +300,13 @@ public class EventManager {
             String lootChestWorld = core.getFileManager().getEvents().getString("events." + eventNames + ".loot-chest.world");
             lootChest = new Location(Bukkit.getWorld(lootChestWorld), lootChestX, lootChestY, lootChestZ);
 
-            Map<Integer, Map<Integer, Integer>> schedule = new HashMap<>();
+            Map<Integer, Map.Entry<Integer, Integer>> schedule = new HashMap<>();
 
             for(String days : core.getFileManager().getEvents().getConfigurationSection("events." + eventNames + ".schedule").getKeys(false)) {
                 int hr = core.getFileManager().getEvents().getInt("events." + eventNames + ".schedule." + days + ".hr");
                 int min = core.getFileManager().getEvents().getInt("events." + eventNames + ".schedule." + days + ".min");
 
-                Map<Integer, Integer> time = new HashMap<>();
-                time.put(hr, min);
-
-                schedule.put(Integer.valueOf(days), time);
+                schedule.put(Integer.valueOf(days), new AbstractMap.SimpleEntry<>(hr, min));
             }
 
             if(core.getFileManager().getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("KOTH")) {
@@ -336,7 +333,7 @@ public class EventManager {
             }
 
             if(core.getFileManager().getEvents().getString("events." + eventNames + ".type").equalsIgnoreCase("DTC")) {
-                Location coreLocation = null;
+                Location coreLocation;
 
                 int coreX = core.getFileManager().getEvents().getInt("events." + eventNames + ".core.x");
                 int coreY = core.getFileManager().getEvents().getInt("events." + eventNames + ".core.y");

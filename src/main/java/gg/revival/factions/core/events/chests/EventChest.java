@@ -11,7 +11,7 @@ public class EventChest {
     @Getter Location location;
     @Getter String lootTable;
 
-    public EventChest(UUID uuid, Location location, String lootTable) {
+    EventChest(UUID uuid, Location location, String lootTable) {
         this.uuid = uuid;
         this.location = location;
         this.lootTable = lootTable;

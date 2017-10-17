@@ -90,6 +90,8 @@ public class Configuration {
     public boolean invalidPearlBlocksEnabled = true;
     public boolean highSpawnersDisabled = true;
     public int highSpawnersHeight = 125;
+    public boolean netherBedsDisabled = true;
+    public boolean explosiveBlockDamageDisabled = true;
 
     public boolean miningEnabled = true;
     public float miningGoldChance = 0.006f;
@@ -229,6 +231,8 @@ public class Configuration {
         invalidPearlBlocksEnabled = config.getBoolean("mechanics.invalid-pearling");
         highSpawnersDisabled = config.getBoolean("mechanics.high-spawners-disabled.enabled");
         highSpawnersHeight = config.getInt("mechanics.high-spawners-disabled.height");
+        netherBedsDisabled = config.getBoolean("mechanics.disable-nether-beds");
+        explosiveBlockDamageDisabled = config.getBoolean("mechanics.disable-explosive-block-damage");
 
         miningEnabled = config.getBoolean("mining.enabled");
         miningGoldChance = (float)config.getDouble("mining.odds.gold");
