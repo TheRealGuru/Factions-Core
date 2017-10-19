@@ -1,5 +1,6 @@
 package gg.revival.factions.core.mining;
 
+import gg.revival.core.Revival;
 import gg.revival.factions.claims.Claim;
 import gg.revival.factions.claims.ClaimManager;
 import gg.revival.factions.core.FC;
@@ -161,6 +162,8 @@ public class Mining {
 
         if(found > 0) {
             final int foundAmount = found;
+
+            Revival.getCore().getAccountManager().addXP(player.getUniqueId(), 10); // TODO: Make this configurable
 
             if(material.equals(Material.GOLD_ORE)) {
                 if(core.getConfiguration().announceFoundGold) {

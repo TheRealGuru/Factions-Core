@@ -1,5 +1,6 @@
 package gg.revival.factions.core.events.builder;
 
+import com.google.common.collect.Maps;
 import gg.revival.factions.core.FactionManager;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.KOTHEvent;
@@ -10,8 +11,8 @@ import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
+import java.util.AbstractMap;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class KOTHBuilder {
     @Getter @Setter String hookedFactionName;
     @Getter @Setter Location lootChest;
     @Getter @Setter CapZone capzone;
-    @Getter Map<Integer, Map<Integer, Integer>> schedule;
+    @Getter Map<Integer, Map.Entry<Integer, Integer>> schedule;
     @Getter @Setter int duration, winCond;
     @Getter @Setter boolean palace;
 
@@ -34,17 +35,14 @@ public class KOTHBuilder {
 
         this.buildPhase = 1;
 
-        Map<Integer, Map<Integer, Integer>> schedule = new HashMap<>();
-        Map<Integer, Integer> time = new HashMap<>();
+        Map<Integer, Map.Entry<Integer, Integer>> schedule = Maps.newHashMap();
 
-        time.put(12, 0);
-
-        schedule.put(Calendar.MONDAY, time);
-        schedule.put(Calendar.TUESDAY, time);
-        schedule.put(Calendar.WEDNESDAY, time);
-        schedule.put(Calendar.THURSDAY, time);
-        schedule.put(Calendar.FRIDAY, time);
-        schedule.put(Calendar.SATURDAY, time);
+        schedule.put(Calendar.MONDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.TUESDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.WEDNESDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.THURSDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.FRIDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.SATURDAY, new AbstractMap.SimpleEntry<>(12, 0));
 
         this.schedule = schedule;
     }

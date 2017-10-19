@@ -39,7 +39,7 @@ public class DeathMessages {
 
             if(shooter instanceof Player) {
                 Player playerKiller = (Player)shooter;
-                double distance = Math.round(killer.getLocation().distance(killed.getLocation()));
+                double distance = Math.round(playerKiller.getLocation().distance(killed.getLocation()));
                 return prefix + ChatColor.GOLD + killed.getName() + ChatColor.RED + " shot by " + ChatColor.GOLD + playerKiller.getName() + ChatColor.RED + " from a distance of " + ChatColor.BLUE + distance + ChatColor.RED + " blocks";
             } else {
                 return prefix + ChatColor.GOLD + killed.getName() + ChatColor.RED + " shot by a " + ChatColor.GOLD + StringUtils.capitalize(killer.getType().toString().replace("_", " ").toLowerCase());

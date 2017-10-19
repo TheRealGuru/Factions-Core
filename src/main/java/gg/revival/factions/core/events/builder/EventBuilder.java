@@ -81,8 +81,8 @@ public class EventBuilder {
         core.getFileManager().getEvents().set("events." + event.getEventName() + ".palace", event.isPalace());
 
         for(Integer days : event.getSchedule().keySet()) {
-            int hr = event.getSchedule().get(days).keySet().iterator().next();
-            int min = event.getSchedule().get(days).get(hr);
+            int hr = event.getSchedule().get(days).getKey();
+            int min = event.getSchedule().get(days).getValue();
 
             core.getFileManager().getEvents().set("events." + event.getEventName() + ".schedule." + days + ".hr", hr);
             core.getFileManager().getEvents().set("events." + event.getEventName() + ".schedule." + days + ".min", min);

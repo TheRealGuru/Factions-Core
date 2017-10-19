@@ -30,6 +30,13 @@ public class Stats {
         onEnable();
     }
 
+    public boolean hasLoadedStats(UUID uuid) {
+        for(PlayerStats stats : activeStats)
+            if(stats.getUuid().equals(uuid)) return true;
+
+        return false;
+    }
+
     public void loadStats(UUID uuid) {
         getStats(uuid, stats -> {
             PlayerStats result = null;

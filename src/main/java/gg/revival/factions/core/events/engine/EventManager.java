@@ -1,6 +1,7 @@
 package gg.revival.factions.core.events.engine;
 
 import com.google.common.collect.ImmutableMap;
+import gg.revival.core.Revival;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
@@ -143,8 +144,14 @@ public class EventManager {
             if(event.isPalace()) {
                 Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().captured(event)));
                 core.getEvents().getPalaceManager().setCappers(koth.getCappingFaction());
+
+                for(UUID capper : koth.getCappingFaction().getRoster(true))
+                    Revival.getCore().getAccountManager().addXP(capper, 2000);
             } else {
                 Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().captured(event)));
+
+                for(UUID capper : koth.getCappingFaction().getRoster(true))
+                    Revival.getCore().getAccountManager().addXP(capper, 500);
             }
 
             event.setLootChestFaction(koth.getCappingFaction());
@@ -160,8 +167,14 @@ public class EventManager {
             if(event.isPalace()) {
                 Bukkit.broadcastMessage(core.getEvents().getEventMessages().asPalace(core.getEvents().getEventMessages().captured(event)));
                 core.getEvents().getPalaceManager().setCappers(dtc.getCappingFaction());
+
+                for(UUID capper : dtc.getCappingFaction().getRoster(true))
+                    Revival.getCore().getAccountManager().addXP(capper, 2000);
             } else {
                 Bukkit.broadcastMessage(core.getEvents().getEventMessages().asDTC(core.getEvents().getEventMessages().captured(event)));
+
+                for(UUID capper : dtc.getCappingFaction().getRoster(true))
+                    Revival.getCore().getAccountManager().addXP(capper, 500);
             }
 
             event.setLootChestFaction(dtc.getCappingFaction());

@@ -13,7 +13,7 @@ public class Bard extends RClass {
         super(Lists.newArrayList(), Maps.newHashMap(), ClassType.BARD);
 
         PotionEffect passiveWeakness = new PotionEffect(PotionEffectType.WEAKNESS, Integer.MAX_VALUE, 3);
-        PotionEffect passiveResistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 3);
+        PotionEffect passiveResistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1);
         PotionEffect passiveSpeed = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2);
 
         PotionEffect activeSpeed = new PotionEffect(PotionEffectType.SPEED, 20 * 8, 3);

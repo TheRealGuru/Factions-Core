@@ -9,16 +9,13 @@ import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class DTCBuilder {
 
     @Getter @Setter String eventName, displayName, hookedFactionName;
     @Getter @Setter Location lootChest, core;
-    @Getter Map<Integer, Map<Integer, Integer>> schedule;
+    @Getter Map<Integer, Map.Entry<Integer, Integer>> schedule;
     @Getter @Setter int winCond, regenTimer;
     @Getter @Setter boolean palace;
 
@@ -30,17 +27,14 @@ public class DTCBuilder {
 
         this.buildPhase = 1;
 
-        Map<Integer, Map<Integer, Integer>> schedule = new HashMap<>();
-        Map<Integer, Integer> time = new HashMap<>();
+        Map<Integer, Map.Entry<Integer, Integer>> schedule = new HashMap<>();
 
-        time.put(12, 0);
-
-        schedule.put(Calendar.MONDAY, time);
-        schedule.put(Calendar.TUESDAY, time);
-        schedule.put(Calendar.WEDNESDAY, time);
-        schedule.put(Calendar.THURSDAY, time);
-        schedule.put(Calendar.FRIDAY, time);
-        schedule.put(Calendar.SATURDAY, time);
+        schedule.put(Calendar.MONDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.TUESDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.WEDNESDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.THURSDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.FRIDAY, new AbstractMap.SimpleEntry<>(12, 0));
+        schedule.put(Calendar.SATURDAY, new AbstractMap.SimpleEntry<>(12, 0));
 
         this.schedule = schedule;
     }

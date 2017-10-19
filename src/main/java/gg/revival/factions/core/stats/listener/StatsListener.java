@@ -3,12 +3,14 @@ package gg.revival.factions.core.stats.listener;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.stats.PlayerStats;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.github.paperspigot.event.server.ServerShutdownEvent;
 
 import java.util.UUID;
 
@@ -41,6 +43,20 @@ public class StatsListener implements Listener {
             core.getStats().saveStats(stats, false);
             core.getStats().getActiveStats().remove(stats);
         });
+    }
+
+    @EventHandler
+    public void onServerShutdown(ServerShutdownEvent event) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(!core.getStats().hasLoadedStats(player.getUniqueId())) continue;
+
+            core.getStats().getStats(player.getUniqueId(), stats -> {
+                if(stats != null) {
+                    core.getStats().saveStats(stats, false);
+                    core.getStats().getActiveStats().remove(stats);
+                }
+            });
+        }
     }
 
     @EventHandler

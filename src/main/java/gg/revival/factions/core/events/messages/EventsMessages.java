@@ -151,8 +151,8 @@ public class EventsMessages {
         result.append(ChatColor.GOLD + "Schedule: " + "\n");
 
         for(int days : event.getSchedule().keySet()) {
-            int hr = event.getSchedule().get(days).keySet().iterator().next();
-            int min = event.getSchedule().get(days).get(hr);
+            int hr = event.getSchedule().get(days).getKey();
+            int min = event.getSchedule().get(days).getValue();
 
             result.append(ChatColor.YELLOW + TimeTools.convertSchedule(days, hr, min) + "\n");
         }
