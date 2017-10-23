@@ -13,10 +13,10 @@ public class Scout extends RClass {
         super(Lists.newArrayList(), Maps.newHashMap(), ClassType.SCOUT);
 
         PotionEffect passiveSpeed = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2);
-        PotionEffect passiveJumpboost = new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0);
+        PotionEffect passiveJumpboost = new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 1);
 
         PotionEffect activeSpeed = new PotionEffect(PotionEffectType.SPEED, 20 * 8, 4);
-        PotionEffect activeJumpboost = new PotionEffect(PotionEffectType.JUMP, 20 * 8, 3);
+        PotionEffect activeJumpboost = new PotionEffect(PotionEffectType.JUMP, 20 * 8, 6);
 
         getPassives().add(passiveSpeed);
         getPassives().add(passiveJumpboost);

@@ -1,7 +1,9 @@
 package gg.revival.factions.core.events.engine;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import gg.revival.core.Revival;
+import gg.revival.factions.claims.Claim;
 import gg.revival.factions.core.FC;
 import gg.revival.factions.core.events.obj.CapZone;
 import gg.revival.factions.core.events.obj.DTCEvent;
@@ -19,21 +21,19 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 
 public class EventManager {
 
     @Getter private FC core;
-    @Getter Set<Event> events = new HashSet<>();
+    @Getter Set<Event> events = Sets.newConcurrentHashSet();
 
     public EventManager(FC core) {
         this.core = core;
     }
 
     public Event getEventByName(String name) {
-        List<Event> cache = new CopyOnWriteArrayList<>(events);
-
-        for(Event event : cache) {
+        for(Event event : events) {
             if(event.getEventName().equalsIgnoreCase(name))
                 return event;
         }
@@ -42,9 +42,7 @@ public class EventManager {
     }
 
     public Event getEventByLootChest(Location lootChestLocation) {
-        List<Event> cache = new CopyOnWriteArrayList<>(events);
-
-        for(Event event : cache) {
+        for(Event event : events) {
             if(event.getLootChest().equals(lootChestLocation))
                 return event;
         }
@@ -52,11 +50,19 @@ public class EventManager {
         return null;
     }
 
+    public Event getEventByClaim(Claim claim) {
+        for(Event event : events) {
+            if(event.getHookedFactionId() != null && event.getHookedFactionId().equals(claim.getClaimOwner().getFactionID()))
+                return event;
+        }
+
+        return null;
+    }
+
     public Set<Event> getActiveEvents() {
-        List<Event> cache = new CopyOnWriteArrayList<>(events);
         Set<Event> result = new HashSet<>();
 
-        for(Event event : cache) {
+        for(Event event : events) {
             if(event.isActive())
                 result.add(event);
         }
@@ -146,12 +152,12 @@ public class EventManager {
                 core.getEvents().getPalaceManager().setCappers(koth.getCappingFaction());
 
                 for(UUID capper : koth.getCappingFaction().getRoster(true))
-                    Revival.getCore().getAccountManager().addXP(capper, 2000);
+                    Revival.getCore().getAccountManager().addXP(capper, "Captured Palace (HCFR)", 2000);
             } else {
                 Bukkit.broadcastMessage(core.getEvents().getEventMessages().asKOTH(core.getEvents().getEventMessages().captured(event)));
 
                 for(UUID capper : koth.getCappingFaction().getRoster(true))
-                    Revival.getCore().getAccountManager().addXP(capper, 500);
+                    Revival.getCore().getAccountManager().addXP(capper, "Captured an event (HCFR)", 500);
             }
 
             event.setLootChestFaction(koth.getCappingFaction());
@@ -169,12 +175,12 @@ public class EventManager {
                 core.getEvents().getPalaceManager().setCappers(dtc.getCappingFaction());
 
                 for(UUID capper : dtc.getCappingFaction().getRoster(true))
-                    Revival.getCore().getAccountManager().addXP(capper, 2000);
+                    Revival.getCore().getAccountManager().addXP(capper, "Captured Palace (HCFR)", 2000);
             } else {
                 Bukkit.broadcastMessage(core.getEvents().getEventMessages().asDTC(core.getEvents().getEventMessages().captured(event)));
 
                 for(UUID capper : dtc.getCappingFaction().getRoster(true))
-                    Revival.getCore().getAccountManager().addXP(capper, 500);
+                    Revival.getCore().getAccountManager().addXP(capper, "Captured an event (HCFR)", 500);
             }
 
             event.setLootChestFaction(dtc.getCappingFaction());
@@ -294,13 +300,13 @@ public class EventManager {
     }
 
     public void loadEvents() {
-        if(core.getFileManager().getEvents().get("events") == null)
+        if(core.getFileManager().getEvents().get("events") == null) {
+            core.getLog().log(Level.WARNING, "It appears there aren't any configured events. Skipping...");
             return;
+        }
 
         for(String eventNames : core.getFileManager().getEvents().getConfigurationSection("events").getKeys(false)) {
             Location lootChest;
-
-            if(core.getEvents().getEventManager() == null || core.getEvents().getEventManager().getEventByName(eventNames) != null) continue;
 
             String displayName = ChatColor.translateAlternateColorCodes('&', core.getFileManager().getEvents().getString("events." + eventNames + ".display-name"));
             boolean palace = core.getFileManager().getEvents().getBoolean("events." + eventNames + ".palace");

@@ -86,7 +86,7 @@ public class CombatManager {
             duration = core.getConfiguration().tagAttacker;
 
         if(facPlayer.isBeingTimed(TimerType.TAG)) {
-            int current = (int)((getTag(player.getUniqueId()) - System.currentTimeMillis()) / 1000L);
+            int current = (int)(getTag(player.getUniqueId()) / 1000L);
 
             if(current >= duration) return;
 

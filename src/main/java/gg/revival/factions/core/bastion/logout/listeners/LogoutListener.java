@@ -65,6 +65,8 @@ public class LogoutListener implements Listener {
                 Player player = (Player)src;
                 FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
 
+                if(facPlayer == null) return;
+
                 if(facPlayer.isBeingTimed(TimerType.LOGOUT)) {
                     facPlayer.removeTimer(TimerType.LOGOUT);
                     core.getBastion().getLogoutTask().getSafeloggers().remove(player.getUniqueId());

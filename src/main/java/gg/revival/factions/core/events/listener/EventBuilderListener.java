@@ -88,6 +88,7 @@ public class EventBuilderListener implements Listener {
                     KOTHEvent kothEvent = builder.convertToKOTH();
                     core.getEvents().getEventManager().getEvents().add(kothEvent);
                     core.getEvents().getEventBuilder().saveEvent(kothEvent);
+                    core.getEvents().getEventBuilder().getKothBuilders().remove(player.getUniqueId());
 
                     event.setCancelled(true);
 
@@ -102,6 +103,7 @@ public class EventBuilderListener implements Listener {
                     KOTHEvent kothEvent = builder.convertToKOTH();
                     core.getEvents().getEventManager().getEvents().add(kothEvent);
                     core.getEvents().getEventBuilder().saveEvent(kothEvent);
+                    core.getEvents().getEventBuilder().getKothBuilders().remove(player.getUniqueId());
 
                     event.setCancelled(true);
 
@@ -167,6 +169,7 @@ public class EventBuilderListener implements Listener {
                     DTCEvent dtcEvent = builder.convertToDTC();
                     core.getEvents().getEventManager().getEvents().add(dtcEvent);
                     core.getEvents().getEventBuilder().saveEvent(dtcEvent);
+                    core.getEvents().getEventBuilder().getDtcBuilders().remove(player.getUniqueId());
 
                     event.setCancelled(true);
 
@@ -181,6 +184,7 @@ public class EventBuilderListener implements Listener {
                     DTCEvent dtcEvent = builder.convertToDTC();
                     core.getEvents().getEventManager().getEvents().add(dtcEvent);
                     core.getEvents().getEventBuilder().saveEvent(dtcEvent);
+                    core.getEvents().getEventBuilder().getDtcBuilders().remove(player.getUniqueId());
 
                     event.setCancelled(true);
 

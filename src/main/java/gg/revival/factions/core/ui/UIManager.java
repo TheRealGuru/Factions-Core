@@ -63,7 +63,7 @@ public class UIManager {
         Team fac, ally, admin, mod;
 
         if(scoreboard == null) {
-            scoreboard = new RScoreboard("Test Scoreboard");
+            scoreboard = new RScoreboard("Revival");
             mcBoard = scoreboard.getScoreboard();
 
             fac = mcBoard.registerNewTeam("f");
@@ -93,9 +93,8 @@ public class UIManager {
         Faction faction = FactionManager.getFactionByPlayer(player.getUniqueId());
         PlayerFaction playerFaction = null;
 
-        if(faction != null) {
+        if(faction != null)
             playerFaction = (PlayerFaction)faction;
-        }
 
         for(Player players : Bukkit.getOnlinePlayers()) {
             if(players.hasPermission(Permissions.CORE_ADMIN)) {
@@ -105,7 +104,7 @@ public class UIManager {
                 continue;
             }
 
-            if(players.hasPermission(Permissions.CORE_MOD) && !player.hasPermission(Permissions.CORE_ADMIN)) {
+            if(players.hasPermission(Permissions.CORE_MOD) && !players.hasPermission(Permissions.CORE_ADMIN)) {
                 if(!mod.hasEntry(players.getName()))
                     mod.addEntry(players.getName());
 

@@ -66,7 +66,7 @@ public class Stats {
                     core.getDatabaseManager().setStats(MongoAPI.getCollection(core.getConfiguration().databaseName, "playerstats"));
 
                 MongoCollection<Document> collection = core.getDatabaseManager().getStats();
-                FindIterable<Document> query = null;
+                FindIterable<Document> query;
 
                 try {
                     query = MongoAPI.getQueryByFilter(collection, "uuid", uuid.toString());
@@ -177,10 +177,6 @@ public class Stats {
             }.runTaskAsynchronously(core);
         }
     }
-
-    /*
-
-     */
 
     public String getFormattedStats(PlayerStats stats, String statsUsername) {
         StringBuilder message = new StringBuilder();

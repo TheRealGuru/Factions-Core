@@ -67,9 +67,6 @@ public class NPCTools {
 
         new BukkitRunnable() {
             public void run() {
-                if(!logger.getLocation().getChunk().isLoaded())
-                    logger.getLocation().getChunk().load();
-
                 if(logger.getNpc() != null && !logger.getNpc().isDead())
                     despawnLogger(logger);
             }
@@ -81,8 +78,21 @@ public class NPCTools {
      * @param logger
      */
     private void despawnLogger(CombatLogger logger) {
-        logger.destroy();
-        core.getBastion().getCombatManager().getCombatLoggers().remove(logger.getUuid());
+        if(logger.getLocation().getChunk().isLoaded()) {
+            logger.destroy();
+            core.getBastion().getCombatManager().getCombatLoggers().remove(logger.getUuid());
+
+            return;
+        }
+
+        logger.getLocation().getChunk().load();
+
+        new BukkitRunnable() {
+            public void run() {
+                logger.destroy();
+                core.getBastion().getCombatManager().getCombatLoggers().remove(logger.getUuid());
+            }
+        }.runTaskLater(core, 1L);
     }
 
     /**

@@ -45,7 +45,7 @@ public class KOTHTask extends BukkitRunnable {
 
             for(Player players : Bukkit.getOnlinePlayers()) {
                 if(!koth.getCapZone().inside(players.getLocation(), true)) continue;
-                if(players.isDead()) continue;
+                if(players.isDead() || players.getHealth() < 0.0) continue;
 
                 capzonePlayers.add(players.getUniqueId());
             }

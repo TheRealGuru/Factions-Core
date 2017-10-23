@@ -50,7 +50,8 @@ public class ClassListener implements Listener {
 
         new BukkitRunnable() {
             public void run() {
-                ClassType foundClassType = core.getClasses().getClassByArmor(player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots());
+                ClassType foundClassType = core.getClasses().getClassByArmor(
+                        player.getInventory().getHelmet(), player.getInventory().getChestplate(), player.getInventory().getLeggings(), player.getInventory().getBoots());
 
                 if(foundClassType == null) return;
 
@@ -90,6 +91,13 @@ public class ClassListener implements Listener {
         if(!(source instanceof Player)) return;
 
         Player shooter = (Player)source;
+
+        if(damaged instanceof Player) {
+            Player playerDamaged = (Player)damaged;
+
+            if(playerDamaged.getUniqueId().equals(shooter.getUniqueId())) return;
+        }
+
         ClassProfile classProfile = core.getClasses().getClassProfile(shooter.getUniqueId());
 
         if(classProfile == null || !classProfile.getSelectedClass().equals(ClassType.ARCHER) || !classProfile.isActive()) return;

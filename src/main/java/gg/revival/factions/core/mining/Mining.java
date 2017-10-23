@@ -163,7 +163,7 @@ public class Mining {
         if(found > 0) {
             final int foundAmount = found;
 
-            Revival.getCore().getAccountManager().addXP(player.getUniqueId(), 10); // TODO: Make this configurable
+            Revival.getCore().getAccountManager().addXP(player.getUniqueId(), "Found ores (HCFR)", 10); // TODO: Make this configurable
 
             if(material.equals(Material.GOLD_ORE)) {
                 if(core.getConfiguration().announceFoundGold) {

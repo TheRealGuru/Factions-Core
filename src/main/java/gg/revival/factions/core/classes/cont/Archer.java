@@ -15,7 +15,7 @@ public class Archer extends RClass {
         PotionEffect passiveSpeed = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2);
 
         PotionEffect activeSpeed = new PotionEffect(PotionEffectType.SPEED, 20 * 8, 3);
-        PotionEffect activeJumpboost = new PotionEffect(PotionEffectType.JUMP, 20 * 8, 3);
+        PotionEffect activeJumpboost = new PotionEffect(PotionEffectType.JUMP, 20 * 8, 6);
 
         getPassives().add(passiveSpeed);
         getActives().put(Material.SUGAR, activeSpeed);

@@ -133,6 +133,7 @@ public class Configuration {
         potionLimits.clear();
 
         load();
+        core.getEvents().getEventManager().loadEvents();
 
         core.getLog().log("Reloaded Configuration");
     }

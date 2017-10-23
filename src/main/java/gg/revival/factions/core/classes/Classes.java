@@ -37,7 +37,7 @@ public class Classes {
     /**
      * Contains all active classes currently running on the server
      */
-    @Getter Set<ClassProfile> activeClasses = Sets.newHashSet();
+    @Getter Set<ClassProfile> activeClasses = Sets.newConcurrentHashSet();
 
     /**
      * Contains all enabled class modules for the server

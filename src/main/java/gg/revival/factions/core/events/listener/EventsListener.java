@@ -8,14 +8,19 @@ import gg.revival.factions.core.PlayerManager;
 import gg.revival.factions.core.events.obj.Event;
 import gg.revival.factions.obj.FPlayer;
 import gg.revival.factions.obj.ServerFaction;
+import gg.revival.factions.timers.TimerType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -28,6 +33,47 @@ public class EventsListener implements Listener {
         this.core = core;
     }
 
+    /**
+     * Used to prevent pearling in Palace claims
+     * @param event
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onProjectileHit(PlayerTeleportEvent event) {
+        if(!event.getCause().equals(PlayerTeleportEvent.TeleportCause.ENDER_PEARL)) return;
+
+        if(event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        FPlayer facPlayer = PlayerManager.getPlayer(player.getUniqueId());
+        Location location = event.getTo();
+        Claim insideClaim = ClaimManager.getClaimAt(location, false);
+
+        if(insideClaim == null) return;
+
+        if(!(insideClaim.getClaimOwner() instanceof ServerFaction)) return;
+
+        ServerFaction serverFaction = (ServerFaction)insideClaim.getClaimOwner();
+
+        if(!serverFaction.getType().equals(ServerClaimType.EVENT)) return;
+
+        Event insideEvent = core.getEvents().getEventManager().getEventByClaim(insideClaim);
+
+        if(insideEvent == null || !insideEvent.isPalace()) return;
+
+        ItemStack enderpearl = new ItemStack(Material.ENDER_PEARL);
+        player.getInventory().addItem(enderpearl);
+
+        facPlayer.removeTimer(TimerType.ENDERPEARL);
+
+        player.sendMessage(ChatColor.RED + "You can not use enderpearls in Palace claims");
+
+        event.setCancelled(true);
+    }
+
+    /**
+     * Used to prevent logging out and logging back in on active event claims
+     * @param event
+     */
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
