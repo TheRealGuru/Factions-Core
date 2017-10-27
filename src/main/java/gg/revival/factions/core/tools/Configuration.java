@@ -89,6 +89,7 @@ public class Configuration {
     public boolean bookUnenchantingEnabled = true;
     public boolean invalidPearlBlocksEnabled = true;
     public boolean highSpawnersDisabled = true;
+    public boolean nonOverworldSpawnersDisabled = true;
     public int highSpawnersHeight = 125;
     public boolean netherBedsDisabled = true;
     public boolean explosiveBlockDamageDisabled = true;
@@ -104,6 +105,7 @@ public class Configuration {
     public boolean announceFoundGlowstone = false;
 
     public boolean kitsEnabled = true;
+    public String starterKitName = null;
 
     public boolean progressEnabled = true;
     public int progressDuration = 3600;
@@ -230,8 +232,9 @@ public class Configuration {
         crowbarPortalUse = config.getInt("mechanics.crowbars.frame-uses");
         bookUnenchantingEnabled = config.getBoolean("mechanics.unenchant-books");
         invalidPearlBlocksEnabled = config.getBoolean("mechanics.invalid-pearling");
-        highSpawnersDisabled = config.getBoolean("mechanics.high-spawners-disabled.enabled");
-        highSpawnersHeight = config.getInt("mechanics.high-spawners-disabled.height");
+        highSpawnersDisabled = config.getBoolean("mechanics.spawner-limits.high-spawners.disabled");
+        highSpawnersHeight = config.getInt("mechanics.spawner-limits.high-spawners.height");
+        nonOverworldSpawnersDisabled = config.getBoolean("mechanics.spawner-limits.non-overworld-disabled");
         netherBedsDisabled = config.getBoolean("mechanics.disable-nether-beds");
         explosiveBlockDamageDisabled = config.getBoolean("mechanics.disable-explosive-block-damage");
 
@@ -366,6 +369,9 @@ public class Configuration {
             endExit.setPitch((float)config.getDouble("locations.end.exit-pitch"));
             endExit.setWorld(Bukkit.getWorld(config.getString("locations.end-exit.world")));
         }
+
+        if(kits.get("starter-kit") != null)
+            starterKitName = kits.getString("starter-kit");
 
         core.getLocations().setSpawnLocation(overworldSpawn);
         core.getLocations().setEndSpawnLocation(endSpawn);

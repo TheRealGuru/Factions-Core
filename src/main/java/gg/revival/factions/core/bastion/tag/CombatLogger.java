@@ -21,7 +21,7 @@ public class CombatLogger {
     @Getter List<ItemStack> inventoryContents;
     @Getter @Setter boolean isDead;
 
-    public CombatLogger(UUID uuid, String displayName, Location location, List<ItemStack> inventoryContents) {
+    CombatLogger(UUID uuid, String displayName, Location location, List<ItemStack> inventoryContents) {
         this.uuid = uuid;
         this.displayName = displayName;
         this.location = location;
@@ -29,7 +29,7 @@ public class CombatLogger {
         this.isDead = false;
     }
 
-    public void build() {
+    void build() {
         Villager villager = (Villager)location.getWorld().spawnEntity(location, EntityType.VILLAGER);
 
         villager.setCanPickupItems(false);

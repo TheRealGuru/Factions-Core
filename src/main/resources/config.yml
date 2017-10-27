@@ -62,9 +62,11 @@ mechanics:
     frame-uses: 6
   unenchant-books: true
   invalid-pearling: true
-  high-spawners-disabled:
-    enabled: true
-    height: 125
+  spawner-limits:
+    high-spawners:
+      disabled: true
+      height: 125
+    non-overworld-disabled: true
   disable-endermites: true
   disable-breaking-spawners: true
   disable-nether-beds: true

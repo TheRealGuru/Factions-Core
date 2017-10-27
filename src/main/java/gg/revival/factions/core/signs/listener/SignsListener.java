@@ -148,7 +148,7 @@ public class SignsListener implements Listener {
                 return;
             }
 
-            core.getKits().giveKit(player, kit);
+            core.getKits().giveKit(player, kit, true);
 
             return;
         }

@@ -64,7 +64,7 @@ public class KitCommandExecutor implements CommandExecutor {
                     return false;
                 }
 
-                core.getKits().giveKit(player, kit);
+                core.getKits().giveKit(player, kit, true);
 
                 return false;
             }

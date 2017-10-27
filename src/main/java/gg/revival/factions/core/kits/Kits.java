@@ -40,7 +40,7 @@ public class Kits {
      * @param player
      * @param kit
      */
-    public void giveKit(Player player, FKit kit) {
+    public void giveKit(Player player, FKit kit, boolean notify) {
         if(!core.getConfiguration().kitsEnabled) {
             player.sendMessage(ChatColor.RED + "Kits are disabled on this server");
             return;
@@ -58,7 +58,8 @@ public class Kits {
             player.getInventory().addItem(contents);
         }
 
-        player.sendMessage(ChatColor.YELLOW + "Loaded kit" + ChatColor.WHITE + ": " + ChatColor.BLUE + kit.getName());
+        if(notify)
+            player.sendMessage(ChatColor.YELLOW + "Loaded kit" + ChatColor.WHITE + ": " + ChatColor.BLUE + kit.getName());
     }
 
     /**

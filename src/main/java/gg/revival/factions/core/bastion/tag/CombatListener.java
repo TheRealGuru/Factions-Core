@@ -14,10 +14,7 @@ import gg.revival.factions.obj.ServerFaction;
 import gg.revival.factions.timers.TimerType;
 import gg.revival.factions.tools.Messages;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -28,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -279,4 +277,19 @@ public class CombatListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        Chunk chunk = event.getChunk();
+
+        if(event.isCancelled()) return;
+
+        if(core.getBastion().getCombatManager().getCombatLoggers().isEmpty()) return;
+
+        for(CombatLogger logger : core.getBastion().getCombatManager().getCombatLoggers().values()) {
+            if(!logger.getLocation().getChunk().equals(chunk)) continue;
+
+            event.setCancelled(true);
+            break;
+        }
+    }
 }

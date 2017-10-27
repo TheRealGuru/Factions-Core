@@ -307,11 +307,14 @@ public class EventManager {
 
         for(String eventNames : core.getFileManager().getEvents().getConfigurationSection("events").getKeys(false)) {
             Location lootChest;
+            UUID hookedFactionId = null;
 
             String displayName = ChatColor.translateAlternateColorCodes('&', core.getFileManager().getEvents().getString("events." + eventNames + ".display-name"));
             boolean palace = core.getFileManager().getEvents().getBoolean("events." + eventNames + ".palace");
             int winCond = core.getFileManager().getEvents().getInt("events." + eventNames + ".win-cond");
-            UUID hookedFactionId = UUID.fromString(core.getFileManager().getEvents().getString("events." + eventNames + ".hooked-claim"));
+
+            if(core.getFileManager().getEvents().get("events." + eventNames + ".hooked-claim") != null)
+                hookedFactionId = UUID.fromString(core.getFileManager().getEvents().getString("events." + eventNames + ".hooked-claim"));
 
             int lootChestX = core.getFileManager().getEvents().getInt("events." + eventNames + ".loot-chest.x");
             int lootChestY = core.getFileManager().getEvents().getInt("events." + eventNames + ".loot-chest.y");

@@ -30,13 +30,21 @@ public class LocationsListener implements Listener {
         if(!player.hasPlayedBefore()) {
             player.teleport(core.getLocations().getSpawnLocation());
             core.getPlayerTools().cleanupPlayer(player);
+
+            if(core.getConfiguration().starterKitName != null && core.getKits().getKitByName(core.getConfiguration().starterKitName) != null)
+                core.getKits().giveKit(player, core.getKits().getKitByName(core.getConfiguration().starterKitName), false);
         }
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+
         event.setRespawnLocation(core.getLocations().getSpawnLocation());
-        core.getPlayerTools().cleanupPlayer(event.getPlayer());
+        core.getPlayerTools().cleanupPlayer(player);
+
+        if(core.getConfiguration().starterKitName != null && core.getKits().getKitByName(core.getConfiguration().starterKitName) != null)
+            core.getKits().giveKit(player, core.getKits().getKitByName(core.getConfiguration().starterKitName), false);
     }
 
     @EventHandler

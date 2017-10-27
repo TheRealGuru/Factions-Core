@@ -17,7 +17,7 @@ public class Bard extends RClass {
         PotionEffect passiveSpeed = new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2);
 
         PotionEffect activeSpeed = new PotionEffect(PotionEffectType.SPEED, 20 * 8, 3);
-        PotionEffect activeStrength = new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 4, 0);
+        PotionEffect activeStrength = new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 4, 1);
         PotionEffect activeRegen = new PotionEffect(PotionEffectType.REGENERATION, 20 * 8, 1);
         PotionEffect activeJumpboost = new PotionEffect(PotionEffectType.JUMP, 20 * 8, 6);
 

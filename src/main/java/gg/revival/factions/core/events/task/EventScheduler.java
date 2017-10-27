@@ -22,7 +22,7 @@ public class EventScheduler extends BukkitRunnable implements Runnable {
         Calendar calendar = Calendar.getInstance();
 
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        int hr = calendar.get(Calendar.HOUR);
+        int hr = calendar.get(Calendar.HOUR_OF_DAY);
         int min = calendar.get(Calendar.MINUTE);
 
         for(Event events : core.getEvents().getEventManager().getEvents()) {

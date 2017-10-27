@@ -59,14 +59,18 @@ public class EventBuilderListener implements Listener {
             }
 
             if(builder.getBuildPhase() == 3) {
-                String namedFaction = message.replace(" ", "");
-                Faction faction = FactionManager.getFactionByName(namedFaction);
+                String namedFaction = null;
 
-                if(faction == null || !(faction instanceof ServerFaction)) {
-                    player.sendMessage(ChatColor.RED + "Faction not found");
+                if(!event.getMessage().equalsIgnoreCase("none")) {
+                    namedFaction = message.replace(" ", "");
+                    Faction faction = FactionManager.getFactionByName(namedFaction);
 
-                    event.setCancelled(true);
-                    return;
+                    if(faction == null || !(faction instanceof ServerFaction)) {
+                        player.sendMessage(ChatColor.RED + "Faction not found");
+
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
 
                 builder.setHookedFactionName(namedFaction);
@@ -140,14 +144,18 @@ public class EventBuilderListener implements Listener {
             }
 
             if(builder.getBuildPhase() == 3) {
-                String namedFaction = message.replace(" ", "");
-                Faction faction = FactionManager.getFactionByName(namedFaction);
+                String namedFaction = null;
 
-                if(faction == null || !(faction instanceof ServerFaction)) {
-                    player.sendMessage(ChatColor.RED + "Faction not found");
+                if(!event.getMessage().equalsIgnoreCase("none")) {
+                    namedFaction = message.replace(" ", "");
+                    Faction faction = FactionManager.getFactionByName(namedFaction);
 
-                    event.setCancelled(true);
-                    return;
+                    if(faction == null || !(faction instanceof ServerFaction)) {
+                        player.sendMessage(ChatColor.RED + "Faction not found");
+
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
 
                 builder.setHookedFactionName(namedFaction);

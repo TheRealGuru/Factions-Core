@@ -77,7 +77,9 @@ public class EventBuilder {
         core.getFileManager().getEvents().set("events." + event.getEventName() + ".loot-chest.z", lootChest.getBlockZ());
         core.getFileManager().getEvents().set("events." + event.getEventName() + ".loot-chest.world", lootChest.getWorld().getName());
 
-        core.getFileManager().getEvents().set("events." + event.getEventName() + ".hooked-claim", event.getHookedFactionId().toString());
+        if(event.getHookedFactionId() != null)
+            core.getFileManager().getEvents().set("events." + event.getEventName() + ".hooked-claim", event.getHookedFactionId().toString());
+
         core.getFileManager().getEvents().set("events." + event.getEventName() + ".palace", event.isPalace());
 
         for(Integer days : event.getSchedule().keySet()) {
